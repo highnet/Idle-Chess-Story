@@ -112,12 +112,10 @@ public class NPC : MonoBehaviour
         {
             transform.LookAt(new Vector3(target.transform.position.x, transform.position.y, target.transform.position.z));
         }
-
     }
 
     public void recalculateArmorValue()
     {
-
         this.ARMOR = BASE_ARMOR;
 
         if (ARMOR < 0.01f)
@@ -166,12 +164,10 @@ public class NPC : MonoBehaviour
 
     public void GainHP(float healsToHeal, HealSource healSourceType)
     {
-
         if (healsToHeal <= 0)
         {
             return;
         }
-
 
         this.HP = this.HP + healsToHeal;
 

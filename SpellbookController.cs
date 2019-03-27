@@ -93,7 +93,6 @@ public class SpellbookController : MonoBehaviour
 
         }
 
-
         else if (abilityToCast == Ability.ARMOR_DOWN_OTHER)
         {
             GameObject go = (GameObject)Instantiate(Resources.Load("ARMOR_PowerDown"), targetNPC.transform.position, Quaternion.identity);
@@ -119,8 +118,9 @@ public class SpellbookController : MonoBehaviour
         else if (abilityToCast == Ability.HealFriend)
         {
             float amountToHeal = CasterSpellPower;
-
             NPC[] casters_AllyList = null;
+
+
 
             if (casterNPC.isEnemy == false)
             {
@@ -131,17 +131,26 @@ public class SpellbookController : MonoBehaviour
                 casters_AllyList = GameObject.Find("World Controller").GetComponent<NpcController>().enemyList.ToArray();
             }
             targetNPC = casters_AllyList[0];
-            float minimumHP = 9999999999f;
+            float maximumHPDeficit = 0;
 
                 foreach(NPC nPC in casters_AllyList)
                 {
-                   if (nPC.HP <= minimumHP)
+
+                float HPDeficit = nPC.MAXHP - nPC.HP;
+
+                   if (HPDeficit >= maximumHPDeficit)
                     {
-                        minimumHP = nPC.HP;
+                        maximumHPDeficit = nPC.MAXHP - nPC.HP;
                         targetNPC = nPC;
                     }
                 }
+
+
                 targetNPC.GainHP(amountToHeal, HealSource.Heal);
+                GameObject anim = (GameObject)Instantiate(Resources.Load("Heal Animation"), targetNPC.transform.position, Quaternion.identity);
+                anim.transform.SetParent(targetNPC.transform);
+                Object.Destroy(anim, 1);
+
         }
 
     }
