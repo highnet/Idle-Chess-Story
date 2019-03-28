@@ -29,8 +29,7 @@ public class PlayerProfiler : MonoBehaviour
     public PlayerProfileSave LoadProfile(int characterslot)
     {
    ///     Debug.Log("LOADING");
-        PlayerProfileSave loadedProfile = new PlayerProfileSave();
-
+            PlayerProfileSave loadedProfile = new PlayerProfileSave();
             loadedProfile.characterName = PlayerPrefs.GetString("characterName_slot" + characterslot);
             loadedProfile.rank = PlayerPrefs.GetString("rank_slot" + characterslot);
             loadedProfile.UserIconImageName = PlayerPrefs.GetString("UserIconImageName_slot" + characterslot);

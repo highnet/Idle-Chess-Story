@@ -26,7 +26,7 @@ public class BoardController : MonoBehaviour
 
     private void Awake()
     {
-        npcController = GetComponent<NpcController>();
+        npcController = GetComponent<NpcController>(); //fetch world controllers
         uiController = GetComponent<UiController>();
         playerController = GetComponent<PlayerController>();
     }
@@ -35,10 +35,10 @@ public class BoardController : MonoBehaviour
     void Start()
     {
 
-        ChangeGameStatus("initializing");
-        CreateBoardTiles();
-        ChangeGameStatus("awaitingWizardConfirmation", "confirm settings"); // TODO: add pre game settings wizard / start menu
-        uiController.LoadFromSaveFile();
+        ChangeGameStatus("initializing"); // set initalizing status
+        CreateBoardTiles(); // create the tile 9x8 array board
+        ChangeGameStatus("awaitingWizardConfirmation", "confirm settings"); // set to settings wizard status
+        uiController.LoadFromSaveFile(); // load the save file stored in the user's computer
 
 
     }
@@ -49,46 +49,44 @@ public class BoardController : MonoBehaviour
     }
     void CreateBoardTiles()
     {
-        chessBoard = new GameObject[9, 8];
-        for (int i = 0; i < 9; i++)
+        chessBoard = new GameObject[9, 8]; // initialize the chessboard array
+        for (int i = 0; i < 9; i++) // 9 rows
         {
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < 8; j++) // 8 collumns
             {
 
-                GameObject spawn = GameObject.Instantiate(tilePrefab, new Vector3(i == 8 ? i - 3.000f : i - 3.435f, 0, 3.435f - j), Quaternion.Euler(0, -90, 0));
-                spawn.gameObject.name = "Chess Tile[" + i + "]" + "[" + j + "]";
-                spawn.transform.parent = this.gameObject.transform;
-                spawn.GetComponent<TileBehaviour>().i = i;
-                spawn.GetComponent<TileBehaviour>().j = j;
-
-
-                chessBoard[i, j] = spawn;
+                GameObject spawn = GameObject.Instantiate(tilePrefab, new Vector3(i == 8 ? i - 3.000f : i - 3.435f, 0, 3.435f - j), Quaternion.Euler(0, -90, 0)); // create a tile in the right position
+                spawn.gameObject.name = "Chess Tile[" + i + "]" + "[" + j + "]"; // name the tile gameobject
+                spawn.transform.parent = this.gameObject.transform; //set the tile parent to the game board
+                spawn.GetComponent<TileBehaviour>().i = i; // store the i index inside the tile 
+                spawn.GetComponent<TileBehaviour>().j = j;// store the j index inside the tile 
+                chessBoard[i, j] = spawn; // store the tile inside the chessboard array
             }
         }
     }
 
-    public void SpawnEnemyUnitsRound_Balanced()
+    public void SpawnEnemyUnitsRound_Balanced() // copy the human players board and deply a similar team
     {
-        if (!testMode)
+        if (!testMode) // test mode spawns dummies instead of real units
         {
             Tribe randomTribe;
-            randomTribe = (Tribe)Enum.GetValues(typeof(Tribe)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Tribe)).Length));
+            randomTribe = (Tribe)Enum.GetValues(typeof(Tribe)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Tribe)).Length)); // get a random tribe
             bool doneTrying = false;
-            while (doneTrying == false)
+            while (doneTrying == false) // we dont want the tribe to spawn to be structures only at the moment
             {
-                randomTribe = (Tribe)Enum.GetValues(typeof(Tribe)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Tribe)).Length));
+                randomTribe = (Tribe)Enum.GetValues(typeof(Tribe)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Tribe)).Length)); // if we got structure tribe, try again until we dont
                 if (randomTribe == Tribe.Structure)
                 {
-                    doneTrying = false;
+                    doneTrying = false; // go agane
                 }
                 else
                 {
-                    doneTrying = true;
+                    doneTrying = true; // we gucci
                 }
             }
 
             List<Unit> spawnList;
-            playerController.TRIBAL_UNIT_DATA.TryGetValue(randomTribe, out spawnList);
+            playerController.TRIBAL_UNIT_DATA.TryGetValue(randomTribe, out spawnList); // get a list of all units of our random tribe
 
 
             int tier1_amount = 0;
@@ -96,7 +94,7 @@ public class BoardController : MonoBehaviour
             int tier3_amount = 0;
 
 
-            foreach (NPC npc in npcController.deployedAllyList)
+            foreach (NPC npc in npcController.deployedAllyList) // count how many t1,t2,t3 units the human player has
             {
                 if (npc.TIER == 1)
                 {
@@ -114,30 +112,30 @@ public class BoardController : MonoBehaviour
 
             Debug.Log("Counting up your units t1:t2:t3 ->" + tier1_amount + ":" + tier2_amount + ":" + tier3_amount);
 
-            playerController.ReInitializeEnemyActiveTribesCounter();
-            for (int i = 0; i < tier1_amount; i++)
+            playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
+            for (int i = 0; i < tier1_amount; i++) // spawn tier 1 units
             {
-                int randomI = UnityEngine.Random.Range(0, 4);
-                int randomJ = UnityEngine.Random.Range(0, 8);
-                Unit randomUnit = spawnList.ToArray()[UnityEngine.Random.Range(0, spawnList.ToArray().Length)];
+                int randomI = UnityEngine.Random.Range(0, 4); // find a random i coordinate
+                int randomJ = UnityEngine.Random.Range(0, 8); // find a random j coordinate
+                Unit randomUnit = spawnList.ToArray()[UnityEngine.Random.Range(0, spawnList.ToArray().Length)]; // get a random unit from the list of units
 
-                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true, false,1);
-                if (spawnedEnemy != null)
+                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true, false,1); // try to spawn the unit
+                if (spawnedEnemy != null) // if we spawned a real unit
                 {
-                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE);
-                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().SECONDARYTRIBE);
+                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE); // increment the enemy tribe counter (primary tribe)
+                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().SECONDARYTRIBE); // increment the enemy tribe counter (secondary tribe)
                 }
              
 
             }
 
-            for (int i = 0; i < tier2_amount; i++)
+            for (int i = 0; i < tier2_amount; i++) // do the same with tier 2 units
             {
                 int randomI = UnityEngine.Random.Range(0, 4);
                 int randomJ = UnityEngine.Random.Range(0, 8);
                 Unit randomUnit = spawnList.ToArray()[UnityEngine.Random.Range(0, spawnList.ToArray().Length)];
 
-                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true,false,2);
+                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true,false,2); // try to spawn the unit (this time TIER 2)
                 if (spawnedEnemy != null)
                 {
                     Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE);
@@ -148,13 +146,13 @@ public class BoardController : MonoBehaviour
                
             }
 
-            for (int i = 0; i < tier3_amount; i++)
+            for (int i = 0; i < tier3_amount; i++) // do the same with tier 3 units
             {
                 int randomI = UnityEngine.Random.Range(0, 4);
                 int randomJ = UnityEngine.Random.Range(0, 8);
                 Unit randomUnit = spawnList.ToArray()[UnityEngine.Random.Range(0, spawnList.ToArray().Length)];
 
-                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true,false,3);
+                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true,false,3); // try to spawn the unit (this time TIER 3)
                 if (spawnedEnemy != null)
                 {
                     Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE);
@@ -167,12 +165,12 @@ public class BoardController : MonoBehaviour
 
         }
     
-        else
+        else // if in test mode
         {
-            GameObject spawnedEnemy = TrySpawnDummy(2, 4, true);
-            if (spawnedEnemy != null)
+            GameObject spawnedEnemy = TrySpawnDummy(2, 4, true); // spawn dummy
+            if (spawnedEnemy != null) // this can be used to test enemy tribe bonuses
             {
-                Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE);
+                Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE); //
                 Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().SECONDARYTRIBE);
             }
 
@@ -183,51 +181,50 @@ public class BoardController : MonoBehaviour
     public void SpawnEnemyUnitsRound_Scaling(int roundCounter) // Spawns enemy units at the start of each round
     {
 
-        if (!testMode)
+        if (!testMode) // testmode spawns dummies
         {
             Tribe randomTribe;
-            randomTribe = (Tribe)Enum.GetValues(typeof(Tribe)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Tribe)).Length));
+            randomTribe = (Tribe)Enum.GetValues(typeof(Tribe)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Tribe)).Length)); // generate a random tribe
 
 
             bool doneTrying = false;
-            while (doneTrying == false)
+            while (doneTrying == false) // we dont want structure as a type
             {
-                randomTribe = (Tribe)Enum.GetValues(typeof(Tribe)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Tribe)).Length));
+                randomTribe = (Tribe)Enum.GetValues(typeof(Tribe)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Tribe)).Length)); // generate a random tribe agane
                 if (randomTribe == Tribe.Structure)
                 {
-                    doneTrying = false;
+                    doneTrying = false; // go agane
                 }
                 else
                 {
-                    doneTrying = true;
+                    doneTrying = true; // we gucci
                 }
             }
 
             List<Unit> spawnList;
-            playerController.TRIBAL_UNIT_DATA.TryGetValue(randomTribe, out spawnList);
+            playerController.TRIBAL_UNIT_DATA.TryGetValue(randomTribe, out spawnList); // get a list of all units of the random tribe
 
-            int amountOfUnitsToSpawn = 1 + roundCounter;
-       //    Debug.Log("Round: " + roundCounter + ". Spawning " + amountOfUnitsToSpawn + " Units, of type: " + randomTribe);
-            playerController.ReInitializeEnemyActiveTribesCounter();
-            for (int i = 0; i < amountOfUnitsToSpawn; i++)
+            int amountOfUnitsToSpawn = 1 + roundCounter; // we wanna spawn this many units
+            playerController.ReInitializeEnemyActiveTribesCounter(); // restart the enemy tribe counter
+            for (int i = 0; i < amountOfUnitsToSpawn; i++) // spawn this many units
             {
-                int randomI = UnityEngine.Random.Range(0, 4);
-                int randomJ = UnityEngine.Random.Range(0, 8);
-                Unit randomUnit = spawnList.ToArray()[UnityEngine.Random.Range(0, spawnList.ToArray().Length)];
+                int randomI = UnityEngine.Random.Range(0, 4); // random i coordinate
+                int randomJ = UnityEngine.Random.Range(0, 8); // random j coordinate
+                Unit randomUnit = spawnList.ToArray()[UnityEngine.Random.Range(0, spawnList.ToArray().Length)]; //get a random unit from the list
 
-                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true,true,1);
-                if (spawnedEnemy != null)
+                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true,true,1); // try spawn the enemy unit
+                if (spawnedEnemy != null) // if we succeeded
                 {
-                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE);
-                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().SECONDARYTRIBE);
-                }
+                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE); // increment enemy tribe counter with my primary tribe
+                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().SECONDARYTRIBE); // increment enemy tribe counter with my secondary tribe
+                } 
 
             }
 
-        } else
+        } else // we are in testmode
         {
-            GameObject spawnedEnemy = TrySpawnDummy(2,4,true);
-            if (spawnedEnemy != null)
+            GameObject spawnedEnemy = TrySpawnDummy(2,4,true); // spawn dummies
+            if (spawnedEnemy != null) // this can be used for testing enemy tribe bonuses
             {
                 Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE);
                 Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().SECONDARYTRIBE);
@@ -240,69 +237,66 @@ public class BoardController : MonoBehaviour
     }
 
 
-    public GameObject TrySpawnUnit(int i, int j, Unit unitToSpawn, bool isEnemySpawn,bool doRandomLevelup,int tierOverride)
+    public GameObject TrySpawnUnit(int i, int j, Unit unitToSpawn, bool isEnemySpawn,bool doRandomLevelupEnemy,int tierOverride) // try to spawn a unit and return it
     {
 
-        Debug.Log("Attempting to spawn a unit [i=" + i + ",j=" + j + ",name:" + unitToSpawn + ",isenemy:" + isEnemySpawn + "]");
-        string prefabName = Enum.GetName(typeof(Unit), unitToSpawn);
-        GameObject tile = chessBoard[i, j];
+        string prefabName = Enum.GetName(typeof(Unit), unitToSpawn); //get the units name as defined in the enum
+        GameObject tile = chessBoard[i, j]; // get the tile we want to spawn on
 
-        if (tile.GetComponent<TileBehaviour>().occupyingUnit != null)
+        if (tile.GetComponent<TileBehaviour>().occupyingUnit != null) // tile is occupied
         {
-            Debug.Log("attempted to spawn on a occupied tile");
-            if (isEnemySpawn &&  tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().TIER == 1)
+            if (isEnemySpawn &&  tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().TIER == 1) // enemy spawns on a tile occupied by a tier 1
             {
-                tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().ApplyTier2Upgrades();
-            } else if (isEnemySpawn && tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().TIER == 2)
+                tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().ApplyTier2Upgrades(); // level up the tier 1 unit to tier 2
+            } else if (isEnemySpawn && tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().TIER == 2) // enemy spawns on a tile occupied by a tier 2
             {
-                tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().ApplyTier3Upgrades();
+                tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().ApplyTier3Upgrades(); // level up the tier 2 unit to tier 3
             }
          
-            return null;
+            return null; // tile occupied is occupied so we break the function.
         }
 
         Quaternion spawnRotation = new Quaternion();
 
         if (isEnemySpawn)
         {
-            spawnRotation = Quaternion.Euler(0, 90, 0);
-
+            spawnRotation = Quaternion.Euler(0, 90, 0); // fix the default spawn rotation for enemy
         }
         else
         {
-            spawnRotation = Quaternion.Euler(0, -90, 0);
+            spawnRotation = Quaternion.Euler(0, -90, 0); //fix the default spawn rotation for friendly
         }
 
-        GameObject go = (GameObject)GameObject.Instantiate(Resources.Load(prefabName), tile.transform.position, spawnRotation);
-        go.GetComponentInChildren<NPC>().isEnemy = isEnemySpawn;
-        tile.GetComponent<TileBehaviour>().occupyingUnit = go;
-        go.GetComponentInChildren<NPC>().occupyingTile = tile;
-        go.GetComponentInChildren<NPC>().PrepareNPC3DHud();
-        if (isEnemySpawn && doRandomLevelup)
+        GameObject spawnedNPC = (GameObject)GameObject.Instantiate(Resources.Load(prefabName), tile.transform.position, spawnRotation); // finally spawn the object
+        spawnedNPC.GetComponentInChildren<NPC>().isEnemy = isEnemySpawn; //initialize the object
+        tile.GetComponent<TileBehaviour>().occupyingUnit = spawnedNPC; //init
+        spawnedNPC.GetComponentInChildren<NPC>().occupyingTile = tile;//init
+        spawnedNPC.GetComponentInChildren<NPC>().PrepareNPC3DHud(); //init
+        if (isEnemySpawn && doRandomLevelupEnemy)
         {
-            go.GetComponentInChildren<NPC>().RandomLevelUpEnemy();
+            spawnedNPC.GetComponentInChildren<NPC>().RandomLevelUpEnemy(); // give the unit a chance(rng) to upgrade
         }
 
-        if (tierOverride == 2)
+        if (tierOverride == 2) //force spawn override tier to tier2
         {
-            go.GetComponentInChildren<NPC>().ApplyTier2Upgrades();
+            spawnedNPC.GetComponentInChildren<NPC>().ApplyTier2Upgrades(); //apply t2 upgrades
         }
-        else if (tierOverride == 3)
+        else if (tierOverride == 3) //force spawn override tier to tier3
             {
-                go.GetComponentInChildren<NPC>().ApplyTier2Upgrades();
-                go.GetComponentInChildren<NPC>().ApplyTier3Upgrades();
+                spawnedNPC.GetComponentInChildren<NPC>().ApplyTier2Upgrades(); //apply t2 upgrades
+                spawnedNPC.GetComponentInChildren<NPC>().ApplyTier3Upgrades(); //also apply the t3 upgrades
             }
 
-        npcController.UpdateNpcList();
+        npcController.UpdateNpcList(); // update the NPC lists with the new NPC
 
-        return go;
+        return spawnedNPC; // return the created object
     }
 
-    public GameObject TrySpawnDummy(int i ,int j, bool isEnemy)
+    public GameObject TrySpawnDummy(int i ,int j, bool isEnemy) // try spawn a dummy
     {
-        GameObject tile = chessBoard[i, j];
+        GameObject tile = chessBoard[i, j]; // get the tile we want to spawn on
 
-        if (tile.GetComponent<TileBehaviour>().occupyingUnit != null)
+        if (tile.GetComponent<TileBehaviour>().occupyingUnit != null) // if its an occupied tile break out of the function
         {
             return null;
         }
@@ -311,66 +305,66 @@ public class BoardController : MonoBehaviour
 
         if (isEnemy)
         {
-            spawnRotation = Quaternion.Euler(0, 90, 0);
+            spawnRotation = Quaternion.Euler(0, 90, 0); // fix the default spawn rotation
 
         }
         else
         {
-            spawnRotation = Quaternion.Euler(0, -90, 0);
+            spawnRotation = Quaternion.Euler(0, -90, 0); // fix the default spawn rotation 
         }
 
-        GameObject go = (GameObject)GameObject.Instantiate(Resources.Load("Dummy"), tile.transform.position, spawnRotation);
-        go.GetComponentInChildren<NPC>().isEnemy = isEnemy;
-        tile.GetComponent<TileBehaviour>().occupyingUnit = go;
-        go.GetComponentInChildren<NPC>().occupyingTile = tile;
-        go.GetComponentInChildren<NPC>().PrepareNPC3DHud();
-        npcController.UpdateNpcList();
+        GameObject spawnedDummy = (GameObject)GameObject.Instantiate(Resources.Load("Dummy"), tile.transform.position, spawnRotation); // spawn the dummy
+        spawnedDummy.GetComponentInChildren<NPC>().isEnemy = isEnemy; // initialize the dummy
+        tile.GetComponent<TileBehaviour>().occupyingUnit = spawnedDummy; //init
+        spawnedDummy.GetComponentInChildren<NPC>().occupyingTile = tile; //init
+        spawnedDummy.GetComponentInChildren<NPC>().PrepareNPC3DHud(); //init
+        npcController.UpdateNpcList(); // update the npc list with the new dummy
 
-        return go;
+        return spawnedDummy; // return the dummy
     }
 
 
 
-    public void ChangeGameStatus(string developerStatus, string userDisplayText)
+    public void ChangeGameStatus(string developerStatus, string userDisplayText) // change game status and display string status (overload)
     {
         gameStatus = developerStatus;
         uiController.ChangeGameStatusDisplayText(userDisplayText);
     }
 
-    public void ChangeGameStatus(string status)
+    public void ChangeGameStatus(string status) // change game status and display string status
     {
         gameStatus = status;
         uiController.ChangeGameStatusDisplayText(status);
     }
 
-    public void ChangeCurrentRound(int round)
+    public void ChangeCurrentRound(int round) // change the current game round
     {
         currentGameRound = round;
         uiController.ChangeCurrentRoundDisplayText(currentGameRound);
     }
 
-    IEnumerator ProgressConcentrationRegeneration()
+    IEnumerator ProgressConcentrationRegeneration() // progress the global concentration regeneration coroutine
     {
         for (; ; )
-        { // TODO: Implement NPC concentration Regeneration Field. 1f 1f 1f 1f
-            if (gameStatus.Equals("Fight"))
+        { 
+            if (gameStatus.Equals("Fight")) // only during fight phase
             {
                 int guardiansCount = 0;
-                playerController.deployedTribesCounter.TryGetValue(Tribe.Guardian, out guardiansCount);
+                playerController.deployedTribesCounter.TryGetValue(Tribe.Guardian, out guardiansCount); // get the friendly count of guardians
 
                 int enemy_GuardiansCount = 0;
-                playerController.enemyActiveTribesCounter.TryGetValue(Tribe.Guardian, out enemy_GuardiansCount);
+                playerController.enemyActiveTribesCounter.TryGetValue(Tribe.Guardian, out enemy_GuardiansCount);// get the enemy count of guardians
 
-                foreach (NPC nPC in npcController.allyList)
+                foreach (NPC nPC in npcController.allyList) // iterate through the friendly ally list
                 {
-                    if (nPC.occupyingTile.GetComponent<TileBehaviour>().i != 8)
+                    if (nPC.occupyingTile.GetComponent<TileBehaviour>().i != 8) // only consider deployed units and not reserve board units
                     {
-                        if (guardiansCount >= 6)
+                        if (guardiansCount >= 6) // we have guardian 6 bonus
                         {
                             nPC.GainConcentration(playerController.constant_Concentration_BaseTickRegeneration + (playerController.coefficient_Guardian_6_ConcentrationRegenBonus_RegenPerTickBonusMultiplier * 1f), HealSource.Concentration_Gain); //FRIENDLY Guardian Tribe 6 * Buffed concentration regen
 
                         }
-                        else
+                        else // we dont have guardian 6 bonus
                         {
                             nPC.GainConcentration(playerController.constant_Concentration_BaseTickRegeneration + 1f, HealSource.Concentration_Gain); // Regular Friendly Regen
                         }
@@ -379,20 +373,20 @@ public class BoardController : MonoBehaviour
        
                 }
 
-                foreach (NPC nPC in npcController.enemyList)
+                foreach (NPC nPC in npcController.enemyList) // do the iteration but with enemy ally list
                 {
-                    if (enemy_GuardiansCount >= 6)
+                    if (enemy_GuardiansCount >= 6) // enemy has guardian 6 bonus
                     {
                         nPC.GainConcentration(playerController.constant_Concentration_BaseTickRegeneration + (playerController.coefficient_Guardian_6_ConcentrationRegenBonus_RegenPerTickBonusMultiplier * 1f), HealSource.Concentration_Gain); //ENEMY Guardian Tribe 6 * Buffed concentration regen
                     }
-                    else
+                    else // enemy does not have guardian 6 bonus
                     {
                         nPC.GainConcentration(playerController.constant_Concentration_BaseTickRegeneration + 1f, HealSource.Concentration_Gain);// Regular enemy Regen
                     }
                 }
 
             }
-            yield return new WaitForSeconds(playerController.constant_Concentration_RegenerationIntervalSeconds);
+            yield return new WaitForSeconds(playerController.constant_Concentration_RegenerationIntervalSeconds); // wait until next interval 
         }
     }
 
@@ -400,13 +394,13 @@ public class BoardController : MonoBehaviour
     {
         for (; ; )
         {
-            if (gameStatus.Equals("Fight"))
+            if (gameStatus.Equals("Fight")) // only do this during fight phase 
             {
                 int warriorsCount = 0;
-                playerController.deployedTribesCounter.TryGetValue(Tribe.Warrior, out warriorsCount);
+                playerController.deployedTribesCounter.TryGetValue(Tribe.Warrior, out warriorsCount); // check friendly warrior count
 
                 int enemy_WarriorsCount = 0;
-                playerController.enemyActiveTribesCounter.TryGetValue(Tribe.Warrior, out enemy_WarriorsCount);
+                playerController.enemyActiveTribesCounter.TryGetValue(Tribe.Warrior, out enemy_WarriorsCount); // check enemy friendly warrior count
 
                 foreach (NPC nPC in npcController.allyList)
                 {
@@ -416,7 +410,7 @@ public class BoardController : MonoBehaviour
                         nPC.GainHP(playerController.constant_HP_BaseTickRegeneration + (playerController.coefficient_Warrior_3_HPRegenBonus_RegenPerTickBonusMultiplier * nPC.HPRegeneration), HealSource.HP_Regeneration); // FRIENDLY Warrior Tribe 3* BUFFED HP REGEN
 
                     }
-                    else
+                    else // we dont have warrior 3 bonus
                     {
                         nPC.GainHP(playerController.constant_HP_BaseTickRegeneration + nPC.HPRegeneration, HealSource.HP_Regeneration); // FRIENDLY regular hp regen
                     }
@@ -429,7 +423,7 @@ public class BoardController : MonoBehaviour
                         nPC.GainHP(playerController.constant_HP_BaseTickRegeneration + (playerController.coefficient_Warrior_3_HPRegenBonus_RegenPerTickBonusMultiplier * nPC.HPRegeneration), HealSource.HP_Regeneration);
 
                     }
-                    else
+                    else // enemy does not have warrior 3 bonus
                     {
                         nPC.GainHP(playerController.constant_HP_BaseTickRegeneration + nPC.HPRegeneration, HealSource.HP_Regeneration);  // ENEMY regular hp regen
                     }
@@ -437,7 +431,7 @@ public class BoardController : MonoBehaviour
                 }
 
             }
-            yield return new WaitForSeconds(playerController.constant_HP_RegenerationIntervalSeconds);
+            yield return new WaitForSeconds(playerController.constant_HP_RegenerationIntervalSeconds); // wait until next health regen interval
         }
 
     }
@@ -446,37 +440,41 @@ public class BoardController : MonoBehaviour
 
 
     // Update is called once per frame
-    void LateUpdate()
+    void LateUpdate() // at the end of every frame check if game is over or if combat is over
     {
-        if (gameStatus.Equals("game over"))
+        if (gameStatus.Equals("game over")) // *GG* game over conditon *GG*
         {
-            TransitionToGameOverPhase();
+            TransitionToGameOverPhase(); // transition to the end of game phase
         }
 
-        if (gameStatus.Equals("Fight") && (npcController.deployedAllyList.Count == 0 || npcController.enemyList.Count == 0))
+         else if (gameStatus.Equals("Fight") && (npcController.deployedAllyList.Count == 0 || npcController.enemyList.Count == 0)) // combat is over
         {
             TransitionToShoppingPhase(); // transition to shopping phase
         }
 
     }
-    IEnumerator SmoothEndCombatRoundTransition()
+    IEnumerator SmoothEndCombatRoundTransition() // smoothly end combat 
     {
 
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(2); // wait 2 seconds
 
-        float goldReward = playerController.playerGoldCount * 1.1f;
-        if (npcController.enemyList.Count == 0)
+        float goldReward = playerController.playerGoldCount; // fetch the player's current gold
+        if (npcController.enemyList.Count == 0) // combat VICTORY
         {
-            playerController.SetPlayerGoldCount((long)goldReward + 5 * currentGameRound);
+            goldReward *= 1.25f; // +25% increase to current gold
+            goldReward += 5 * (1+currentGameRound); // calculate bonus gold for victory
+            playerController.SetPlayerGoldCount((long)goldReward); // reward bonus gold
         }
-        else
+        else // combat DEFEAT
+
         {
-            playerController.SetPlayerGoldCount((long)goldReward);
+            goldReward *= 1.20f; // +20% increase to current gold
+            playerController.SetPlayerGoldCount((long)goldReward); // reward DEFEAT bonus gold
         }
 
         int i;
 
-        for (i = npcController.enemyList.Count - 1; i >= 0; i--)
+        for (i = npcController.enemyList.Count - 1; i >= 0; i--) // clean up the board from any enemy units
         {
             if (npcController.enemyList[i] != null)
             {
@@ -484,7 +482,7 @@ public class BoardController : MonoBehaviour
             }
         }
 
-        for (i = npcController.deployedAllyList.Count - 1; i >= 0; i--)
+        for (i = npcController.deployedAllyList.Count - 1; i >= 0; i--) // clean up the board from any ally units
         {
             if (npcController.deployedAllyList[i] != null)
             {
@@ -493,7 +491,7 @@ public class BoardController : MonoBehaviour
         }
 
 
-        for (i = npcController.allyListBackup.Count - 1; i >= 0; i--)
+        for (i = npcController.allyListBackup.Count - 1; i >= 0; i--) // put back all the pre-combat clones into the board
         {
             if (npcController.allyListBackup[i] != null)
             {
@@ -510,10 +508,13 @@ public class BoardController : MonoBehaviour
             }
         }
 
-        playerController.SetMaxDeployedUnitsLimit(playerController.maxDeployedUnitsLimit + 1);
         ChangeCurrentRound(currentGameRound + 1);
-        playerController.ShuffleNewShopingOptions(true);
-        ChangeGameStatus("shopping");
+        if (currentGameRound % 3 == 0) // only once every 3 rounds
+        {
+            playerController.SetMaxDeployedUnitsLimit(playerController.maxDeployedUnitsLimit + 1); // increment the max deployed unit limit
+        }
+        playerController.ShuffleNewShopingOptions(true); // shuffle the player shop for free with new options to buy
+        ChangeGameStatus("shopping"); // finally, change the game status to shopping phase
     }
 
     public void TransitionToGameOverPhase()
@@ -528,9 +529,6 @@ public class BoardController : MonoBehaviour
     {
         ChangeGameStatus("wait", "Combat Over");
         StartCoroutine(SmoothEndCombatRoundTransition());
-
-
-
 
     }
 

@@ -9,8 +9,8 @@ using System;
 
 public enum Unit {Grenadier, RogueSpy,Chomper,RatWarrior, Tiger, Orbling, Skeleton, AxeGuard, DeadWizard, Cactus, BabyDragon, BigLizard, RockGolem, MageTower, ShamanTotem, Spitter, GoblinZerk, Zombie,Tree,KnightTower,CursedTomb,WarriorTent,AngelStatue,DemonLord}
 public enum Tribe {Warrior, Beast, Elemental, Undead, Wizard, Assassin, Guardian, Structure }
-public enum DamageSource {PhysicalDamage_AutoAttack, MagicalDamage_AutoAttack, PureDamage, Physical_Ability, Magical_Ability }
-public enum HealSource { HP_Regeneration, AOEHeal, Heal, Concentration_Gain }
+public enum DamageSource {PhysicalDamage_AutoAttack, MagicalDamage_AutoAttack, PureDamage, Physical_Ability, Magical_Ability,NOTHING}
+public enum HealSource { HP_Regeneration, AOEHeal, Heal, Concentration_Gain,NOTHING}
 public enum Ability {Fireball,AP_UP_Self,MaxHP_Up_Self,Retaliation_UP_Self,Armor_UP_Self,NOTHING,HeroicStrike,AP_DOWN_OTHER,ARMOR_DOWN_OTHER,FrostBall,Stab,Stun,HealFriend}
 
 
@@ -298,6 +298,7 @@ public class PlayerController : MonoBehaviour
             }
 
             uiController.SaveToSaveFile();
+            uiController.LoadFromSaveFile();
             boardController.ChangeGameStatus("game over");
         }
 

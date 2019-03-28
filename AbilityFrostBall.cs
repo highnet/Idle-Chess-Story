@@ -8,25 +8,33 @@ public class AbilityFrostBall : MonoBehaviour
     public NPC Target;
     public Vector3 destination;
     public float damageToDeal;
+    private bool Local_OwnerCaster_IsEnemy;
 
-    // Update is called once per frame
+
+    private void Start()
+    {
+        Local_OwnerCaster_IsEnemy = OwnerCaster.isEnemy; // store a copy of wether the caster is enemy or not.
+    }
+
     void Update()
     {
         //    Debug.Log(destination.ToString());
-        transform.position = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * 3f);
+        transform.position = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * 3f); // move towards the target destination
         if (Target != null)
         {
-            destination = Target.transform.position;
+            destination = Target.transform.position; // refresh the target destination, in case the target npc moves
         }
 
-        if (Vector3.Distance(transform.position, destination) < 0.1f)
+        if (Vector3.Distance(transform.position, destination) < 0.1f) // if reached the target
         {
-            Object.Destroy(this.transform.parent.gameObject);
+          
             if (Target != null)
             {
-                Target.TakePureDamage(damageToDeal);
+                UiController uic = GameObject.Find("World Controller").GetComponent<UiController>(); // fetch ui controller once
+                uic.SpawnFloatingCombatText(Target, damageToDeal, DamageSource.MagicalDamage_AutoAttack, Local_OwnerCaster_IsEnemy,HealSource.NOTHING); // spawn floating combat text
+                Target.TakePureDamage(damageToDeal); // deal the pre-calculated damage to the target
             }
-
+            Object.Destroy(this.transform.parent.gameObject); // destroy the frostball
         }
 
     }

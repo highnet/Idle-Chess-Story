@@ -85,7 +85,6 @@ public class UiController : MonoBehaviour
     public Text shopMouseOverInfoText_SECONDARYTRIBE;
     public DynamicTribeIconVisualizer shopMouseOverInfoIcon_PRIMARYTRIBE_tribeIconVisualizer;
     public DynamicTribeIconVisualizer shopMouseOverInfoIcon_SECONDARYTRIBE_tribeIconVisualizer;
-
     //
 
     private void Awake()
@@ -162,35 +161,34 @@ public class UiController : MonoBehaviour
 
     }
 
-
-    public void SellFriendlySelectedTarget()
+    public void SellFriendlySelectedTarget() // sell the friendly selected target npc
     {
         if (boardController.selectedObject != null && boardController.selectedObject.GetComponent<NPC>().isEnemy == false)
         {
             int goldReward;
-            playerController.NPC_COST_DATA.TryGetValue(boardController.selectedObject.GetComponent<NPC>().UNIT_TYPE, out goldReward);
+            playerController.NPC_COST_DATA.TryGetValue(boardController.selectedObject.GetComponent<NPC>().UNIT_TYPE, out goldReward); // fetch the gold reward for the unit type
             if (boardController.selectedObject.GetComponent<NPC>().TIER == 2)
             {
-                goldReward = (int)(goldReward * 2f);
+                goldReward = (int)(goldReward * 2f); // gold bonus for selling a tier 2 unit
             }
             else if (boardController.selectedObject.GetComponent<NPC>().TIER == 3)
             {
-                goldReward = (int)(goldReward * 8f);
+                goldReward = (int)(goldReward * 8f); // gold bonus for selling a tier 3 unit
             }
-            boardController.selectedObject.GetComponent<NPC>().RemoveFromBoard(true);
-            playerController.SetPlayerGoldCount(playerController.playerGoldCount + (long)goldReward);
+            boardController.selectedObject.GetComponent<NPC>().RemoveFromBoard(true); // remove the sold npc from the board 
+            playerController.SetPlayerGoldCount(playerController.playerGoldCount + (long)goldReward); // apply the gold reward to the player
         }
     }
-    public void ResetSelectedTarget()
+
+    public void ResetSelectedTarget() // reset the selected target
     {
-        boardController.selectedObject = null;
+        boardController.selectedObject = null; // null it
     }
 
-    // Update is called once per frame
     void Update()
     {
 
-        if (boardController.selectedObject != null)
+        if (boardController.selectedObject != null) // update the entire selected unit panel
         {
             hudCanvasCurrentlySelectedUnitPanel.SetActive(true);
             GameObject selectedObject = boardController.selectedObject;
@@ -215,7 +213,7 @@ public class UiController : MonoBehaviour
 
         }
 
-        if (!boardController.gameStatus.Equals("shopping"))
+        if (!boardController.gameStatus.Equals("shopping")) // take out ui elements outside that should not be outside of the shopping phase
         {
             shopToggleButton.gameObject.SetActive(false);
             hudCanvasShopPanel.SetActive(false);
@@ -226,34 +224,33 @@ public class UiController : MonoBehaviour
 
     public void ChangeNameAndSaveToFile()
     {
-        string newName = wizardNewPlayerNameInputField.text;
+        string newName = wizardNewPlayerNameInputField.text;  // fetch name from input field
 
-        if (newName != "" && newName != playerController.playerName)
+        if (newName != "" && newName != playerController.playerName) // check for valid name
         {
-            playerController.playerName = newName;
-            SaveToSaveFile();
-            wizardNewPlayerNameInputField.text = "";
+            playerController.playerName = newName; // update player name
+            SaveToSaveFile(); // save to save file with new name
+            wizardNewPlayerNameInputField.text = ""; // reset the input field
         }
 
 
     }
 
-
-    public void StartGameTransitionPhase()
+    public void StartGameTransitionPhase() // set up the ui for starting the game
     {
-        LoadFromSaveFile();
-        if (playerController.playerName != "")
+        LoadFromSaveFile(); // load from save file
+        if (playerController.playerName != "") // dont allow to start game with an empty named save file
         {
 
             if (wizardNewPlayerNameInputField.text != "")
             {
-                ChangeNameAndSaveToFile();
+                ChangeNameAndSaveToFile(); // new name has been inputted so lets save anew to file
             }
-            boardController.ChangeGameStatus("shopping", "Shopping Phase");
-            ChangeCurrentRoundDisplayText(boardController.currentGameRound);
-            boardController.StartCoroutine("ProgressHealthRegeneration");
-            boardController.StartCoroutine("ProgressConcentrationRegeneration");
-            hudCanvasPlayerPanel.SetActive(true);
+            boardController.ChangeGameStatus("shopping", "Shopping Phase"); // set to shopping phae
+            ChangeCurrentRoundDisplayText(boardController.currentGameRound); // update ui text element
+            boardController.StartCoroutine("ProgressHealthRegeneration"); // begin health regeneration process
+            boardController.StartCoroutine("ProgressConcentrationRegeneration"); // begin concentration regeneration process
+            hudCanvasPlayerPanel.SetActive(true); // activate required ui elements
             hudCanvasShopPanel.SetActive(true);
             hudCanvasBottomBar.SetActive(true);
             shopToggleButton.gameObject.SetActive(true);
@@ -267,40 +264,34 @@ public class UiController : MonoBehaviour
 
     public void LoadFromSaveFile()
     {
-        PlayerProfileSave pps = playerProfiler.LoadProfile(0);
-       //   Debug.Log(pps.characterName);
-      //  Debug.Log(pps.mmr);
-       // Debug.Log(pps.rank);
-       // Debug.Log(pps.UserIconImageName);
-        playerController.LoadProfileFromSave(pps);
-        ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString());
-        wizard_playerName.text = playerController.playerName;
-        wizard_playerMMR.text = "MMR: " + playerController.playerMMR.ToString();
+        PlayerProfileSave pps = playerProfiler.LoadProfile(0); // load profile from slot 0
+        //   Debug.Log(pps.characterName);
+        //  Debug.Log(pps.mmr);
+        // Debug.Log(pps.rank);
+        // Debug.Log(pps.UserIconImageName);
+        playerController.LoadProfileFromSave(pps); // load players profile
+        ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString()); // update username display text
+        wizard_playerName.text = playerController.playerName; // update username display text 
+        wizard_playerMMR.text = "MMR: " + playerController.playerMMR.ToString(); // update mmr display text 
 
-        if (playerController.playerMMR <= 0)
+        if (playerController.playerMMR <= 0) // reset the user mmr if its negative or zero
         {
             playerController.playerMMR = 1500;
-
-        }
-        if (playerController.playerName == "")
-        {
-            //      playerController.playerName = "new player";
-            //      ChangeCurrentPlayerUsernameDisplayText("new player", playerController.playerMMR.ToString());
         }
     }
 
     public void SaveToSaveFile()
     {
-        PlayerProfileSave pps = new PlayerProfileSave();
-        pps.characterName = playerController.playerName;
+        PlayerProfileSave pps = new PlayerProfileSave(); // create new save file
+        pps.characterName = playerController.playerName; // set the save file parameters
         pps.mmr = playerController.playerMMR;
         pps.rank = "placeholder";
         pps.UserIconImageName = "placeholder";
-        playerProfiler.SaveProfile(pps, 0);
-        LoadFromSaveFile();
+        playerProfiler.SaveProfile(pps, 0); // save profile to slot 0
+        LoadFromSaveFile(); // load the new profile in
     }
 
-    public void UpdateAllShopButtons()
+    public void UpdateAllShopButtons() // update all the shop buttons with the required information
     {
 
         hudCanvasShopPanel.SetActive(true);
@@ -464,21 +455,18 @@ public class UiController : MonoBehaviour
     void TryTransitionToFightPhase()
     {
 
-        if (boardController.gameStatus != "Fight" && boardController.gameStatus == "shopping" && playerController.currentlyDeployedUnits > 0)
+        if (boardController.gameStatus != "Fight" && boardController.gameStatus == "shopping" && playerController.currentlyDeployedUnits > 0) // check if we are ready to proceed to combat
         {
 
-
-            boardController.ChangeGameStatus("Wait");
-
+            boardController.ChangeGameStatus("Wait"); // smooth wait transition
             npcController.allyListBackup = new List<NPC>();
-
-            boardController.SpawnEnemyUnitsRound_Balanced();
-            for (int i = npcController.deployedAllyList.Count - 1; i >= 0; i--)
+            boardController.SpawnEnemyUnitsRound_Balanced(); // spawn balanced enemies
+            for (int i = npcController.deployedAllyList.Count - 1; i >= 0; i--) // copy the human player unit deployment so we can restore it after combat
             {
                 if (npcController.deployedAllyList[i] != null)
                 {
                     npcController.deployedAllyList[i].enabled = false;
-                    GameObject obj = Instantiate(npcController.deployedAllyList[i].transform.parent.gameObject);
+                    GameObject obj = Instantiate(npcController.deployedAllyList[i].transform.parent.gameObject); // make a copy of our units and store them out of sight so we can restore them after combat
                     npcController.allyListBackup.Add(obj.GetComponentInChildren<NPC>());
                     obj.transform.position = Vector3.up * 1000;
                     obj.name = npcController.deployedAllyList[i].transform.parent.gameObject.name;
@@ -486,14 +474,21 @@ public class UiController : MonoBehaviour
 
                 }
             }
-            StartCoroutine(SmoothRoundFightPhaseTransition());
+            StartCoroutine(SmoothRoundFightPhaseTransition()); // finally we can transition to combat phase.
         }
 
     }
 
-
-
-
+    public void SpawnFloatingCombatText(NPC targetNPC,float damageDealt,DamageSource damageSourceTypeTaken, bool SourceNPC_IsEnemy,HealSource healSourceTypeTaken)
+    {
+        GameObject fct = (GameObject)Instantiate(Resources.Load("Floating Combat Text"), targetNPC.transform.position, Quaternion.identity);
+        FloatingCombatText floatingCombatTextScript = fct.GetComponentInChildren<FloatingCombatText>();
+        floatingCombatTextScript.NumberToDisplay = damageDealt;
+        floatingCombatTextScript.DamageSourceType = damageSourceTypeTaken;
+        floatingCombatTextScript.SourceNPC_IsEnemy = SourceNPC_IsEnemy;
+        floatingCombatTextScript.HealSourceType = healSourceTypeTaken;
+        UnityEngine.Object.Destroy(fct, 1.1f);
+    }
 
     public void RefreshDeployedTribesCounter()
     {
@@ -526,9 +521,6 @@ public class UiController : MonoBehaviour
 
     }
 
-
-
-
     public void ChangeDeployedUnitCountDisplayText(int _currentlyDeployedUnits, int _maxDeployedUnitsLimit)
     {
         hudCanvasTopPanelDeployedUnitCountText.text = _currentlyDeployedUnits + "/" + _maxDeployedUnitsLimit;
@@ -546,7 +538,8 @@ public class UiController : MonoBehaviour
     {
         hudCanvasTopPanelPlayerCurrentHPCounterText.text = _currentHP.ToString() + "/" + _maxHP.ToString();
     }
-    public IEnumerator FadeOut(float cycleTime)
+
+    public IEnumerator FadeOut(float cycleTime) //fade out the damage overlay
     {
         yield return new WaitForSeconds(cycleTime);
         Color fixedColor = damageOverlay.color;
@@ -556,7 +549,7 @@ public class UiController : MonoBehaviour
         damageOverlay.CrossFadeAlpha(0f, cycleTime, false);
     }
 
-    public void DamageOveray_Animation_CycleFadeInFadeOut(float cycleTime)
+    public void DamageOveray_Animation_CycleFadeInFadeOut(float cycleTime) // begin the fade in fade out cycle of the damage overlay
     {
         Color fixedColor = damageOverlay.color;
         fixedColor.a = 1;

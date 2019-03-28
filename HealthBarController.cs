@@ -61,7 +61,6 @@ public class HealthBarController : MonoBehaviour
         {
             fillPercentageConcentration = (attachedNpc.CONCENTRATION / attachedNpc.MAXCONCENTRATION);
         }
-
         transform.rotation = Camera.main.transform.rotation; // "billboard" the hp bar gui
         fullBar.transform.localScale = new Vector3(fillPercentageHealth,1,1);
         fullConcentrationBar.transform.localScale = new Vector3(fillPercentageConcentration, 1, 1);

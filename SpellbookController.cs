@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class SpellbookController : MonoBehaviour
 {
-    public void CastSpell(NPC casterNPC, NPC targetNPC, Ability abilityToCast, DamageSource damageTypeDealt, float CasterSpellPower,float CasterAttackPower)
+    public void CastSpell(NPC casterNPC, NPC targetNPC, Ability abilityToCast, float CasterSpellPower,float CasterAttackPower)
     {
 
         if (abilityToCast == Ability.NOTHING || casterNPC == null || targetNPC == null)
@@ -20,7 +20,7 @@ public class SpellbookController : MonoBehaviour
             GameObject go = (GameObject)Instantiate(Resources.Load("Fireball"), this.transform.position, Quaternion.identity);
             go.GetComponentInChildren<AbilityFireball>().SetCaster(casterNPC);
             go.GetComponentInChildren<AbilityFireball>().SetTarget(targetNPC);
-            go.GetComponentInChildren<AbilityFireball>().SetDamageToDeal(targetNPC.CalculateDamageTaken(2 * CasterSpellPower, casterNPC, damageTypeDealt));
+            go.GetComponentInChildren<AbilityFireball>().SetDamageToDeal(targetNPC.CalculateDamageTaken(2 * CasterSpellPower, casterNPC, DamageSource.Magical_Ability));
 
         }
 
@@ -68,7 +68,10 @@ public class SpellbookController : MonoBehaviour
             GameObject go = (GameObject)Instantiate(Resources.Load("HeroicStrike Animation"), this.transform.position, Quaternion.identity);
             go.transform.LookAt(targetNPC.transform);
             go.transform.SetParent(casterNPC.transform);
-            targetNPC.TakePureDamage(targetNPC.CalculateDamageTaken(3 * CasterAttackPower, casterNPC, damageTypeDealt));
+            float damageToDeal = targetNPC.CalculateDamageTaken(3 * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
+            UiController uic = GameObject.Find("World Controller").GetComponent<UiController>();
+            uic.SpawnFloatingCombatText(targetNPC, damageToDeal, DamageSource.Physical_Ability, casterNPC.isEnemy,HealSource.NOTHING);
+            targetNPC.TakePureDamage(damageToDeal);
             GameObject.Destroy(go, 4);
 
         }
@@ -77,7 +80,10 @@ public class SpellbookController : MonoBehaviour
             GameObject go = (GameObject)Instantiate(Resources.Load("Stab Animation"), this.transform.position, Quaternion.identity);
             go.transform.LookAt(targetNPC.transform);
             go.transform.SetParent(casterNPC.transform);
-            targetNPC.TakePureDamage(targetNPC.CalculateDamageTaken(1.5f * CasterAttackPower, casterNPC, damageTypeDealt));
+            float damageToDeal = targetNPC.CalculateDamageTaken(1.5f * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
+            UiController uic = GameObject.Find("World Controller").GetComponent<UiController>();
+            uic.SpawnFloatingCombatText(targetNPC, damageToDeal, DamageSource.Physical_Ability, casterNPC.isEnemy,HealSource.NOTHING);
+            targetNPC.TakePureDamage(damageToDeal);
             GameObject.Destroy(go, 3);
 
         }
@@ -107,7 +113,7 @@ public class SpellbookController : MonoBehaviour
             GameObject go = (GameObject)Instantiate(Resources.Load("FrostBall"), this.transform.position, Quaternion.identity);
             go.GetComponentInChildren<AbilityFrostBall>().SetCaster(casterNPC);
             go.GetComponentInChildren<AbilityFrostBall>().SetTarget(targetNPC);
-            go.GetComponentInChildren<AbilityFrostBall>().SetDamageToDeal(targetNPC.CalculateDamageTaken(2 * CasterSpellPower, casterNPC, damageTypeDealt));
+            go.GetComponentInChildren<AbilityFrostBall>().SetDamageToDeal(targetNPC.CalculateDamageTaken(2 * CasterSpellPower, casterNPC, DamageSource.Magical_Ability));
         } else if (abilityToCast == Ability.Stun)
         {
             float stunDuration = 3;
@@ -119,8 +125,6 @@ public class SpellbookController : MonoBehaviour
         {
             float amountToHeal = CasterSpellPower;
             NPC[] casters_AllyList = null;
-
-
 
             if (casterNPC.isEnemy == false)
             {
@@ -145,10 +149,11 @@ public class SpellbookController : MonoBehaviour
                     }
                 }
 
-
-                targetNPC.GainHP(amountToHeal, HealSource.Heal);
+                UiController uic = GameObject.Find("World Controller").GetComponent<UiController>();
+                uic.SpawnFloatingCombatText(targetNPC, amountToHeal, DamageSource.NOTHING, casterNPC.isEnemy, HealSource.Heal);
                 GameObject anim = (GameObject)Instantiate(Resources.Load("Heal Animation"), targetNPC.transform.position, Quaternion.identity);
                 anim.transform.SetParent(targetNPC.transform);
+                targetNPC.GainHP(amountToHeal, HealSource.Heal);
                 Object.Destroy(anim, 1);
 
         }

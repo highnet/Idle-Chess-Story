@@ -61,7 +61,6 @@ public class NPC : MonoBehaviour
     public Tribe SECONDARYTRIBE;
     public Unit UNIT_TYPE;
     public Ability ABILITY;
-    public DamageSource ability_DamageType;
     public DamageSource autoattack_DamageType;
 
 
@@ -113,6 +112,8 @@ public class NPC : MonoBehaviour
             transform.LookAt(new Vector3(target.transform.position.x, transform.position.y, target.transform.position.z));
         }
     }
+
+    
 
     public void recalculateArmorValue()
     {
@@ -948,6 +949,10 @@ public class NPC : MonoBehaviour
 
     public void TakePureDamage(float dmgToTake)
     {
+        if (dmgToTake < 0)
+        {
+            dmgToTake = 0;
+        }
         this.HP -= dmgToTake;
      
     if (HP <= 0)
@@ -1016,25 +1021,27 @@ public class NPC : MonoBehaviour
                        
                         if (this.spellBookController != null && target != null)
                         {
-                 
-                            spellBookController.CastSpell(this, target, this.ABILITY, this.ability_DamageType, this.SPELLPOWER,this.ATTACKPOWER);
+                            spellBookController.CastSpell(this, target, this.ABILITY, this.SPELLPOWER,this.ATTACKPOWER);
                         }
                     }
                     else if (distance < attackDistance)
                     {
-                        float damageToDeal = target.CalculateDamageTaken(this.ATTACKPOWER, this, autoAttack_DamageType);
+                        float damageToDeal;
 
-                        if (this.autoattack_DamageType == DamageSource.PhysicalDamage_AutoAttack)
+                        if (this.autoattack_DamageType == DamageSource.PhysicalDamage_AutoAttack) // meleee auto attack
                         {
+                            damageToDeal = target.CalculateDamageTaken(this.ATTACKPOWER, this, autoAttack_DamageType);
+                            uiController.SpawnFloatingCombatText(target, damageToDeal,DamageSource.PhysicalDamage_AutoAttack,this.isEnemy,HealSource.NOTHING);
                             target.TakePureDamage(damageToDeal);
                         }
 
-                        else if (this.autoattack_DamageType == DamageSource.MagicalDamage_AutoAttack)
+                        else if (this.autoattack_DamageType == DamageSource.MagicalDamage_AutoAttack) // magical auto attack
                         {
-                            GameObject go = (GameObject)Instantiate(Resources.Load("Auto Attack Projectile"), this.transform.position, Quaternion.identity);
-                            go.GetComponentInChildren<MagicalAutoAttackProjectile>().SetCaster(this);
-                            go.GetComponentInChildren<MagicalAutoAttackProjectile>().SetTarget(target);
-                            go.GetComponentInChildren<MagicalAutoAttackProjectile>().SetDamageToDeal(target.CalculateDamageTaken(ATTACKPOWER, this, DamageSource.MagicalDamage_AutoAttack));
+                            damageToDeal = target.CalculateDamageTaken(ATTACKPOWER, this, DamageSource.MagicalDamage_AutoAttack);
+                            GameObject aap = (GameObject)Instantiate(Resources.Load("Auto Attack Projectile"), this.transform.position, Quaternion.identity);
+                            aap.GetComponentInChildren<MagicalAutoAttackProjectile>().SetCaster(this);
+                            aap.GetComponentInChildren<MagicalAutoAttackProjectile>().SetTarget(target);
+                            aap.GetComponentInChildren<MagicalAutoAttackProjectile>().SetDamageToDeal(damageToDeal);
 
                         }
 
