@@ -5,54 +5,35 @@ using UnityEngine;
 public class AbilityFireball : MonoBehaviour
 {
 
-    public NPC OwnerCaster;
-    public NPC Target;
     public Vector3 destination;
-    public float damageToDeal;
-    private bool Local_OwnerCaster_IsEnemy;
-
+    public DamageReport dmgReport;
+    public AudioClip abilitySound;
 
     private void Start()
     {
-        Local_OwnerCaster_IsEnemy = OwnerCaster.isEnemy; // store a copy of wether the caster is enemy or not.
+        AudioSource.PlayClipAtPoint(abilitySound, this.transform.position);
     }
-
-    // Update is called once per frame
     void Update()
     {
-        transform.position = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * 3f); // move towards the target destination
-        if (Target != null)
+        transform.position = Vector3.MoveTowards(transform.position, destination, Time.deltaTime * 5f); // move towards the target destination
+        transform.LookAt(destination);
+        if (dmgReport.damageReceiverNPC != null)
         {
-            destination = Target.transform.position;  // refresh the target destination, in case the target npc moves
+            destination = dmgReport.damageReceiverNPC.transform.position;  // refresh the target destination, in case the target npc moves
         }
 
-        if (Vector3.Distance(transform.position,destination) < 0.1f)  // if reached the target
+        if (Vector3.Distance(transform.position, destination) < 0.1f)  // if reached the target
         {
-           
-            if (Target != null)
+
+            if (dmgReport.damageReceiverNPC != null)
             {
-                UiController uic = GameObject.Find("World Controller").GetComponent<UiController>(); // fetch ui controller
-                uic.SpawnFloatingCombatText(Target, damageToDeal, DamageSource.Magical_Ability , Local_OwnerCaster_IsEnemy,HealSource.NOTHING); // spawn floating combat text
-                Target.TakePureDamage(damageToDeal); // deal damage
+                UiController uic = GameObject.Find("World Controller").GetComponent<UiController>(); // fetch the ui controller once
+                uic.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DamageSource.Magical_Ability, HealSource.NOTHING); // spawn floating combat text
+                dmgReport.damageReceiverNPC.TakePureDamage(dmgReport.damageToTakeOrDisplay); // deal damage
+
             }
-            Object.Destroy(this.transform.parent.gameObject); //destroy this fireball
+            Object.Destroy(this.transform.parent.gameObject); // destroy this projectile
 
         }
-
-    }
-    public void SetDamageToDeal(float dmgToDeal)
-    {
-        this.damageToDeal = dmgToDeal;
-    }
-
-
-    public void SetCaster(NPC casterNPC)
-    {
-        this.OwnerCaster = casterNPC;
-    }
-    public void SetTarget(NPC targetNPC)
-    {
-        this.Target = targetNPC;
-        this.destination = targetNPC.transform.position;
     }
 }

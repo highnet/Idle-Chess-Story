@@ -4,31 +4,43 @@ using UnityEngine;
 
 public class FloatingCombatText : MonoBehaviour
 {
-
-    public float NumberToDisplay;
     public DamageSource DamageSourceType;
     public HealSource HealSourceType;
-    public bool SourceNPC_IsEnemy;
+    public DamageReport dmgReport;
     public string ExtraDisplayString;
     // Start is called before the first frame update
     void Start()
     {
-        if (NumberToDisplay < 0)
+        if (dmgReport.damageToTakeOrDisplay  < 0)
         {
-            NumberToDisplay = 0;
+            dmgReport.damageToTakeOrDisplay = 0;
         }
 
-        NumberToDisplay = Mathf.Round(NumberToDisplay);
+
+        dmgReport.damageToTakeOrDisplay = Mathf.Round(dmgReport.damageToTakeOrDisplay);
 
         TextMesh textmesh = this.GetComponent<TextMesh>();
-        textmesh.text = "" + NumberToDisplay;
+        textmesh.text = "" + dmgReport.damageToTakeOrDisplay;
 
+
+        if (dmgReport.damageToTakeOrDisplay != 0 && dmgReport.wasCriticalStrike)
+        {
+            textmesh.characterSize *= 2;
+            ExtraDisplayString = "CRIT";
+        }
+        else if (dmgReport.wasMiss)
+        {
+            ExtraDisplayString = "MISS";
+        } else if (dmgReport.wasDampenedMiss)
+        {
+            ExtraDisplayString = "DAMPENED";
+        }
 
         if (ExtraDisplayString != "")
         {
             textmesh.text += " (" + ExtraDisplayString + ")";
         }
-        if (System.Math.Abs(NumberToDisplay) < 0.001f && ExtraDisplayString != "")
+        if (dmgReport.damageToTakeOrDisplay == 0 && ExtraDisplayString != "")
         {
             textmesh.text = " (" + ExtraDisplayString + ")";
         }
@@ -36,11 +48,11 @@ public class FloatingCombatText : MonoBehaviour
         if (DamageSourceType != DamageSource.NOTHING)
         {
         //adapt floating combat text colors
-        if (SourceNPC_IsEnemy == true) // enemy attacks are always red
+        if (dmgReport.damageSourceNPC.isEnemy == true) // enemy attacks are always red
         { 
             textmesh.color = Color.red;
         }
-        else if (SourceNPC_IsEnemy == false) // human attack
+        else if (dmgReport.damageSourceNPC.isEnemy == false) // human attack
         {
             if (DamageSourceType == DamageSource.MagicalDamage_AutoAttack || DamageSourceType == DamageSource.PhysicalDamage_AutoAttack) // auto attacks
             {
@@ -66,9 +78,8 @@ public class FloatingCombatText : MonoBehaviour
         }
         else if (HealSourceType != HealSource.NOTHING)
         {
-            textmesh.text = "" + NumberToDisplay;
+            textmesh.text = "" + dmgReport.damageToTakeOrDisplay;
             textmesh.color = Color.green;
-            
         }
     }
 

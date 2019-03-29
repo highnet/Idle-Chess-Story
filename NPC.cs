@@ -38,7 +38,6 @@ public class NPC : MonoBehaviour
     public GameObject currentTarget;
     public SpellbookController spellBookController;
     public Animator animator;
-    //
     public float HP;
     public float MAXHP;
     public float BASE_MAXHP;
@@ -56,30 +55,22 @@ public class NPC : MonoBehaviour
     public int TIER;
     public int AttackDistance;
     public float actionTime;
-
     public Tribe PRIMARYTRIBE;
     public Tribe SECONDARYTRIBE;
     public Unit UNIT_TYPE;
     public Ability ABILITY;
     public DamageSource autoattack_DamageType;
-
-
-    //
     public float baseGoldBountyReward;
-    //
     public bool visualIdentifierGenerated = false;
     public bool isEnemy = false;
     public bool beingDragged;
     public bool isDying_SingleRunController = false;
-
     public Coroutine liveRoutine = null;
-
-    //
     public GameObject occupyingTile;
     public NPC target;
-
     private VisualSideIdentifierCircleToggler visualSideIdentifierCircle;
-
+    public AudioSource npcAudioSource;
+    public AudioClip autoAttackSoundClip;
 
     public void Awake()
     {
@@ -233,7 +224,7 @@ public class NPC : MonoBehaviour
         else { return 1; }
     }
 
-    public float CalculateCriticalDamage_And_Beast3Bonus(bool DamageDealerIsEnemy, int beastsCount, int enemy_beastsCount, int rollCriticalHit)
+    public bool CalculateCriticalDamage_And_Beast3Bonus(bool DamageDealerIsEnemy, int beastsCount, int enemy_beastsCount, int rollCriticalHit)
     {
         if (DamageDealerIsEnemy == false && beastsCount >= 3)
         {
@@ -247,11 +238,11 @@ public class NPC : MonoBehaviour
 
         if (rollCriticalHit >= playerController.constant_Crit_RngRollBaseMinimumRequiredLuck) // Regular Base Critical Chance for All units.
         {
-            return playerController.coefficient_Crit_OnCritBonusDamageMultiplier;  // critical value scalar coefficient
+            return true; // critical value scalar coefficient
 
         }
 
-        return 1;
+        return false;
     }
 
     public float CheckWarrior6Bonus(bool DamageDealerIsEnemy, int warriorsCount, int enemy_WarriorsCount)
@@ -269,12 +260,20 @@ public class NPC : MonoBehaviour
         return 1;
     }
 
-    public float CalculateDamageTaken(float damageToDeal,NPC damageDealer,DamageSource damageSourceType)
+    public DamageReport CalculateDamageTaken(float damageToDeal,NPC damageDealer,DamageSource damageSourceType)
     {
         /// PRE-DAMAGE-SOURCE-FORK Preparation
         if (damageToDeal <= 0)
         {
-            return 0;
+            DamageReport dmgReportx = ScriptableObject.CreateInstance<DamageReport>();
+            dmgReportx.damageReceiverNPC = this;
+            dmgReportx.damageSourceNPC = damageDealer;
+            dmgReportx.damageToTakeOrDisplay = 0;
+            dmgReportx.wasCriticalStrike = false;
+            dmgReportx.wasDampenedMiss = false;
+            dmgReportx.wasMiss = false;
+
+            return dmgReportx;
         }
 
         int beastsCount = 0;
@@ -333,7 +332,15 @@ public class NPC : MonoBehaviour
 
         if (CheckRollMiss_And_Assassin6Bonus(DamageDealerIsEnemy,assassinsCount,enemy_AssassinsCount,rollMiss) == false)
         {
-            return 0;
+            DamageReport dmgReport0 = ScriptableObject.CreateInstance<DamageReport>();
+            dmgReport0.damageReceiverNPC = this;
+            dmgReport0.damageSourceNPC = damageDealer;
+            dmgReport0.damageToTakeOrDisplay = 0;
+            dmgReport0.wasCriticalStrike = false;
+            dmgReport0.wasDampenedMiss = false;
+            dmgReport0.wasMiss = true;
+
+            return dmgReport0;
         } 
 
         if (damageSourceType == DamageSource.Magical_Ability || damageSourceType == DamageSource.Physical_Ability)
@@ -347,7 +354,12 @@ public class NPC : MonoBehaviour
             CheckConcentrationGain_And_Guardian3Bonus(damageDealer,guardiansCount,enemy_GuardiansCount);
         }
 
-        damageToDeal *= CalculateCriticalDamage_And_Beast3Bonus(DamageDealerIsEnemy,beastsCount,enemy_beastsCount,rollCriticalHit);
+        bool isCrit = CalculateCriticalDamage_And_Beast3Bonus(DamageDealerIsEnemy, beastsCount, enemy_beastsCount, rollCriticalHit);
+        if (isCrit == true)
+        {
+            damageToDeal *= playerController.coefficient_Crit_OnCritBonusDamageMultiplier;
+        } 
+         
 
         /// DAMAGE-SOURCE-FORK
         if (damageSourceType == DamageSource.PhysicalDamage_AutoAttack || damageSourceType == DamageSource.Physical_Ability)
@@ -356,7 +368,15 @@ public class NPC : MonoBehaviour
             damageToDeal *= CheckGuardian6Bonus(DamageDealerIsEnemy, guardiansCount, enemy_GuardiansCount, rollMiss);
             if (damageToDeal <= 0)
             {
-                return 0; // guardian 6 dampened check
+                DamageReport dmgReport1 = ScriptableObject.CreateInstance<DamageReport>();
+                dmgReport1.damageReceiverNPC = this;
+                dmgReport1.damageSourceNPC = damageDealer;
+                dmgReport1.damageToTakeOrDisplay = 0;
+                dmgReport1.wasCriticalStrike = false;
+                dmgReport1.wasDampenedMiss = true;
+                dmgReport1.wasMiss = false;
+
+                return dmgReport1;
             }
 
         }
@@ -368,12 +388,18 @@ public class NPC : MonoBehaviour
             damageToDeal *= CheckWizard6Bonus(DamageDealerIsEnemy, wizardsCount, enemy_WizardsCount, rollMiss);
             if (damageToDeal <= 0)
             {
-                return 0; //wizard 6 dampened check
+                DamageReport dmgReport2 = ScriptableObject.CreateInstance<DamageReport>();
+                dmgReport2.damageReceiverNPC = this;
+                dmgReport2.damageSourceNPC = damageDealer;
+                dmgReport2.damageToTakeOrDisplay = 0;
+                dmgReport2.wasCriticalStrike = false;
+                dmgReport2.wasDampenedMiss = true;
+                dmgReport2.wasMiss = false;
+                return dmgReport2;
             }
 
         }
 
-      
         damageToDeal *= CheckElemental6Bonus(DamageDealerIsEnemy, elementalsCount, enemy_ElementalsCount);
         netArmor *= CalculateStructure6Bonus(DamageDealerIsEnemy,structureCount,enemy_StructureCount);
         netRetaliation *= CalculateStructure3Bonus(DamageDealerIsEnemy, structureCount, enemy_StructureCount);
@@ -381,10 +407,20 @@ public class NPC : MonoBehaviour
         damageToDeal -= (netArmor);
         if (damageSourceType == DamageSource.MagicalDamage_AutoAttack || damageSourceType == DamageSource.PhysicalDamage_AutoAttack)
         {
-            LifeSteal_CheckBeast6Bonus(DamageDealerIsEnemy, beastsCount, enemy_beastsCount, damageDealer, damageToDeal);
-            damageDealer.HP -= damageToDeal * (netRetaliation / playerController.coefficient_DamageFormula_OnDamage_RetaliationEfficiencyPenalty);
+            DoLifeSteal_And_CheckBeast6Bonus(DamageDealerIsEnemy, beastsCount, enemy_beastsCount, damageDealer, damageToDeal);
+         //   damageDealer.HP -= damageToDeal * (netRetaliation / playerController.coefficient_DamageFormula_OnDamage_RetaliationEfficiencyPenalty);  ADD TO DAMAGE REPORT AND MOVE OUT OF CALCULATE DAMAGE
         }
-        return damageToDeal;         
+
+
+        DamageReport dmgReport = ScriptableObject.CreateInstance<DamageReport>();
+        dmgReport.damageReceiverNPC = this;
+        dmgReport.damageSourceNPC = damageDealer;
+        dmgReport.damageToTakeOrDisplay = damageToDeal;
+        dmgReport.wasCriticalStrike = isCrit;
+        dmgReport.wasDampenedMiss = false;
+        dmgReport.wasMiss = false;
+
+        return dmgReport;  
     }
 
     public float CheckWizard6Bonus(bool DamageDealerIsEnemy, int wizardsCount, int enemy_WizardsCount, int rollMiss)
@@ -566,6 +602,7 @@ public class NPC : MonoBehaviour
             {
             //    Debug.Log("Rewarding you " + goldBountyReward + " gold for killing: " + this.name);
                 playerController.SetPlayerGoldCount(playerController.playerGoldCount + goldBountyReward);
+                uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopClosedAudioClip);
             }
             npcController.npcList.Remove(gameObject.GetComponent<NPC>());
             gameObject.GetComponent<NPC>().occupyingTile.GetComponent<TileBehaviour>().occupyingUnit = null;
@@ -642,17 +679,25 @@ public class NPC : MonoBehaviour
 
     void OnMouseDown()
     {
-
+        if (boardController.selectedObject == this.gameObject)
+        {
+            uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitclickAudioClip);
+            if (boardController.gameStatus.Equals("shopping"))
+            {
+                this.beingDragged = true;
+            }
+        }
 
         if (boardController.selectedObject != this.gameObject)
         {
             boardController.selectedObject = this.gameObject;
+            
+            uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitclickAudioClip);
+            if (boardController.gameStatus.Equals("shopping"))
+            {
+                this.beingDragged = true;
+            }
         }
-        else if (boardController.gameStatus.Equals("shopping"))
-        {
-            this.beingDragged = true;
-        }
-
     }
 
     private void OnMouseDrag()
@@ -682,14 +727,12 @@ public class NPC : MonoBehaviour
         if (isEnemy) { beingDragged = false; }
         if (beingDragged)
         {
-
-
-
             RaycastHit hit;
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("ChessTile")))
             {
                 if (hit.collider.GetComponent<TileBehaviour>().i >= 4)
                 {
+                    uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitReleaseAudioClip);
                     moveToEmptyTile(hit.collider.GetComponent<TileBehaviour>().i, hit.collider.GetComponent<TileBehaviour>().j);
                 }
 
@@ -699,15 +742,13 @@ public class NPC : MonoBehaviour
             {
                     this.gameObject.GetComponentsInParent<Transform>()[1].position = this.occupyingTile.transform.position;
             }
-
-
             beingDragged = false;
             worldControl.GetComponent<LineRenderer>().enabled = false;
         }
     }
 
 
-    public void LifeSteal_CheckBeast6Bonus(bool DamageDealerIsEnemy, int beastsCount, int enemy_beastsCount, NPC damageDealer, float damageToDeal)
+    public void DoLifeSteal_And_CheckBeast6Bonus(bool DamageDealerIsEnemy, int beastsCount, int enemy_beastsCount, NPC damageDealer, float damageToDeal)
     {
         if (DamageDealerIsEnemy == false && beastsCount >= 6)
         {
@@ -978,8 +1019,6 @@ public class NPC : MonoBehaviour
     {
         for (; ; )
         {
-           
-       
             if (boardController.gameStatus.Equals("Fight") && occupyingTile.GetComponent<TileBehaviour>().i != 8) {
 
                 float distance = 0;
@@ -1026,23 +1065,31 @@ public class NPC : MonoBehaviour
                     }
                     else if (distance < attackDistance)
                     {
-                        float damageToDeal;
+                      
+                        DamageReport damageReport;
 
                         if (this.autoattack_DamageType == DamageSource.PhysicalDamage_AutoAttack) // meleee auto attack
                         {
-                            damageToDeal = target.CalculateDamageTaken(this.ATTACKPOWER, this, autoAttack_DamageType);
-                            uiController.SpawnFloatingCombatText(target, damageToDeal,DamageSource.PhysicalDamage_AutoAttack,this.isEnemy,HealSource.NOTHING);
-                            target.TakePureDamage(damageToDeal);
+                            damageReport = target.CalculateDamageTaken(this.ATTACKPOWER, this, autoAttack_DamageType);
+                            uiController.SpawnFloatingCombatText(damageReport.damageReceiverNPC, damageReport, DamageSource.PhysicalDamage_AutoAttack, HealSource.NOTHING);
+                            target.TakePureDamage(damageReport.damageToTakeOrDisplay);
+                            if (autoAttackSoundClip != null)
+                            {
+                                npcAudioSource.PlayOneShot(autoAttackSoundClip);
+                            }
+                        
                         }
 
                         else if (this.autoattack_DamageType == DamageSource.MagicalDamage_AutoAttack) // magical auto attack
                         {
-                            damageToDeal = target.CalculateDamageTaken(ATTACKPOWER, this, DamageSource.MagicalDamage_AutoAttack);
+                            damageReport = target.CalculateDamageTaken(ATTACKPOWER, this, DamageSource.MagicalDamage_AutoAttack);
                             GameObject aap = (GameObject)Instantiate(Resources.Load("Auto Attack Projectile"), this.transform.position, Quaternion.identity);
-                            aap.GetComponentInChildren<MagicalAutoAttackProjectile>().SetCaster(this);
-                            aap.GetComponentInChildren<MagicalAutoAttackProjectile>().SetTarget(target);
-                            aap.GetComponentInChildren<MagicalAutoAttackProjectile>().SetDamageToDeal(damageToDeal);
-
+                            aap.GetComponentInChildren<MagicalAutoAttackProjectile>().dmgReport = damageReport;
+                            aap.GetComponentInChildren<MagicalAutoAttackProjectile>().destination = damageReport.damageReceiverNPC.transform.position;
+                            if (autoAttackSoundClip != null)
+                            {
+                                npcAudioSource.PlayOneShot(autoAttackSoundClip);
+                            }
                         }
 
                         if (animator != null)

@@ -16,11 +16,11 @@ public class SpellbookController : MonoBehaviour
 
         if (abilityToCast == Ability.Fireball)
         {
-
             GameObject go = (GameObject)Instantiate(Resources.Load("Fireball"), this.transform.position, Quaternion.identity);
-            go.GetComponentInChildren<AbilityFireball>().SetCaster(casterNPC);
-            go.GetComponentInChildren<AbilityFireball>().SetTarget(targetNPC);
-            go.GetComponentInChildren<AbilityFireball>().SetDamageToDeal(targetNPC.CalculateDamageTaken(2 * CasterSpellPower, casterNPC, DamageSource.Magical_Ability));
+            DamageReport dmgReport = targetNPC.CalculateDamageTaken(2 * CasterSpellPower, casterNPC, DamageSource.Magical_Ability);
+            go.GetComponentInChildren<AbilityFireball>().dmgReport = dmgReport;
+            go.GetComponentInChildren<AbilityFireball>().destination = dmgReport.damageReceiverNPC.transform.position;
+
 
         }
 
@@ -68,10 +68,10 @@ public class SpellbookController : MonoBehaviour
             GameObject go = (GameObject)Instantiate(Resources.Load("HeroicStrike Animation"), this.transform.position, Quaternion.identity);
             go.transform.LookAt(targetNPC.transform);
             go.transform.SetParent(casterNPC.transform);
-            float damageToDeal = targetNPC.CalculateDamageTaken(3 * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
+            DamageReport dmgReport = targetNPC.CalculateDamageTaken(3 * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
             UiController uic = GameObject.Find("World Controller").GetComponent<UiController>();
-            uic.SpawnFloatingCombatText(targetNPC, damageToDeal, DamageSource.Physical_Ability, casterNPC.isEnemy,HealSource.NOTHING);
-            targetNPC.TakePureDamage(damageToDeal);
+            uic.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DamageSource.Physical_Ability, HealSource.NOTHING);
+            targetNPC.TakePureDamage(dmgReport.damageToTakeOrDisplay);
             GameObject.Destroy(go, 4);
 
         }
@@ -80,10 +80,10 @@ public class SpellbookController : MonoBehaviour
             GameObject go = (GameObject)Instantiate(Resources.Load("Stab Animation"), this.transform.position, Quaternion.identity);
             go.transform.LookAt(targetNPC.transform);
             go.transform.SetParent(casterNPC.transform);
-            float damageToDeal = targetNPC.CalculateDamageTaken(1.5f * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
+            DamageReport dmgReport = targetNPC.CalculateDamageTaken(1.5f * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
             UiController uic = GameObject.Find("World Controller").GetComponent<UiController>();
-            uic.SpawnFloatingCombatText(targetNPC, damageToDeal, DamageSource.Physical_Ability, casterNPC.isEnemy,HealSource.NOTHING);
-            targetNPC.TakePureDamage(damageToDeal);
+            uic.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DamageSource.Physical_Ability, HealSource.NOTHING);
+            targetNPC.TakePureDamage(dmgReport.damageToTakeOrDisplay);
             GameObject.Destroy(go, 3);
 
         }
@@ -111,9 +111,9 @@ public class SpellbookController : MonoBehaviour
         else if (abilityToCast == Ability.FrostBall)
         {
             GameObject go = (GameObject)Instantiate(Resources.Load("FrostBall"), this.transform.position, Quaternion.identity);
-            go.GetComponentInChildren<AbilityFrostBall>().SetCaster(casterNPC);
-            go.GetComponentInChildren<AbilityFrostBall>().SetTarget(targetNPC);
-            go.GetComponentInChildren<AbilityFrostBall>().SetDamageToDeal(targetNPC.CalculateDamageTaken(2 * CasterSpellPower, casterNPC, DamageSource.Magical_Ability));
+            DamageReport dmgReport = targetNPC.CalculateDamageTaken(2 * CasterSpellPower, casterNPC, DamageSource.Magical_Ability);
+            go.GetComponentInChildren<AbilityFrostBall>().dmgReport = dmgReport;
+            go.GetComponentInChildren<AbilityFrostBall>().destination = dmgReport.damageReceiverNPC.transform.position;
         } else if (abilityToCast == Ability.Stun)
         {
             float stunDuration = 3;
@@ -150,7 +150,14 @@ public class SpellbookController : MonoBehaviour
                 }
 
                 UiController uic = GameObject.Find("World Controller").GetComponent<UiController>();
-                uic.SpawnFloatingCombatText(targetNPC, amountToHeal, DamageSource.NOTHING, casterNPC.isEnemy, HealSource.Heal);
+            DamageReport dmgReport = ScriptableObject.CreateInstance<DamageReport>();
+            dmgReport.damageReceiverNPC = targetNPC;
+            dmgReport.damageSourceNPC = casterNPC;
+            dmgReport.damageToTakeOrDisplay = amountToHeal;
+            dmgReport.wasCriticalStrike = false;
+            dmgReport.wasDampenedMiss = false;
+            dmgReport.wasMiss = false;
+                uic.SpawnFloatingCombatText(targetNPC, dmgReport,DamageSource.NOTHING,HealSource.Heal);
                 GameObject anim = (GameObject)Instantiate(Resources.Load("Heal Animation"), targetNPC.transform.position, Quaternion.identity);
                 anim.transform.SetParent(targetNPC.transform);
                 targetNPC.GainHP(amountToHeal, HealSource.Heal);

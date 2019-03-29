@@ -8,7 +8,6 @@ public class JukeBox : MonoBehaviour
 {
 
     public AudioClip track1;
-   // public AudioClip track2;
     public AudioClip track3;
     public AudioClip track4;
     public AudioClip track5;
@@ -18,15 +17,12 @@ public class JukeBox : MonoBehaviour
 
     public AudioSource audioSource;
 
-
-
     // Start is called before the first frame update
     void Start()
     {
 
         bgMusic = new Queue<AudioClip>();
         bgMusic.Enqueue(track1);
-    //    bgMusic.Enqueue(track2);
         bgMusic.Enqueue(track3);
         bgMusic.Enqueue(track4);
         bgMusic.Enqueue(track5);

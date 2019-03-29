@@ -82,7 +82,6 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-     
         costToShuffleShop = 1;
         uiController = GetComponent<UiController>();
         boardController = GetComponent<BoardController>();
@@ -111,6 +110,7 @@ public class PlayerController : MonoBehaviour
             uiController.shopToggleButton.gameObject.SetActive(true);
             uiController.UpdateAllShopButtons();
             uiController.ChangeCostToShuffleShopDisplayText(costToShuffleShop.ToString());
+            uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopRefreshAudioClip);
         }
 
     }
@@ -249,7 +249,6 @@ public class PlayerController : MonoBehaviour
         playerOwnedNpcs = new List<NPC>();
         uiController.ChangeCurrentPlayerUsernameDisplayText(playerName,playerMMR.ToString());
         SetCurrentlyDeployedUnits(0);
-        SetMaxDeployedUnitsLimit(3);
 
         uiController.ChangeHPPlayerDisplayText(this.currentPlayerHealth, this.maxPlayerHealth);
     }
@@ -280,26 +279,31 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        if (currentPlayerHealth <= 0) // check lose condition
+        if ((boardController.gameStatus == "Fight" || boardController.gameStatus == "shopping") && currentPlayerHealth <= 0) // check lose condition
         {
 
+            int mmrChange = 0;
+
             int currentGameRound = boardController.currentGameRound;
-            if (currentGameRound == 0)
+            if (currentGameRound < 10)
             {
-                playerMMR -= 50;
-            }
-             else if (currentGameRound < 10)
-            {
-                playerMMR -= 25;
+                mmrChange -= 25;
             }
             else if (currentGameRound >= 10)
             {
-                playerMMR += (25 + (currentGameRound / playerMMR % 100));
+                mmrChange += (25 + (currentGameRound / playerMMR % 100));
             }
+            playerMMR += mmrChange;
 
+            boardController.ChangeGameStatus("report defeat");
+            uiController.hudCanvasReportDefeatPanel.gameObject.SetActive(true);
+            uiController.hudCanvasTribesPanel.gameObject.SetActive(false);
+            uiController.hudCanvasTopBar.gameObject.SetActive(false);
+            uiController.hudCanvasBottomBar.gameObject.SetActive(false);
+            uiController.hudCanvasShopPanel.gameObject.SetActive(false);
             uiController.SaveToSaveFile();
-            uiController.LoadFromSaveFile();
-            boardController.ChangeGameStatus("game over");
+            uiController.UpdateReportDefeatPanelScreen(mmrChange);
+
         }
 
     }

@@ -19,6 +19,7 @@ public class UiController : MonoBehaviour
     public GameObject hudCanvasWizardPanel;
     public GameObject hudCanvasTribesPanel;
     public GameObject hudCanvasCurrentlySelectedUnitPanel;
+    public GameObject hudCanvasReportDefeatPanel;
     //
     public Button shopToggleButton;
     public Button tribesToggleButton;
@@ -32,6 +33,7 @@ public class UiController : MonoBehaviour
     public Button shopRefreshButton;
     public Button saveButton;
     public Button loadButton;
+    public Button gameOverButton;
     //
     public InputField wizardNewPlayerNameInputField;
     //
@@ -86,6 +88,25 @@ public class UiController : MonoBehaviour
     public DynamicTribeIconVisualizer shopMouseOverInfoIcon_PRIMARYTRIBE_tribeIconVisualizer;
     public DynamicTribeIconVisualizer shopMouseOverInfoIcon_SECONDARYTRIBE_tribeIconVisualizer;
     //
+    public Text reportdefeatPanel_reachedRoundText;
+    public Text reportdefeatPanel_recordReachedRoundText;
+    public Text reportdefeatPanel_mmrChange;
+    public Text reportdefeatPanel_recordAchievedMMRText;
+    public Text reportdefeatPanel_userNameText;
+    public Text reportdefeatPanel_userMMR;
+    //
+    public AudioSource hudCanvasAudioSource;
+    public AudioClip startGameAudioClip;
+    public AudioClip shopRefreshAudioClip;
+    public AudioClip shopOpenAudioClip;
+    public AudioClip shopClosedAudioClip;
+    public AudioClip fightStartAudioClip;
+    public AudioClip genericButtonSucessAudioClip;
+    public AudioClip genericButtonFailureAudioClip;
+    public AudioClip buyUnitSuccessAudioClip;
+    public AudioClip chessUnitReleaseAudioClip;
+    public AudioClip chessUnitclickAudioClip;
+    //
 
     private void Awake()
     {
@@ -109,6 +130,9 @@ public class UiController : MonoBehaviour
         hudCanvasShopCostToShuffleText = GameObject.Find("HUDCanvas/Player Panel/Shop Panel/Refresh Button/Gold Cost Text").GetComponent<Text>();
 
 
+        gameOverButton.onClick.RemoveAllListeners();
+        gameOverButton.onClick.AddListener(delegate { boardController.ChangeGameStatus("game over"); });
+
         resetSelectedTargetButton.onClick.RemoveAllListeners();
         resetSelectedTargetButton.onClick.AddListener(delegate { ResetSelectedTarget(); });
 
@@ -130,7 +154,6 @@ public class UiController : MonoBehaviour
 
         tribesToggleButton.onClick.RemoveAllListeners();
         tribesToggleButton.onClick.AddListener(delegate { ToggleTribePanel(); });
-
 
         fightButton.onClick.RemoveAllListeners();
         fightButton.onClick.AddListener(delegate { TryTransitionToFightPhase(); });
@@ -156,9 +179,6 @@ public class UiController : MonoBehaviour
         shopRefreshButton.onClick.RemoveAllListeners();
         shopRefreshButton.onClick.AddListener(delegate { RefreshShop(); });
 
-
-
-
     }
 
     public void SellFriendlySelectedTarget() // sell the friendly selected target npc
@@ -177,6 +197,7 @@ public class UiController : MonoBehaviour
             }
             boardController.selectedObject.GetComponent<NPC>().RemoveFromBoard(true); // remove the sold npc from the board 
             playerController.SetPlayerGoldCount(playerController.playerGoldCount + (long)goldReward); // apply the gold reward to the player
+            hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         }
     }
 
@@ -188,7 +209,7 @@ public class UiController : MonoBehaviour
     void Update()
     {
 
-        if (boardController.selectedObject != null) // update the entire selected unit panel
+        if (boardController.gameStatus != "report defeat" && boardController.selectedObject != null) // update the entire selected unit panel
         {
             hudCanvasCurrentlySelectedUnitPanel.SetActive(true);
             GameObject selectedObject = boardController.selectedObject;
@@ -225,6 +246,7 @@ public class UiController : MonoBehaviour
     public void ChangeNameAndSaveToFile()
     {
         string newName = wizardNewPlayerNameInputField.text;  // fetch name from input field
+        hudCanvasAudioSource.PlayOneShot(genericButtonSucessAudioClip);
 
         if (newName != "" && newName != playerController.playerName) // check for valid name
         {
@@ -241,7 +263,7 @@ public class UiController : MonoBehaviour
         LoadFromSaveFile(); // load from save file
         if (playerController.playerName != "") // dont allow to start game with an empty named save file
         {
-
+            hudCanvasAudioSource.PlayOneShot(startGameAudioClip);
             if (wizardNewPlayerNameInputField.text != "")
             {
                 ChangeNameAndSaveToFile(); // new name has been inputted so lets save anew to file
@@ -256,19 +278,32 @@ public class UiController : MonoBehaviour
             shopToggleButton.gameObject.SetActive(true);
             hudCanvasTopBar.SetActive(true);
             hudCanvasWizardPanel.SetActive(false);
+           
 
         }
+        else
+        {
+            hudCanvasAudioSource.PlayOneShot(genericButtonFailureAudioClip);
+        }
 
+
+    }
+
+    public void UpdateReportDefeatPanelScreen(int mmrChange)
+    {
+        reportdefeatPanel_mmrChange.text = "MMR Change: " + mmrChange;
+        PlayerProfileSave pps = playerProfiler.LoadProfile(0);
+        reportdefeatPanel_reachedRoundText.text = "Reached Round: " + pps.achievedRound;
+        reportdefeatPanel_recordAchievedMMRText.text = "Record Max MMR: " + pps.highestAchievedMmr;
+        reportdefeatPanel_recordReachedRoundText.text = "Record Reached Round: " + pps.highestAchievedRound;
+        reportdefeatPanel_userMMR.text = "MMR: " + pps.mmr;
+        reportdefeatPanel_userNameText.text = "" + pps.characterName;
 
     }
 
     public void LoadFromSaveFile()
     {
         PlayerProfileSave pps = playerProfiler.LoadProfile(0); // load profile from slot 0
-        //   Debug.Log(pps.characterName);
-        //  Debug.Log(pps.mmr);
-        // Debug.Log(pps.rank);
-        // Debug.Log(pps.UserIconImageName);
         playerController.LoadProfileFromSave(pps); // load players profile
         ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString()); // update username display text
         wizard_playerName.text = playerController.playerName; // update username display text 
@@ -285,8 +320,9 @@ public class UiController : MonoBehaviour
         PlayerProfileSave pps = new PlayerProfileSave(); // create new save file
         pps.characterName = playerController.playerName; // set the save file parameters
         pps.mmr = playerController.playerMMR;
-        pps.rank = "placeholder";
-        pps.UserIconImageName = "placeholder";
+        pps.rank = "queen";
+        pps.UserIconImageName = "polarbear";
+        pps.achievedRound = boardController.currentGameRound;
         playerProfiler.SaveProfile(pps, 0); // save profile to slot 0
         LoadFromSaveFile(); // load the new profile in
     }
@@ -383,6 +419,7 @@ public class UiController : MonoBehaviour
         {
             shopButton1.interactable = false;
             shopButton1.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border-Unclickable");
+            hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         }
     }
 
@@ -392,6 +429,7 @@ public class UiController : MonoBehaviour
         {
             shopButton2.interactable = false;
             shopButton2.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border-Unclickable");
+            hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         }
     }
 
@@ -401,7 +439,9 @@ public class UiController : MonoBehaviour
         {
             shopButton3.interactable = false;
             shopButton3.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border-Unclickable");
+            hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         }
+ 
     }
 
     void ShopButton4Clicked()
@@ -411,8 +451,10 @@ public class UiController : MonoBehaviour
         {
             shopButton4.interactable = false;
             shopButton4.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border-Unclickable");
+            hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         }
-    }
+
+    } 
 
     void ShopButton5Clicked()
     {
@@ -420,6 +462,7 @@ public class UiController : MonoBehaviour
         {
             shopButton5.interactable = false;
             shopButton5.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border-Unclickable");
+            hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         }
     }
 
@@ -429,19 +472,31 @@ public class UiController : MonoBehaviour
         {
             shopButton6.interactable = false;
             shopButton6.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border-Unclickable");
+            hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         }
+
 
     }
 
     void ToggleShopPanel()
     {
 
-        hudCanvasShopPanel.SetActive(!hudCanvasShopPanel.activeSelf);
+        if (hudCanvasShopPanel.activeSelf) // check if the shop panel is active
+        {
+            hudCanvasAudioSource.PlayOneShot(shopClosedAudioClip); // play the shop closing sound
+        }
+        else
+        {
+            hudCanvasAudioSource.PlayOneShot(shopOpenAudioClip); // play the shop opening sound
+
+        }
+        hudCanvasShopPanel.SetActive(!hudCanvasShopPanel.activeSelf); //toggle the active state
+       
     }
 
     void ToggleTribePanel()
     {
-
+        hudCanvasAudioSource.PlayOneShot(genericButtonSucessAudioClip);
         hudCanvasTribesPanel.SetActive(!hudCanvasTribesPanel.activeSelf);
     }
 
@@ -449,15 +504,17 @@ public class UiController : MonoBehaviour
     {
 
         yield return new WaitForSeconds(2);
+        if (boardController.gameStatus != "report defeat"){
         boardController.ChangeGameStatus("Fight");
+
+        }
     }
 
     void TryTransitionToFightPhase()
     {
 
-        if (boardController.gameStatus != "Fight" && boardController.gameStatus == "shopping" && playerController.currentlyDeployedUnits > 0) // check if we are ready to proceed to combat
+        if (boardController.gameStatus != "Fight" && boardController.gameStatus != "report defeat" && boardController.gameStatus == "shopping" && playerController.currentlyDeployedUnits > 0) // check if we are ready to proceed to combat
         {
-
             boardController.ChangeGameStatus("Wait"); // smooth wait transition
             npcController.allyListBackup = new List<NPC>();
             boardController.SpawnEnemyUnitsRound_Balanced(); // spawn balanced enemies
@@ -474,20 +531,26 @@ public class UiController : MonoBehaviour
 
                 }
             }
+            hudCanvasAudioSource.PlayOneShot(fightStartAudioClip);
             StartCoroutine(SmoothRoundFightPhaseTransition()); // finally we can transition to combat phase.
+        }
+        else
+        {
+            hudCanvasAudioSource.PlayOneShot(genericButtonFailureAudioClip);
         }
 
     }
 
-    public void SpawnFloatingCombatText(NPC targetNPC,float damageDealt,DamageSource damageSourceTypeTaken, bool SourceNPC_IsEnemy,HealSource healSourceTypeTaken)
+    public void SpawnFloatingCombatText(NPC TargetDestinationNPC,DamageReport dmgReport,DamageSource damageSourceTypeTaken,HealSource healSourceTypeTaken)
     {
-        GameObject fct = (GameObject)Instantiate(Resources.Load("Floating Combat Text"), targetNPC.transform.position, Quaternion.identity);
+        GameObject fct = (GameObject)Instantiate(Resources.Load("Floating Combat Text"), TargetDestinationNPC.transform.position, Quaternion.identity);
         FloatingCombatText floatingCombatTextScript = fct.GetComponentInChildren<FloatingCombatText>();
-        floatingCombatTextScript.NumberToDisplay = damageDealt;
         floatingCombatTextScript.DamageSourceType = damageSourceTypeTaken;
-        floatingCombatTextScript.SourceNPC_IsEnemy = SourceNPC_IsEnemy;
         floatingCombatTextScript.HealSourceType = healSourceTypeTaken;
-        UnityEngine.Object.Destroy(fct, 1.1f);
+        floatingCombatTextScript.dmgReport = dmgReport;
+
+  
+        UnityEngine.Object.Destroy(fct, 1f);
     }
 
     public void RefreshDeployedTribesCounter()

@@ -29,18 +29,16 @@ public class BoardController : MonoBehaviour
         npcController = GetComponent<NpcController>(); //fetch world controllers
         uiController = GetComponent<UiController>();
         playerController = GetComponent<PlayerController>();
+     
     }
 
     // Start is called before the first frame update
     void Start()
     {
-
         ChangeGameStatus("initializing"); // set initalizing status
         CreateBoardTiles(); // create the tile 9x8 array board
         ChangeGameStatus("awaitingWizardConfirmation", "confirm settings"); // set to settings wizard status
         uiController.LoadFromSaveFile(); // load the save file stored in the user's computer
-
-
     }
 
     private void FixedUpdate()
@@ -471,6 +469,7 @@ public class BoardController : MonoBehaviour
             goldReward *= 1.20f; // +20% increase to current gold
             playerController.SetPlayerGoldCount((long)goldReward); // reward DEFEAT bonus gold
         }
+        uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopRefreshAudioClip);
 
         int i;
 
@@ -508,13 +507,20 @@ public class BoardController : MonoBehaviour
             }
         }
 
-        ChangeCurrentRound(currentGameRound + 1);
+        if (gameStatus != "report defeat" || gameStatus != "game over")
+        {
+            ChangeCurrentRound(currentGameRound + 1);
+        }
+    
         if (currentGameRound % 3 == 0) // only once every 3 rounds
         {
             playerController.SetMaxDeployedUnitsLimit(playerController.maxDeployedUnitsLimit + 1); // increment the max deployed unit limit
         }
         playerController.ShuffleNewShopingOptions(true); // shuffle the player shop for free with new options to buy
-        ChangeGameStatus("shopping"); // finally, change the game status to shopping phase
+        if (gameStatus != "report defeat")
+        {
+            ChangeGameStatus("shopping"); // finally, change the game status to shopping phase
+        }
     }
 
     public void TransitionToGameOverPhase()
