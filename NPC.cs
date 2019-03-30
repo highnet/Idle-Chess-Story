@@ -70,7 +70,14 @@ public class NPC : MonoBehaviour
     public NPC target;
     private VisualSideIdentifierCircleToggler visualSideIdentifierCircle;
     public AudioSource npcAudioSource;
-    public AudioClip autoAttackSoundClip;
+    public AudioClip autoAttacking_SoundClip;
+    public AudioClip dying_SoundClip; // TODO: not yet implemented
+    public AudioClip battleCry_SoundClip; // TODO: not yet implemented
+    public AudioClip moving_SoundClip; // TODO: not yet implemented
+    public AudioClip lvlingUp_SoundClip; // TODO: not yet implemented
+    public AudioClip lastHit_SoundClip; // TODO: not yet implemented
+    public AudioClip takingDamage_SoundClip; // TODO: not yet implemented
+    public AudioClip laughing_SoundClip; // TODO: not yet implemented
 
     public void Awake()
     {
@@ -1073,9 +1080,9 @@ public class NPC : MonoBehaviour
                             damageReport = target.CalculateDamageTaken(this.ATTACKPOWER, this, autoAttack_DamageType);
                             uiController.SpawnFloatingCombatText(damageReport.damageReceiverNPC, damageReport, DamageSource.PhysicalDamage_AutoAttack, HealSource.NOTHING);
                             target.TakePureDamage(damageReport.damageToTakeOrDisplay);
-                            if (autoAttackSoundClip != null)
+                            if (autoAttacking_SoundClip != null)
                             {
-                                npcAudioSource.PlayOneShot(autoAttackSoundClip);
+                                npcAudioSource.PlayOneShot(autoAttacking_SoundClip);
                             }
                         
                         }
@@ -1086,9 +1093,9 @@ public class NPC : MonoBehaviour
                             GameObject aap = (GameObject)Instantiate(Resources.Load("Auto Attack Projectile"), this.transform.position, Quaternion.identity);
                             aap.GetComponentInChildren<MagicalAutoAttackProjectile>().dmgReport = damageReport;
                             aap.GetComponentInChildren<MagicalAutoAttackProjectile>().destination = damageReport.damageReceiverNPC.transform.position;
-                            if (autoAttackSoundClip != null)
+                            if (autoAttacking_SoundClip != null)
                             {
-                                npcAudioSource.PlayOneShot(autoAttackSoundClip);
+                                npcAudioSource.PlayOneShot(autoAttacking_SoundClip);
                             }
                         }
 

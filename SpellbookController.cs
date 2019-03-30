@@ -3,6 +3,14 @@ using UnityEngine;
 
 public class SpellbookController : MonoBehaviour
 {
+
+    public UiController uic;
+
+    private void Start()
+    {
+        uic = GameObject.Find("World Controller").GetComponent<UiController>();
+    }
+
     public void CastSpell(NPC casterNPC, NPC targetNPC, Ability abilityToCast, float CasterSpellPower,float CasterAttackPower)
     {
 
@@ -20,8 +28,6 @@ public class SpellbookController : MonoBehaviour
             DamageReport dmgReport = targetNPC.CalculateDamageTaken(2 * CasterSpellPower, casterNPC, DamageSource.Magical_Ability);
             go.GetComponentInChildren<AbilityFireball>().dmgReport = dmgReport;
             go.GetComponentInChildren<AbilityFireball>().destination = dmgReport.damageReceiverNPC.transform.position;
-
-
         }
 
         else if (abilityToCast == Ability.AP_UP_Self)
@@ -32,7 +38,6 @@ public class SpellbookController : MonoBehaviour
             float boostDuration = 6;
             casterNPC.ATTACKPOWER += 100;
             StartCoroutine(AP_SubstractBonusAfterSeconds(casterNPC, boostDuration, boostValue, go));
-
         }
 
         else if (abilityToCast == Ability.Armor_UP_Self)
@@ -69,7 +74,6 @@ public class SpellbookController : MonoBehaviour
             go.transform.LookAt(targetNPC.transform);
             go.transform.SetParent(casterNPC.transform);
             DamageReport dmgReport = targetNPC.CalculateDamageTaken(3 * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
-            UiController uic = GameObject.Find("World Controller").GetComponent<UiController>();
             uic.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DamageSource.Physical_Ability, HealSource.NOTHING);
             targetNPC.TakePureDamage(dmgReport.damageToTakeOrDisplay);
             GameObject.Destroy(go, 4);
@@ -81,7 +85,6 @@ public class SpellbookController : MonoBehaviour
             go.transform.LookAt(targetNPC.transform);
             go.transform.SetParent(casterNPC.transform);
             DamageReport dmgReport = targetNPC.CalculateDamageTaken(1.5f * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
-            UiController uic = GameObject.Find("World Controller").GetComponent<UiController>();
             uic.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DamageSource.Physical_Ability, HealSource.NOTHING);
             targetNPC.TakePureDamage(dmgReport.damageToTakeOrDisplay);
             GameObject.Destroy(go, 3);
@@ -149,7 +152,6 @@ public class SpellbookController : MonoBehaviour
                     }
                 }
 
-                UiController uic = GameObject.Find("World Controller").GetComponent<UiController>();
             DamageReport dmgReport = ScriptableObject.CreateInstance<DamageReport>();
             dmgReport.damageReceiverNPC = targetNPC;
             dmgReport.damageSourceNPC = casterNPC;

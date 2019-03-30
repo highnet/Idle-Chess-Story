@@ -480,9 +480,10 @@ public class UiController : MonoBehaviour
 
     void ToggleShopPanel()
     {
-
-        if (hudCanvasShopPanel.activeSelf) // check if the shop panel is active
+        
+        if ( hudCanvasShopPanel.activeSelf) // check if the shop panel is active
         {
+          
             hudCanvasAudioSource.PlayOneShot(shopClosedAudioClip); // play the shop closing sound
         }
         else

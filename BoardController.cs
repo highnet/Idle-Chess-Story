@@ -454,7 +454,7 @@ public class BoardController : MonoBehaviour
     IEnumerator SmoothEndCombatRoundTransition() // smoothly end combat 
     {
 
-        yield return new WaitForSeconds(2); // wait 2 seconds
+        yield return new WaitForSeconds(4); // wait 2 seconds
 
         float goldReward = playerController.playerGoldCount; // fetch the player's current gold
         if (npcController.enemyList.Count == 0) // combat VICTORY
