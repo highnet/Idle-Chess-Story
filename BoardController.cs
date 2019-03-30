@@ -517,6 +517,7 @@ public class BoardController : MonoBehaviour
             playerController.SetMaxDeployedUnitsLimit(playerController.maxDeployedUnitsLimit + 1); // increment the max deployed unit limit
         }
         playerController.ShuffleNewShopingOptions(true); // shuffle the player shop for free with new options to buy
+     
         if (gameStatus != "report defeat")
         {
             ChangeGameStatus("shopping"); // finally, change the game status to shopping phase

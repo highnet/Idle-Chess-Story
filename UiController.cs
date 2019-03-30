@@ -128,8 +128,6 @@ public class UiController : MonoBehaviour
         hudCanvasTopPanelCurrentRoundText = GameObject.Find("HUDCanvas/Top Bar/Top Panel/Round Text").GetComponent<Text>();
         hudCanvasTopPanelDeployedUnitCountText = GameObject.Find("HUDCanvas/Top Bar/Top Panel/Deployed Unit Count Text").GetComponent<Text>();
         hudCanvasShopCostToShuffleText = GameObject.Find("HUDCanvas/Player Panel/Shop Panel/Refresh Button/Gold Cost Text").GetComponent<Text>();
-
-
         gameOverButton.onClick.RemoveAllListeners();
         gameOverButton.onClick.AddListener(delegate { boardController.ChangeGameStatus("game over"); });
 
@@ -214,14 +212,14 @@ public class UiController : MonoBehaviour
             hudCanvasCurrentlySelectedUnitPanel.SetActive(true);
             GameObject selectedObject = boardController.selectedObject;
             NPC selectedNPC = selectedObject.GetComponent<NPC>();
-            string friendOrFoe = selectedNPC.isEnemy ? "Enemy " : "Friendly ";
+            string friendOrFoe = selectedNPC.isEnemy ? "Enemy " : "";
             selectedUnitPanel_InformationText_NAME.text = friendOrFoe + selectedObject.name;
-            selectedUnitPanel_InformationText_ARMORANDRETALIATION.text = "Armor: " + selectedNPC.ARMOR + "Retaliation: " + selectedNPC.RETALIATION;
+            selectedUnitPanel_InformationText_ARMORANDRETALIATION.text = "Armor: " + selectedNPC.ARMOR + " / Retaliation: " + selectedNPC.RETALIATION;
             selectedUnitPanel_InformationText_ATTACKPOWER.text = "AP: " + selectedNPC.ATTACKPOWER;
             selectedUnitPanel_InformationText_CONCENTRATION.text = "CONCENTRATION: " + selectedNPC.CONCENTRATION + "/" + selectedNPC.MAXCONCENTRATION;
             selectedUnitPanel_InformationText_HP.text = "HP: " + selectedNPC.HP + "/" + selectedNPC.MAXHP;
             selectedUnitPanel_InformationText_SPELLPOWER.text = "SP: " + selectedNPC.SPELLPOWER;
-            selectedUnitPanel_InformationText_TIER.text = "Tier " + selectedNPC.TIER;
+            selectedUnitPanel_InformationText_TIER.text = "Level " + selectedNPC.TIER;
             selectedUnitPanel_primaryTribeIconVisualizer.SetImage(selectedNPC.PRIMARYTRIBE);
             selectedUnitPanel_secondaryTribeIconVisualizer.SetImage(selectedNPC.SECONDARYTRIBE);
             selectedUnitPanel_abilityiconVisualizer.SetImage(selectedNPC.ABILITY);
@@ -239,6 +237,10 @@ public class UiController : MonoBehaviour
             shopToggleButton.gameObject.SetActive(false);
             hudCanvasShopPanel.SetActive(false);
             sellFriendlySelectedTargetButton.gameObject.SetActive(false);
+            fightButton.gameObject.SetActive(false);
+        } else
+        {
+            fightButton.gameObject.SetActive(true);
         }
 
     }
@@ -342,7 +344,7 @@ public class UiController : MonoBehaviour
         }
 
         shopButton1.interactable = true;
-        shopButton1.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border");
+      
         shopButton1.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[0]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[0], out unitCost);
         shopbutton1_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
@@ -353,7 +355,7 @@ public class UiController : MonoBehaviour
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
 
         shopButton2.interactable = true;
-        shopButton2.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border");
+ 
         shopButton2.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[1]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[1], out unitCost);
         shopbutton2_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
@@ -364,7 +366,7 @@ public class UiController : MonoBehaviour
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
 
         shopButton3.interactable = true;
-        shopButton3.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border");
+   
         shopButton3.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[2]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[2], out unitCost);
         shopbutton3_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
@@ -375,7 +377,7 @@ public class UiController : MonoBehaviour
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
 
         shopButton4.interactable = true;
-        shopButton4.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border");
+
         shopButton4.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[3]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[3], out unitCost);
         shopbutton4_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
@@ -386,7 +388,7 @@ public class UiController : MonoBehaviour
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
 
         shopButton5.interactable = true;
-        shopButton5.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border");
+  
         shopButton5.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[4]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[4], out unitCost);
         shopbutton5_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
@@ -397,7 +399,7 @@ public class UiController : MonoBehaviour
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
 
         shopButton6.interactable = true;
-        shopButton6.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border");
+
         shopButton6.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[5]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[5], out unitCost);
         shopbutton6_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
@@ -418,7 +420,7 @@ public class UiController : MonoBehaviour
         if (playerController.buyUnitFromShop(playerController.shoppingOptions[0]))
         {
             shopButton1.interactable = false;
-            shopButton1.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border-Unclickable");
+            shopButton1.GetComponent<Image>().sprite = Resources.Load<Sprite>("bought unit icon");
             hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         }
     }
@@ -428,7 +430,7 @@ public class UiController : MonoBehaviour
         if (playerController.buyUnitFromShop(playerController.shoppingOptions[1]))
         {
             shopButton2.interactable = false;
-            shopButton2.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border-Unclickable");
+            shopButton2.GetComponent<Image>().sprite = Resources.Load<Sprite>("bought unit icon");
             hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         }
     }
@@ -438,7 +440,7 @@ public class UiController : MonoBehaviour
         if (playerController.buyUnitFromShop(playerController.shoppingOptions[2]))
         {
             shopButton3.interactable = false;
-            shopButton3.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border-Unclickable");
+            shopButton3.GetComponent<Image>().sprite = Resources.Load<Sprite>("bought unit icon");
             hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         }
  
@@ -450,7 +452,7 @@ public class UiController : MonoBehaviour
 
         {
             shopButton4.interactable = false;
-            shopButton4.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border-Unclickable");
+            shopButton4.GetComponent<Image>().sprite = Resources.Load<Sprite>("bought unit icon");
             hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         }
 
@@ -461,7 +463,7 @@ public class UiController : MonoBehaviour
         if (playerController.buyUnitFromShop(playerController.shoppingOptions[4]))
         {
             shopButton5.interactable = false;
-            shopButton5.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border-Unclickable");
+            shopButton5.GetComponent<Image>().sprite = Resources.Load<Sprite>("bought unit icon");
             hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         }
     }
@@ -471,7 +473,7 @@ public class UiController : MonoBehaviour
         if (playerController.buyUnitFromShop(playerController.shoppingOptions[5]))
         {
             shopButton6.interactable = false;
-            shopButton6.GetComponent<Image>().sprite = Resources.Load<Sprite>("Rope-Border-Unclickable");
+            shopButton6.GetComponent<Image>().sprite = Resources.Load<Sprite>("bought unit icon");
             hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         }
 

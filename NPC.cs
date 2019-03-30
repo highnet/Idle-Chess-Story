@@ -176,10 +176,6 @@ public class NPC : MonoBehaviour
         }
     }
 
-
-
-    
-
     public void CheckConcentrationGain_And_Guardian3Bonus(NPC damageDealer, int guardiansCount, int enemy_GuardiansCount)
     {
         float concentrationGain = playerController.constant_OnHit_BaseConcentrationGain;
@@ -1075,9 +1071,10 @@ public class NPC : MonoBehaviour
                       
                         DamageReport damageReport;
 
-                        if (this.autoattack_DamageType == DamageSource.PhysicalDamage_AutoAttack) // meleee auto attack
+                        if (this.autoattack_DamageType == DamageSource.PhysicalDamage_AutoAttack) // melee auto attack
                         {
-                            damageReport = target.CalculateDamageTaken(this.ATTACKPOWER, this, autoAttack_DamageType);
+                            float ap = this.ATTACKPOWER + UnityEngine.Random.Range(-3, 4);
+                            damageReport = target.CalculateDamageTaken(ap, this, autoAttack_DamageType);
                             uiController.SpawnFloatingCombatText(damageReport.damageReceiverNPC, damageReport, DamageSource.PhysicalDamage_AutoAttack, HealSource.NOTHING);
                             target.TakePureDamage(damageReport.damageToTakeOrDisplay);
                             if (autoAttacking_SoundClip != null)
@@ -1089,7 +1086,8 @@ public class NPC : MonoBehaviour
 
                         else if (this.autoattack_DamageType == DamageSource.MagicalDamage_AutoAttack) // magical auto attack
                         {
-                            damageReport = target.CalculateDamageTaken(ATTACKPOWER, this, DamageSource.MagicalDamage_AutoAttack);
+                            float ap = this.ATTACKPOWER + UnityEngine.Random.Range(-3, 4);
+                            damageReport = target.CalculateDamageTaken(ap, this, DamageSource.MagicalDamage_AutoAttack);
                             GameObject aap = (GameObject)Instantiate(Resources.Load("Auto Attack Projectile"), this.transform.position, Quaternion.identity);
                             aap.GetComponentInChildren<MagicalAutoAttackProjectile>().dmgReport = damageReport;
                             aap.GetComponentInChildren<MagicalAutoAttackProjectile>().destination = damageReport.damageReceiverNPC.transform.position;
