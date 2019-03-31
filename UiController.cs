@@ -181,7 +181,7 @@ public class UiController : MonoBehaviour
 
     public void SellFriendlySelectedTarget() // sell the friendly selected target npc
     {
-        if (boardController.selectedObject != null && boardController.selectedObject.GetComponent<NPC>().isEnemy == false)
+        if (npcController.allyList.Count > 1 && boardController.selectedObject != null && boardController.selectedObject.GetComponent<NPC>().isEnemy == false)
         {
             int goldReward;
             playerController.NPC_COST_DATA.TryGetValue(boardController.selectedObject.GetComponent<NPC>().UNIT_TYPE, out goldReward); // fetch the gold reward for the unit type
@@ -196,6 +196,9 @@ public class UiController : MonoBehaviour
             boardController.selectedObject.GetComponent<NPC>().RemoveFromBoard(true); // remove the sold npc from the board 
             playerController.SetPlayerGoldCount(playerController.playerGoldCount + (long)goldReward); // apply the gold reward to the player
             hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
+        } else
+        {
+            hudCanvasAudioSource.PlayOneShot(genericButtonFailureAudioClip);
         }
     }
 
@@ -344,7 +347,7 @@ public class UiController : MonoBehaviour
         }
 
         shopButton1.interactable = true;
-      
+        shopButton1.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI board Large  parchment");
         shopButton1.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[0]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[0], out unitCost);
         shopbutton1_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
@@ -355,7 +358,8 @@ public class UiController : MonoBehaviour
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
 
         shopButton2.interactable = true;
- 
+        shopButton2.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI board Large  parchment");
+
         shopButton2.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[1]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[1], out unitCost);
         shopbutton2_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
@@ -366,7 +370,8 @@ public class UiController : MonoBehaviour
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
 
         shopButton3.interactable = true;
-   
+        shopButton3.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI board Large  parchment");
+
         shopButton3.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[2]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[2], out unitCost);
         shopbutton3_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
@@ -377,6 +382,7 @@ public class UiController : MonoBehaviour
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
 
         shopButton4.interactable = true;
+        shopButton4.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI board Large  parchment");
 
         shopButton4.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[3]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[3], out unitCost);
@@ -388,7 +394,8 @@ public class UiController : MonoBehaviour
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
 
         shopButton5.interactable = true;
-  
+        shopButton5.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI board Large  parchment");
+
         shopButton5.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[4]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[4], out unitCost);
         shopbutton5_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
@@ -399,6 +406,7 @@ public class UiController : MonoBehaviour
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
 
         shopButton6.interactable = true;
+        shopButton6.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI board Large  parchment");
 
         shopButton6.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[5]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[5], out unitCost);

@@ -7,7 +7,7 @@ using System;
 //  Debug.Log(string.Join(", ", (playerController.enemyActiveTribesCounter.Select(pair => $"{pair.Key} => {pair.Value}"))));
 //  Debug.Log(string.Join(", ", (playerController.deployedTribesCounter.Select(pair => $"{pair.Key} => {pair.Value}"))));
 
-public enum Unit {Grenadier, RogueSpy,Chomper,RatWarrior, Tiger, Orbling, Skeleton, AxeGuard, DeadWizard, Cactus, BabyDragon, BigLizard, RockGolem, MageTower, ShamanTotem, Spitter, GoblinZerk, Zombie,Tree,KnightTower,CursedTomb,WarriorTent,AngelStatue,DemonLord}
+public enum Unit {Grenadier, RogueSpy,Chomper,RatWarrior, Tiger, Orbling, Skeleton, AxeGuard, DeadWizard, Cactus, BabyDragon, BigLizard, RockGolem, MageTower, ShamanTotem, Spitter, GoblinZerk, Zombie,Tree,KnightTower,CursedTomb,WarriorTent,AngelStatue,DemonLord,Eyebat,AlienSoldier,Engineer,RobotCreep}
 public enum Tribe {Warrior, Beast, Elemental, Undead, Wizard, Assassin, Guardian, Structure }
 public enum DamageSource {PhysicalDamage_AutoAttack, MagicalDamage_AutoAttack, PureDamage, Physical_Ability, Magical_Ability,NOTHING}
 public enum HealSource { HP_Regeneration, AOEHeal, Heal, Concentration_Gain,NOTHING}
@@ -93,12 +93,17 @@ public class PlayerController : MonoBehaviour
     public void ShuffleNewShopingOptions(bool isFreeShuffle) // shuffle new shopping options
     {
    
-
-        if (isFreeShuffle || (costToShuffleShop <= playerGoldCount))
+        if (isFreeShuffle || (costToShuffleShop <= playerGoldCount && npcController.allyList.Count != 0))
         {
             for (int i = 0; i < 6; i++)
             {
                 shoppingOptions[i] = (Unit)Enum.GetValues(typeof(Unit)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Unit)).Length));
+
+                while (shoppingOptions[i] == Unit.Eyebat || shoppingOptions[i] == Unit.AlienSoldier || shoppingOptions[i] == Unit.Engineer || shoppingOptions[i] == Unit.RobotCreep)
+                {
+                    shoppingOptions[i] = (Unit)Enum.GetValues(typeof(Unit)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Unit)).Length));
+                }
+
             }
 
             if (!isFreeShuffle)
@@ -111,6 +116,9 @@ public class PlayerController : MonoBehaviour
             uiController.UpdateAllShopButtons();
             uiController.ChangeCostToShuffleShopDisplayText(costToShuffleShop.ToString());
             uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopRefreshAudioClip);
+        } else
+        {
+            uiController.hudCanvasAudioSource.PlayOneShot(uiController.genericButtonFailureAudioClip);
         }
 
     }
@@ -131,30 +139,34 @@ public class PlayerController : MonoBehaviour
 
 
     {
-             { Unit.AngelStatue, 10 },
-             { Unit.AxeGuard , 10 },
-             { Unit.BabyDragon  , 10 },
-             { Unit.BigLizard  , 10 },
-             { Unit.Cactus , 10 },
-             { Unit.Chomper , 10 },
-             { Unit.CursedTomb , 10 },
-             { Unit.DeadWizard , 10 },
-             { Unit.DemonLord , 10 },
-             { Unit.GoblinZerk , 10 },
-             { Unit.Grenadier , 10 },
-             { Unit.KnightTower , 10 },
-             { Unit.MageTower , 10 },
-             { Unit.Orbling , 10 },
-             { Unit.RatWarrior , 10 },
-             { Unit.RockGolem , 10 },
-             { Unit.RogueSpy , 10 },
-             { Unit.ShamanTotem , 10 },
-             { Unit.Skeleton , 10 },
-             { Unit.Spitter , 10 },
-             { Unit.Tiger , 10 },
-             { Unit.Tree , 10 },
-             { Unit.WarriorTent , 10 },
-             { Unit.Zombie , 10 },
+
+    { Unit.AngelStatue, 4 },
+     { Unit.AlienSoldier, 999 },
+    { Unit.AxeGuard, 2 },
+       { Unit.BabyDragon, 6 },
+          { Unit.BigLizard, 4 },
+             { Unit.Cactus, 2 },
+                { Unit.Chomper, 2 },
+                   { Unit.CursedTomb, 4 },
+                      { Unit.DeadWizard, 4 },
+                         { Unit.DemonLord, 6 },
+                            { Unit.Engineer, 999 },
+                               { Unit.Eyebat, 999 },
+                                  { Unit.GoblinZerk, 2 },
+                                     { Unit.Grenadier, 2 },
+                                        { Unit.KnightTower, 4 },
+                                           { Unit.MageTower, 4 },
+                                              { Unit.Orbling, 6 },
+                                                 { Unit.RatWarrior, 4 },
+                                                    { Unit.RockGolem, 2 },
+                                                       { Unit.RogueSpy, 6 },
+                                                          { Unit.ShamanTotem, 4 },
+                                                             { Unit.Skeleton, 2 },
+                                                                { Unit.Spitter, 2 },
+                                                                   { Unit.Tiger, 4 },
+                                                                      { Unit.Tree, 4 },
+                                                                         { Unit.WarriorTent, 4 },
+                                                                            { Unit.Zombie, 2 },
 
 
 

@@ -67,12 +67,11 @@ public class FloatingCombatText : MonoBehaviour
         //adapt floating combat text styles
         if (DamageSourceType == DamageSource.MagicalDamage_AutoAttack || DamageSourceType == DamageSource.PhysicalDamage_AutoAttack)
         {
-            textmesh.fontStyle = FontStyle.Normal;
+      
         }
         else if (DamageSourceType == DamageSource.Magical_Ability || DamageSourceType == DamageSource.Physical_Ability)
         {
-            textmesh.fontStyle = FontStyle.BoldAndItalic;
-            textmesh.characterSize *= 1.5f;
+            textmesh.characterSize *= 1.3f;
         }
 
         }

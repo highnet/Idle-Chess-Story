@@ -65,8 +65,55 @@ public class BoardController : MonoBehaviour
 
     public void SpawnEnemyUnitsRound_Balanced() // copy the human players board and deply a similar team
     {
+
+
         if (!testMode) // test mode spawns dummies instead of real units
         {
+       
+            if (currentGameRound  == 1 || currentGameRound == 2  || currentGameRound == 5 ||  currentGameRound == 7 || currentGameRound == 11 || currentGameRound == 15 || currentGameRound == 17)
+            {
+                playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
+                for(int i = 0; i < currentGameRound+1; i++)
+                {
+                    int randomI = UnityEngine.Random.Range(0, 4); // find a random i coordinate
+                    int randomJ = UnityEngine.Random.Range(0, 8); // find a random j coordinate
+                    TrySpawnUnit(randomI, randomJ, Unit.RobotCreep, true, false, 0,true); // spawn creep
+                }
+
+            }
+
+            else  if (currentGameRound == 18) // boss round 
+            {
+                playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
+                GameObject spawnedEnemy = TrySpawnUnit(2, 4, Unit.Engineer, true, false, 0,true); // spawn engineer
+                if (spawnedEnemy != null) // this can be used to test enemy tribe bonuses
+                {
+                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE); //
+                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().SECONDARYTRIBE);
+                }
+            }
+            else if (currentGameRound == 12) // boss round 
+            {
+                playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
+                GameObject spawnedEnemy = TrySpawnUnit(2, 4, Unit.AlienSoldier, true, false, 0,true); // spawn alien soldier
+                if (spawnedEnemy != null) // this can be used to test enemy tribe bonuses
+                {
+                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE); //
+                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().SECONDARYTRIBE);
+                }
+            }
+            else if (currentGameRound == 6) // boss round 
+            {
+                playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
+                GameObject spawnedEnemy = TrySpawnUnit(2,4,Unit.Eyebat,true,false,0,true); // spawn eyebat
+                if (spawnedEnemy != null) // this can be used to test enemy tribe bonuses
+                {
+                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE); //
+                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().SECONDARYTRIBE);
+                }
+            }
+            else // normal round
+            {
             Tribe randomTribe;
             randomTribe = (Tribe)Enum.GetValues(typeof(Tribe)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Tribe)).Length)); // get a random tribe
             bool doneTrying = false;
@@ -117,7 +164,7 @@ public class BoardController : MonoBehaviour
                 int randomJ = UnityEngine.Random.Range(0, 8); // find a random j coordinate
                 Unit randomUnit = spawnList.ToArray()[UnityEngine.Random.Range(0, spawnList.ToArray().Length)]; // get a random unit from the list of units
 
-                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true, false,1); // try to spawn the unit
+                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true, false,1,false); // try to spawn the unit
                 if (spawnedEnemy != null) // if we spawned a real unit
                 {
                     Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE); // increment the enemy tribe counter (primary tribe)
@@ -133,7 +180,7 @@ public class BoardController : MonoBehaviour
                 int randomJ = UnityEngine.Random.Range(0, 8);
                 Unit randomUnit = spawnList.ToArray()[UnityEngine.Random.Range(0, spawnList.ToArray().Length)];
 
-                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true,false,2); // try to spawn the unit (this time TIER 2)
+                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true,false,2,false); // try to spawn the unit (this time TIER 2)
                 if (spawnedEnemy != null)
                 {
                     Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE);
@@ -150,7 +197,7 @@ public class BoardController : MonoBehaviour
                 int randomJ = UnityEngine.Random.Range(0, 8);
                 Unit randomUnit = spawnList.ToArray()[UnityEngine.Random.Range(0, spawnList.ToArray().Length)];
 
-                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true,false,3); // try to spawn the unit (this time TIER 3)
+                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true,false,3,false); // try to spawn the unit (this time TIER 3)
                 if (spawnedEnemy != null)
                 {
                     Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE);
@@ -160,11 +207,12 @@ public class BoardController : MonoBehaviour
 
 
             }
-
+            }
         }
     
         else // if in test mode
         {
+            playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
             GameObject spawnedEnemy = TrySpawnDummy(2, 4, true); // spawn dummy
             if (spawnedEnemy != null) // this can be used to test enemy tribe bonuses
             {
@@ -176,6 +224,7 @@ public class BoardController : MonoBehaviour
 
     }
 
+    [Obsolete]
     public void SpawnEnemyUnitsRound_Scaling(int roundCounter) // Spawns enemy units at the start of each round
     {
 
@@ -210,7 +259,7 @@ public class BoardController : MonoBehaviour
                 int randomJ = UnityEngine.Random.Range(0, 8); // random j coordinate
                 Unit randomUnit = spawnList.ToArray()[UnityEngine.Random.Range(0, spawnList.ToArray().Length)]; //get a random unit from the list
 
-                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true,true,1); // try spawn the enemy unit
+                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true,true,1,false); // try spawn the enemy unit
                 if (spawnedEnemy != null) // if we succeeded
                 {
                     Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE); // increment enemy tribe counter with my primary tribe
@@ -235,7 +284,7 @@ public class BoardController : MonoBehaviour
     }
 
 
-    public GameObject TrySpawnUnit(int i, int j, Unit unitToSpawn, bool isEnemySpawn,bool doRandomLevelupEnemy,int tierOverride) // try to spawn a unit and return it
+    public GameObject TrySpawnUnit(int i, int j, Unit unitToSpawn, bool isEnemySpawn,bool doRandomLevelupEnemy,int tierOverride,bool isCreep) // try to spawn a unit and return it
     {
 
         string prefabName = Enum.GetName(typeof(Unit), unitToSpawn); //get the units name as defined in the enum
@@ -243,10 +292,10 @@ public class BoardController : MonoBehaviour
 
         if (tile.GetComponent<TileBehaviour>().occupyingUnit != null) // tile is occupied
         {
-            if (isEnemySpawn &&  tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().TIER == 1) // enemy spawns on a tile occupied by a tier 1
+            if (isEnemySpawn && !isCreep && tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().TIER == 1) // enemy spawns on a tile occupied by a tier 1
             {
                 tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().ApplyTier2Upgrades(); // level up the tier 1 unit to tier 2
-            } else if (isEnemySpawn && tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().TIER == 2) // enemy spawns on a tile occupied by a tier 2
+            } else if (isEnemySpawn && !isCreep && tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().TIER == 2) // enemy spawns on a tile occupied by a tier 2
             {
                 tile.GetComponent<TileBehaviour>().occupyingUnit.GetComponentInChildren<NPC>().ApplyTier3Upgrades(); // level up the tier 2 unit to tier 3
             }
@@ -467,6 +516,11 @@ public class BoardController : MonoBehaviour
 
         {
             goldReward *= 1.20f; // +20% increase to current gold
+
+            if (goldReward < 2)
+            {
+                goldReward = 2;
+            }
             playerController.SetPlayerGoldCount((long)goldReward); // reward DEFEAT bonus gold
         }
         uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopRefreshAudioClip);

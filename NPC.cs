@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 
 
@@ -82,12 +83,6 @@ public class NPC : MonoBehaviour
     public void Awake()
     {
         FindWorldControllers();
-        HP = BASE_MAXHP;
-        MAXHP = BASE_MAXHP;
-        ARMOR = BASE_ARMOR;
-        ATTACKPOWER = BASE_ATTACKPOWER;
-        SPELLPOWER = BASE_SPELLPOWER;
-        RETALIATION = BASE_RETALIATION;
         animator = GetComponent<Animator>();
     }
 
@@ -95,6 +90,12 @@ public class NPC : MonoBehaviour
     void Start()
     {
         StartLiveRoutine();
+        HP = BASE_MAXHP;
+        MAXHP = BASE_MAXHP;
+        ARMOR = BASE_ARMOR;
+        ATTACKPOWER = BASE_ATTACKPOWER;
+        SPELLPOWER = BASE_SPELLPOWER;
+        RETALIATION = BASE_RETALIATION;
     }
 
     public void StartLiveRoutine()
@@ -708,10 +709,10 @@ public class NPC : MonoBehaviour
         if (beingDragged && !isEnemy)
         {
             RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("ChessTile"))) {
+            if (!EventSystem.current.IsPointerOverGameObject(-1) && Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("ChessTile"))) {
                 this.gameObject.GetComponentsInParent<Transform>()[1].position = hit.point + Vector3.up * 2;
             }
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("ChessBoard")))
+            if (!EventSystem.current.IsPointerOverGameObject(-1) && Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("ChessBoard")))
             {
                 this.gameObject.GetComponentsInParent<Transform>()[1].position = hit.point + Vector3.up * 2;
             }
