@@ -17,7 +17,13 @@ public class DummyBehaviour : NPC
 
     void Start()
     {
-        StartCoroutine(Live(1, this.autoattack_DamageType, this.ABILITY,this.actionTime));
+        StartLiveRoutine();
+        HP = BASE_MAXHP;
+        MAXHP = BASE_MAXHP;
+        ARMOR = BASE_ARMOR;
+        ATTACKPOWER = BASE_ATTACKPOWER;
+        SPELLPOWER = BASE_SPELLPOWER;
+        RETALIATION = BASE_RETALIATION;
         textMesh = GetComponentInChildren<TextMesh>();
     }
 

@@ -120,9 +120,7 @@ public class SpellbookController : MonoBehaviour
         } else if (abilityToCast == Ability.Stun)
         {
             float stunDuration = 3;
-            GameObject anim = (GameObject)Instantiate(Resources.Load("Stun Animation"), targetNPC.transform.position, Quaternion.identity);
-            anim.transform.SetParent(targetNPC.transform);
-            DoStunCycle(stunDuration,targetNPC,anim);
+            DoStunCycle(stunDuration,targetNPC,casterNPC);
         }
         else if (abilityToCast == Ability.HealFriend)
         {
@@ -168,15 +166,28 @@ public class SpellbookController : MonoBehaviour
         }
 
     }
-    public void DoStunCycle(float secondsToBeStunned,NPC tobeAffected,GameObject anim)
+    public void DoStunCycle(float secondsToBeStunned,NPC tobeAffected,NPC casterNPC)
     {
+        Debug.Log("Attempting stun cycle.");
         if (tobeAffected.liveRoutine != null)
         {
+            Debug.Log("stunning");
+            GameObject anim = (GameObject)Instantiate(Resources.Load("Stun Animation"), tobeAffected.transform.position, Quaternion.identity);
+            anim.transform.SetParent(tobeAffected.transform);
             tobeAffected.StopCoroutine(tobeAffected.liveRoutine);
             tobeAffected.liveRoutine = null;
+            StartCoroutine(WakeUpAfterSeconds(secondsToBeStunned, anim, tobeAffected));
+        }
+        else
+        {
+           
+            Debug.Log("dont want to stack stuns");
+            if (casterNPC != null)
+            {
+                casterNPC.CONCENTRATION = casterNPC.MAXCONCENTRATION;
+            }
         }
 
-        StartCoroutine(WakeUpAfterSeconds(secondsToBeStunned, anim, tobeAffected));
     }
 
     public IEnumerator WakeUpAfterSeconds(float secondsToBeStunned, GameObject anim,NPC toBeAffected)
@@ -185,6 +196,7 @@ public class SpellbookController : MonoBehaviour
 
             if (toBeAffected!= null && toBeAffected.liveRoutine == null)
             {
+            Debug.Log("waking up");
                 toBeAffected.StartLiveRoutine(); 
             }
 

@@ -1109,6 +1109,7 @@ public class NPC : MonoBehaviour
                         int deltaI = 0;
                         int deltaJ = 0;
 
+
                         if (target.occupyingTile.GetComponent<TileBehaviour>().i < occupyingTile.GetComponent<TileBehaviour>().i)
                         {
                             deltaI = -1;
@@ -1118,6 +1119,8 @@ public class NPC : MonoBehaviour
                             deltaI = 1;
                         }
 
+                        moveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + deltaI, occupyingTile.GetComponent<TileBehaviour>().j);
+
                         if (target.occupyingTile.GetComponent<TileBehaviour>().j < occupyingTile.GetComponent<TileBehaviour>().j)
                         {
                             deltaJ = -1;
@@ -1126,7 +1129,9 @@ public class NPC : MonoBehaviour
                         {
                             deltaJ = 1;
                         }
-                        moveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + deltaI, occupyingTile.GetComponent<TileBehaviour>().j + deltaJ);
+
+                        moveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i, occupyingTile.GetComponent<TileBehaviour>().j + deltaJ);
+
                     }
 
                 }
