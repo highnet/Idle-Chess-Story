@@ -5,7 +5,9 @@ using UnityEngine;
 public class DamageReport : ScriptableObject
 {
 
-    public float damageToTakeOrDisplay;
+    public float primaryDamageDealt;
+    public float lifeStealHeal;
+    public float retaliationDamageRecieved;
     public NPC damageSourceNPC;
     public NPC damageReceiverNPC;
     public bool wasCriticalStrike;

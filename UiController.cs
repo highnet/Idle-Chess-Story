@@ -552,16 +552,16 @@ public class UiController : MonoBehaviour
 
     }
 
-    public void SpawnFloatingCombatText(NPC TargetDestinationNPC,DamageReport dmgReport,DamageSource damageSourceTypeTaken,HealSource healSourceTypeTaken)
+    public void SpawnFloatingCombatText(NPC TargetDestinationNPC,DamageReport dmgReport,DisplayMode displayMode)
     {
-        GameObject fct = (GameObject)Instantiate(Resources.Load("Floating Combat Text"), TargetDestinationNPC.transform.position, Quaternion.identity);
-        FloatingCombatText floatingCombatTextScript = fct.GetComponentInChildren<FloatingCombatText>();
-        floatingCombatTextScript.DamageSourceType = damageSourceTypeTaken;
-        floatingCombatTextScript.HealSourceType = healSourceTypeTaken;
-        floatingCombatTextScript.dmgReport = dmgReport;
-
-  
-        UnityEngine.Object.Destroy(fct, 1f);
+        if (TargetDestinationNPC != null)
+        {
+            GameObject fct = (GameObject)Instantiate(Resources.Load("Floating Combat Text"), TargetDestinationNPC.transform.position, Quaternion.identity);
+            FloatingCombatText floatingCombatTextScript = fct.GetComponentInChildren<FloatingCombatText>();
+            floatingCombatTextScript.displayMode = displayMode;
+            floatingCombatTextScript.dmgReport = dmgReport;
+            UnityEngine.Object.Destroy(fct, 1f);
+        }
     }
 
     public void RefreshDeployedTribesCounter()

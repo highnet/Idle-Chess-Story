@@ -73,7 +73,7 @@ public class BoardController : MonoBehaviour
             if (currentGameRound  == 1 || currentGameRound == 2  || currentGameRound == 5 ||  currentGameRound == 7 || currentGameRound == 11 || currentGameRound == 15 || currentGameRound == 17)
             {
                 playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
-                for(int i = 0; i < 2 + (currentGameRound-2); i++)
+                for(int i = 0; i < 2 + (currentGameRound/2); i++)
                 {
                     int randomI = UnityEngine.Random.Range(0, 4); // find a random i coordinate
                     int randomJ = UnityEngine.Random.Range(0, 8); // find a random j coordinate
@@ -554,8 +554,9 @@ public class BoardController : MonoBehaviour
                 Helper.Increment<Tribe>(playerController.deployedTribesCounter, npcController.allyListBackup[i].PRIMARYTRIBE);
                 Helper.Increment<Tribe>(playerController.deployedTribesCounter, npcController.allyListBackup[i].SECONDARYTRIBE);
                 uiController.RefreshDeployedTribesCounter();
-                playerController.SetCurrentlyDeployedUnits(playerController.currentlyDeployedUnits + 1);
+                playerController.SetCurrentlyDeployedUnits(playerController.currentlyDeployedUnits + 1);;
                 npcController.deployedAllyList.Add(npcController.allyListBackup[i]);
+                npcController.allyList.Add(npcController.allyListBackup[i]);
                 selectedObject = npcController.deployedAllyList.ToArray()[0].gameObject;
 
             }

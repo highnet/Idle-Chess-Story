@@ -272,7 +272,7 @@ public class NPC : MonoBehaviour
             DamageReport dmgReportx = ScriptableObject.CreateInstance<DamageReport>();
             dmgReportx.damageReceiverNPC = this;
             dmgReportx.damageSourceNPC = damageDealer;
-            dmgReportx.damageToTakeOrDisplay = 0;
+            dmgReportx.primaryDamageDealt = 0;
             dmgReportx.wasCriticalStrike = false;
             dmgReportx.wasDampenedMiss = false;
             dmgReportx.wasMiss = false;
@@ -339,7 +339,7 @@ public class NPC : MonoBehaviour
             DamageReport dmgReport0 = ScriptableObject.CreateInstance<DamageReport>();
             dmgReport0.damageReceiverNPC = this;
             dmgReport0.damageSourceNPC = damageDealer;
-            dmgReport0.damageToTakeOrDisplay = 0;
+            dmgReport0.primaryDamageDealt = 0;
             dmgReport0.wasCriticalStrike = false;
             dmgReport0.wasDampenedMiss = false;
             dmgReport0.wasMiss = true;
@@ -375,7 +375,7 @@ public class NPC : MonoBehaviour
                 DamageReport dmgReport1 = ScriptableObject.CreateInstance<DamageReport>();
                 dmgReport1.damageReceiverNPC = this;
                 dmgReport1.damageSourceNPC = damageDealer;
-                dmgReport1.damageToTakeOrDisplay = 0;
+                dmgReport1.primaryDamageDealt = 0;
                 dmgReport1.wasCriticalStrike = false;
                 dmgReport1.wasDampenedMiss = true;
                 dmgReport1.wasMiss = false;
@@ -395,7 +395,7 @@ public class NPC : MonoBehaviour
                 DamageReport dmgReport2 = ScriptableObject.CreateInstance<DamageReport>();
                 dmgReport2.damageReceiverNPC = this;
                 dmgReport2.damageSourceNPC = damageDealer;
-                dmgReport2.damageToTakeOrDisplay = 0;
+                dmgReport2.primaryDamageDealt = 0;
                 dmgReport2.wasCriticalStrike = false;
                 dmgReport2.wasDampenedMiss = true;
                 dmgReport2.wasMiss = false;
@@ -403,27 +403,32 @@ public class NPC : MonoBehaviour
             }
 
         }
+        float lifeStealHeal = 0;
+        float retaliationDamage = 0;
 
         damageToDeal *= CheckElemental6Bonus(DamageDealerIsEnemy, elementalsCount, enemy_ElementalsCount);
         netArmor *= CalculateStructure6Bonus(DamageDealerIsEnemy,structureCount,enemy_StructureCount);
         netRetaliation *= CalculateStructure3Bonus(DamageDealerIsEnemy, structureCount, enemy_StructureCount);
         netArmor /= CheckUndead3Bonus(DamageDealerIsEnemy, undeadCount, enemy_UndeadCount);
-        damageToDeal -= (netArmor);
+
+        damageToDeal -= (damageToDeal * (netArmor / playerController.coefficient_DamageFormula_OnDamage_ArmorEfficiencyPenalty));
+
         if (damageSourceType == DamageSource.MagicalDamage_AutoAttack || damageSourceType == DamageSource.PhysicalDamage_AutoAttack)
         {
-            DoLifeSteal_And_CheckBeast6Bonus(DamageDealerIsEnemy, beastsCount, enemy_beastsCount, damageDealer, damageToDeal);
-         //   damageDealer.HP -= damageToDeal * (netRetaliation / playerController.coefficient_DamageFormula_OnDamage_RetaliationEfficiencyPenalty);  ADD TO DAMAGE REPORT AND MOVE OUT OF CALCULATE DAMAGE
+          lifeStealHeal =   DoLifeSteal_And_CheckBeast6Bonus(DamageDealerIsEnemy, beastsCount, enemy_beastsCount, damageDealer, damageToDeal);
+          retaliationDamage = damageToDeal * (netRetaliation / playerController.coefficient_DamageFormula_OnDamage_RetaliationEfficiencyPenalty); 
         }
 
 
         DamageReport dmgReport = ScriptableObject.CreateInstance<DamageReport>();
         dmgReport.damageReceiverNPC = this;
         dmgReport.damageSourceNPC = damageDealer;
-        dmgReport.damageToTakeOrDisplay = damageToDeal;
+        dmgReport.primaryDamageDealt = damageToDeal;
         dmgReport.wasCriticalStrike = isCrit;
         dmgReport.wasDampenedMiss = false;
         dmgReport.wasMiss = false;
-
+        dmgReport.lifeStealHeal = lifeStealHeal;
+        dmgReport.retaliationDamageRecieved = retaliationDamage;
         return dmgReport;  
     }
 
@@ -752,18 +757,19 @@ public class NPC : MonoBehaviour
     }
 
 
-    public void DoLifeSteal_And_CheckBeast6Bonus(bool DamageDealerIsEnemy, int beastsCount, int enemy_beastsCount, NPC damageDealer, float damageToDeal)
+    public float DoLifeSteal_And_CheckBeast6Bonus(bool DamageDealerIsEnemy, int beastsCount, int enemy_beastsCount, NPC damageDealer, float damageToDeal)
     {
         if (DamageDealerIsEnemy == false && beastsCount >= 6)
         {
-            damageDealer.HP += playerController.coefficient_Beast_6_LifeStealBonus_OnDamage_LifeStealEfficiencyMultiplier * damageToDeal; // FRIENDLY Beast Tribe 6 * LIFESTEAL
+          return  playerController.coefficient_Beast_6_LifeStealBonus_OnDamage_LifeStealEfficiencyMultiplier * damageToDeal; // FRIENDLY Beast Tribe 6 * LIFESTEAL
         }
 
         else if (DamageDealerIsEnemy == true && enemy_beastsCount >= 6)
         {
-            damageDealer.HP += playerController.coefficient_Beast_6_LifeStealBonus_OnDamage_LifeStealEfficiencyMultiplier * damageToDeal; // FRIENDLY Beast Tribe 6 * LIFESTEAL
+          return   playerController.coefficient_Beast_6_LifeStealBonus_OnDamage_LifeStealEfficiencyMultiplier * damageToDeal; // FRIENDLY Beast Tribe 6 * LIFESTEAL
 
         }
+        return 0;
     }
 
 
@@ -992,13 +998,32 @@ public class NPC : MonoBehaviour
             return false;
     }
 
-    public void TakePureDamage(float dmgToTake)
+    public void TakePureDamage(DamageReport damageReport)
     {
-        if (dmgToTake < 0)
+        if (damageReport.primaryDamageDealt < 0)
         {
-            dmgToTake = 0;
+            damageReport.primaryDamageDealt = 0;
         }
-        this.HP -= dmgToTake;
+
+        if(damageReport.lifeStealHeal <= 0)
+        {
+            damageReport.lifeStealHeal = 0;
+        } else
+        {
+            damageReport.damageSourceNPC.GainHP(damageReport.lifeStealHeal, HealSource.Heal);
+            uiController.SpawnFloatingCombatText(damageReport.damageSourceNPC, damageReport, DisplayMode.Lifesteal);
+        }
+
+        if (damageReport.retaliationDamageRecieved <= 0)
+        {
+            damageReport.retaliationDamageRecieved = 0;
+        } else
+        {
+            damageReport.damageSourceNPC.HP -= damageReport.retaliationDamageRecieved;
+            uiController.SpawnFloatingCombatText(damageReport.damageSourceNPC, damageReport, DisplayMode.Retaliation);
+        }
+
+        this.HP -= damageReport.primaryDamageDealt;
      
     if (HP <= 0)
     {
@@ -1012,7 +1037,17 @@ public class NPC : MonoBehaviour
     this.HP = this.MAXHP;
     }
 
+        if (damageReport.damageSourceNPC.HP <= 0)
+        {
+            damageReport.damageSourceNPC.HP = 0;
+            damageReport.damageSourceNPC.RemoveFromBoard(false);
+        }
 
+
+        if (damageReport.damageSourceNPC.HP > this.MAXHP)
+        {
+            damageReport.damageSourceNPC.HP = this.MAXHP;
+        }
 
     }
 
@@ -1076,9 +1111,9 @@ public class NPC : MonoBehaviour
                         {
                             float ap = this.ATTACKPOWER + UnityEngine.Random.Range(-3, 4);
                             damageReport = target.CalculateDamageTaken(ap, this, autoAttack_DamageType);
-                            uiController.SpawnFloatingCombatText(damageReport.damageReceiverNPC, damageReport, DamageSource.PhysicalDamage_AutoAttack, HealSource.NOTHING);
-                            target.TakePureDamage(damageReport.damageToTakeOrDisplay);
-                            if (autoAttacking_SoundClip != null)
+                            uiController.SpawnFloatingCombatText(damageReport.damageReceiverNPC, damageReport, DisplayMode.RegularDamage);
+                            target.TakePureDamage(damageReport);
+                            if (autoAttacking_SoundClip != null && npcAudioSource != null)
                             {
                                 npcAudioSource.PlayOneShot(autoAttacking_SoundClip);
                             }

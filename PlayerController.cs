@@ -9,8 +9,8 @@ using System;
 
 public enum Unit {Grenadier, RogueSpy,Chomper,RatWarrior, Tiger, Orbling, Skeleton, AxeGuard, DeadWizard, Cactus, BabyDragon, BigLizard, RockGolem, MageTower, ShamanTotem, Spitter, GoblinZerk, Zombie,Tree,KnightTower,CursedTomb,WarriorTent,AngelStatue,DemonLord,Eyebat,AlienSoldier,Engineer,RobotCreep}
 public enum Tribe {Warrior, Beast, Elemental, Undead, Wizard, Assassin, Guardian, Structure }
-public enum DamageSource {PhysicalDamage_AutoAttack, MagicalDamage_AutoAttack, PureDamage, Physical_Ability, Magical_Ability,NOTHING}
-public enum HealSource { HP_Regeneration, AOEHeal, Heal, Concentration_Gain,NOTHING}
+public enum DamageSource {PhysicalDamage_AutoAttack, MagicalDamage_AutoAttack, PureDamage, Physical_Ability, Magical_Ability,NOTHING, RetaliationDamage}
+public enum HealSource { HP_Regeneration, AOEHeal, Heal, Lifesteal, Concentration_Gain,NOTHING}
 public enum Ability {Fireball,AP_UP_Self,MaxHP_Up_Self,Retaliation_UP_Self,Armor_UP_Self,NOTHING,HeroicStrike,AP_DOWN_OTHER,ARMOR_DOWN_OTHER,FrostBall,Stab,Stun,HealFriend}
 
 
@@ -65,6 +65,7 @@ public class PlayerController : MonoBehaviour
     public float coefficient_Structure_6_ArmorBonus_OnIncomingDamageArmorMultiplier;
     public float coefficient_Structure_3_RetaliationBonus_OnIncomingDamageRetaliationMultiplier;
     public int coefficient_DamageFormula_OnDamage_RetaliationEfficiencyPenalty;
+    public int coefficient_DamageFormula_OnDamage_ArmorEfficiencyPenalty;
     public float coefficient_Beast_6_LifeStealBonus_OnDamage_LifeStealEfficiencyMultiplier;
     public float coefficient_Wizard_3_OnHitBonusMagicalDamageMultiplier;
     public float coefficient_Wizard_6_DampenBonus_OnIncomingMagicalDamageMultiplier;

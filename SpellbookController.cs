@@ -74,8 +74,8 @@ public class SpellbookController : MonoBehaviour
             go.transform.LookAt(targetNPC.transform);
             go.transform.SetParent(casterNPC.transform);
             DamageReport dmgReport = targetNPC.CalculateDamageTaken(3 * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
-            uic.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DamageSource.Physical_Ability, HealSource.NOTHING);
-            targetNPC.TakePureDamage(dmgReport.damageToTakeOrDisplay);
+            uic.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DisplayMode.AbilityDamage);
+            targetNPC.TakePureDamage(dmgReport);
             GameObject.Destroy(go, 4);
 
         }
@@ -85,8 +85,8 @@ public class SpellbookController : MonoBehaviour
             go.transform.LookAt(targetNPC.transform);
             go.transform.SetParent(casterNPC.transform);
             DamageReport dmgReport = targetNPC.CalculateDamageTaken(1.5f * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
-            uic.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DamageSource.Physical_Ability, HealSource.NOTHING);
-            targetNPC.TakePureDamage(dmgReport.damageToTakeOrDisplay);
+            uic.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DisplayMode.AbilityDamage);
+            targetNPC.TakePureDamage(dmgReport);
             GameObject.Destroy(go, 3);
 
         }
@@ -153,15 +153,15 @@ public class SpellbookController : MonoBehaviour
             DamageReport dmgReport = ScriptableObject.CreateInstance<DamageReport>();
             dmgReport.damageReceiverNPC = targetNPC;
             dmgReport.damageSourceNPC = casterNPC;
-            dmgReport.damageToTakeOrDisplay = amountToHeal;
+            dmgReport.primaryDamageDealt = amountToHeal;
             dmgReport.wasCriticalStrike = false;
             dmgReport.wasDampenedMiss = false;
             dmgReport.wasMiss = false;
-                uic.SpawnFloatingCombatText(targetNPC, dmgReport,DamageSource.NOTHING,HealSource.Heal);
-                GameObject anim = (GameObject)Instantiate(Resources.Load("Heal Animation"), targetNPC.transform.position, Quaternion.identity);
-                anim.transform.SetParent(targetNPC.transform);
-                targetNPC.GainHP(amountToHeal, HealSource.Heal);
-                Object.Destroy(anim, 1);
+            uic.SpawnFloatingCombatText(targetNPC, dmgReport,DisplayMode.Heal);
+            GameObject anim = (GameObject)Instantiate(Resources.Load("Heal Animation"), targetNPC.transform.position, Quaternion.identity);
+            anim.transform.SetParent(targetNPC.transform);
+            targetNPC.GainHP(amountToHeal, HealSource.Heal);
+            Object.Destroy(anim, 1);
 
         }
 
