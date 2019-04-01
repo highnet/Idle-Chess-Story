@@ -46,15 +46,15 @@ public class FloatingCombatText : MonoBehaviour
             textmesh.text = "" + dmgReport.primaryDamageDealt;
         }
 
-        if (dmgReport.wasCriticalStrike)
+        if (dmgReport.wasCriticalStrike  && displayMode != DisplayMode.Retaliation)
         {
             ExtraDisplayString = "CRIT";
         }
-        else if (dmgReport.wasMiss)
+        else if (dmgReport.wasMiss && displayMode != DisplayMode.Retaliation)
         {
             ExtraDisplayString = "MISS";
         }
-        else if (dmgReport.wasDampenedMiss)
+        else if (dmgReport.wasDampenedMiss && displayMode != DisplayMode.Retaliation)
         {
             ExtraDisplayString = "DAMPENED";
         }

@@ -47,6 +47,7 @@ public class UiController : MonoBehaviour
     private Text hudCanvasTopPanelCurrentRoundText;
     private Text hudCanvasTopPanelDeployedUnitCountText;
     private Text hudCanvasShopCostToShuffleText;
+    public Image hudCanvasRankImage;
     //
     public Text shopbutton1_hudCanvasShopCostBuyUnit;
     public Text shopbutton2_hudCanvasShopCostBuyUnit;
@@ -176,7 +177,7 @@ public class UiController : MonoBehaviour
 
         shopRefreshButton.onClick.RemoveAllListeners();
         shopRefreshButton.onClick.AddListener(delegate { RefreshShop(); });
-
+  
     }
 
     public void SellFriendlySelectedTarget() // sell the friendly selected target npc
@@ -220,7 +221,7 @@ public class UiController : MonoBehaviour
             selectedUnitPanel_InformationText_ARMORANDRETALIATION.text = "Armor: " + selectedNPC.ARMOR + " / Retaliation: " + selectedNPC.RETALIATION;
             selectedUnitPanel_InformationText_ATTACKPOWER.text = "AP: " + selectedNPC.ATTACKPOWER;
             selectedUnitPanel_InformationText_CONCENTRATION.text = "CONCENTRATION: " + selectedNPC.CONCENTRATION + "/" + selectedNPC.MAXCONCENTRATION;
-            selectedUnitPanel_InformationText_HP.text = "HP: " + selectedNPC.HP + "/" + selectedNPC.MAXHP;
+            selectedUnitPanel_InformationText_HP.text = "HP: " + Mathf.Round(selectedNPC.HP) + "/" + selectedNPC.MAXHP;
             selectedUnitPanel_InformationText_SPELLPOWER.text = "SP: " + selectedNPC.SPELLPOWER;
             selectedUnitPanel_InformationText_TIER.text = "Level " + selectedNPC.TIER;
             selectedUnitPanel_primaryTribeIconVisualizer.SetImage(selectedNPC.PRIMARYTRIBE);
@@ -261,6 +262,11 @@ public class UiController : MonoBehaviour
         }
 
 
+    }
+
+    public void SetRankImage(string rank)
+    {
+        hudCanvasRankImage.sprite = Resources.Load<Sprite>(rank + " icon");
     }
 
     public void StartGameTransitionPhase() // set up the ui for starting the game
@@ -325,7 +331,32 @@ public class UiController : MonoBehaviour
         PlayerProfileSave pps = new PlayerProfileSave(); // create new save file
         pps.characterName = playerController.playerName; // set the save file parameters
         pps.mmr = playerController.playerMMR;
-        pps.rank = "queen";
+
+        if (playerController.playerMMR < 1600)
+        {
+            pps.rank = "pawn";
+        }
+        else if (playerController.playerMMR >= 1600 && playerController.playerMMR < 1700)
+        {
+            pps.rank = "knight";
+        }
+        else if (playerController.playerMMR >= 1700 && playerController.playerMMR < 1800)
+        {
+            pps.rank = "bishop";
+        }
+        else if (playerController.playerMMR >= 1900 && playerController.playerMMR < 2000)
+        {
+            pps.rank = "rook";
+        }
+        else if (playerController.playerMMR >= 2100 && playerController.playerMMR < 2200)
+        {
+            pps.rank = "queen";
+        }
+        else if (playerController.playerMMR >= 2200)
+        {
+            pps.rank = "king";
+        }
+
         pps.UserIconImageName = "polarbear";
         pps.achievedRound = boardController.currentGameRound;
         playerProfiler.SaveProfile(pps, 0); // save profile to slot 0
@@ -425,7 +456,7 @@ public class UiController : MonoBehaviour
 
     void ShopButton1Clicked()
     {
-        if (playerController.buyUnitFromShop(playerController.shoppingOptions[0]))
+        if (playerController.BuyUnitFromShop(playerController.shoppingOptions[0]))
         {
             shopButton1.interactable = false;
             shopButton1.GetComponent<Image>().sprite = Resources.Load<Sprite>("bought unit icon");
@@ -435,7 +466,7 @@ public class UiController : MonoBehaviour
 
     void ShopButton2Clicked()
     {
-        if (playerController.buyUnitFromShop(playerController.shoppingOptions[1]))
+        if (playerController.BuyUnitFromShop(playerController.shoppingOptions[1]))
         {
             shopButton2.interactable = false;
             shopButton2.GetComponent<Image>().sprite = Resources.Load<Sprite>("bought unit icon");
@@ -445,7 +476,7 @@ public class UiController : MonoBehaviour
 
     void ShopButton3Clicked()
     {
-        if (playerController.buyUnitFromShop(playerController.shoppingOptions[2]))
+        if (playerController.BuyUnitFromShop(playerController.shoppingOptions[2]))
         {
             shopButton3.interactable = false;
             shopButton3.GetComponent<Image>().sprite = Resources.Load<Sprite>("bought unit icon");
@@ -456,7 +487,7 @@ public class UiController : MonoBehaviour
 
     void ShopButton4Clicked()
     {
-        if (playerController.buyUnitFromShop(playerController.shoppingOptions[3]))
+        if (playerController.BuyUnitFromShop(playerController.shoppingOptions[3]))
 
         {
             shopButton4.interactable = false;
@@ -468,7 +499,7 @@ public class UiController : MonoBehaviour
 
     void ShopButton5Clicked()
     {
-        if (playerController.buyUnitFromShop(playerController.shoppingOptions[4]))
+        if (playerController.BuyUnitFromShop(playerController.shoppingOptions[4]))
         {
             shopButton5.interactable = false;
             shopButton5.GetComponent<Image>().sprite = Resources.Load<Sprite>("bought unit icon");
@@ -478,7 +509,7 @@ public class UiController : MonoBehaviour
 
     void ShopButton6Clicked()
     {
-        if (playerController.buyUnitFromShop(playerController.shoppingOptions[5]))
+        if (playerController.BuyUnitFromShop(playerController.shoppingOptions[5]))
         {
             shopButton6.interactable = false;
             shopButton6.GetComponent<Image>().sprite = Resources.Load<Sprite>("bought unit icon");

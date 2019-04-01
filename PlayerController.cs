@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
      BoardController boardController;
      NpcController npcController;
      PlayerProfiler playerProfiler;
+     public SessionLogger sessionLogger;
   
     //
     public string playerName;
@@ -88,6 +89,8 @@ public class PlayerController : MonoBehaviour
         boardController = GetComponent<BoardController>();
         npcController = GetComponent<NpcController>();
         playerProfiler = GetComponent<PlayerProfiler>();
+        sessionLogger = GetComponent<SessionLogger>();
+        sessionLogger.goldRewarded = (int) playerGoldCount;
         currentPlayerHealth = maxPlayerHealth;
     }
 
@@ -262,7 +265,7 @@ public class PlayerController : MonoBehaviour
         playerOwnedNpcs = new List<NPC>();
         uiController.ChangeCurrentPlayerUsernameDisplayText(playerName,playerMMR.ToString());
         SetCurrentlyDeployedUnits(0);
-
+        uiController.SetRankImage(PlayerPrefs.GetString("rank_slot0"));
         uiController.ChangeHPPlayerDisplayText(this.currentPlayerHealth, this.maxPlayerHealth);
     }
 
@@ -298,14 +301,19 @@ public class PlayerController : MonoBehaviour
             int mmrChange = 0;
 
             int currentGameRound = boardController.currentGameRound;
-            if (currentGameRound < 10)
+            if (currentGameRound < 6)
             {
                 mmrChange -= 25;
             }
-            else if (currentGameRound >= 10)
+            else if (currentGameRound >= 6 && currentGameRound <= 12)
             {
-                mmrChange += (25 + (currentGameRound / playerMMR % 100));
+                mmrChange += 25;
             }
+            else if (currentGameRound > 12)
+            {
+                mmrChange += 50;
+            }
+
             playerMMR += mmrChange;
 
             boardController.ChangeGameStatus("report defeat");
@@ -330,7 +338,7 @@ public class PlayerController : MonoBehaviour
 
 
 
-    public bool buyUnitFromShop(Unit unitToBuy) // buy a unit from the shop
+    public bool BuyUnitFromShop(Unit unitToBuy) // buy a unit from the shop
     {
 
         int unitCost = 0;

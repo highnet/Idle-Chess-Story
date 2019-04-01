@@ -596,20 +596,22 @@ public class NPC : MonoBehaviour
             Helper.Decrement<Tribe>(playerController.enemyActiveTribesCounter, this.SECONDARYTRIBE);
             npcController.enemyList.Remove(gameObject.GetComponent<NPC>());
 
-            long goldBountyReward = (long)this.baseGoldBountyReward + (long) Random.Range(0, Mathf.Pow(2, boardController.currentGameRound)); // TODO: Find me a curve and coefficients
-
-            int assassinsCount = 0;
-            playerController.deployedTribesCounter.TryGetValue(Tribe.Assassin, out assassinsCount);
-
-            if (assassinsCount >= 3)
-            {
-                float bonusGold = goldBountyReward * playerController.coefficient_Assassin_3_OnKillBonusGoldMultiplier;
-                goldBountyReward += (long)bonusGold;
-            }
+   
 
             if (!isNotCombatRelatedDeath)
             {
-            //    Debug.Log("Rewarding you " + goldBountyReward + " gold for killing: " + this.name);
+                //    Debug.Log("Rewarding you " + goldBountyReward + " gold for killing: " + this.name);
+                long goldBountyReward = (long)this.baseGoldBountyReward;
+
+                int assassinsCount = 0;
+                playerController.deployedTribesCounter.TryGetValue(Tribe.Assassin, out assassinsCount);
+
+                if (assassinsCount >= 3)
+                {
+                    float bonusGold = goldBountyReward * playerController.coefficient_Assassin_3_OnKillBonusGoldMultiplier;
+                    goldBountyReward += (long)bonusGold;
+                }
+                playerController.sessionLogger.goldRewarded += goldBountyReward;
                 playerController.SetPlayerGoldCount(playerController.playerGoldCount + goldBountyReward);
                 uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopClosedAudioClip);
             }
@@ -817,99 +819,77 @@ public class NPC : MonoBehaviour
     public void ApplyTier2Upgrades()
     {
         this.TIER = 2;
-        if (PRIMARYTRIBE.Equals(Tribe.Warrior))
+        playerController.NPC_COST_DATA.TryGetValue(this.UNIT_TYPE, out int unitCost);
+
+        if (unitCost == 2)
         {
-            this.BASE_MAXHP += 100;
-            recalculateHPValues();
+            this.BASE_ARMOR *= 2.6f;
+            this.BASE_ATTACKPOWER *= 2.6f;
+            this.BASE_MAXHP *= 2.6f;
+            this.BASE_RETALIATION *= 2.6f;
+            this.BASE_SPELLPOWER *= 2.6f;
+
         }
-        else if (PRIMARYTRIBE.Equals(Tribe.Wizard))
+        else if (unitCost == 4)
         {
-            this.BASE_SPELLPOWER += 50;
-            recalculateSpellPowerValue();
+            this.BASE_ARMOR *= 2.7f;
+            this.BASE_ATTACKPOWER *= 2.7f;
+            this.BASE_MAXHP *= 2.7f;
+            this.BASE_RETALIATION *= 2.7f;
+            this.BASE_SPELLPOWER *= 2.7f;
         }
-        else if (PRIMARYTRIBE.Equals(Tribe.Undead))
+        else if (unitCost == 6)
         {
-            this.BASE_RETALIATION += 5;
-            recalculateRetaliationValue();
+            this.BASE_ARMOR *= 2.8f;
+            this.BASE_ATTACKPOWER *= 2.8f;
+            this.BASE_MAXHP *= 2.8f;
+            this.BASE_RETALIATION *= 2.8f;
+            this.BASE_SPELLPOWER *= 2.8f;
         }
-        else if (PRIMARYTRIBE.Equals(Tribe.Structure))
-        {
-            this.BASE_MAXHP += 100;
-            recalculateHPValues();
-        }
-        else if (PRIMARYTRIBE.Equals(Tribe.Guardian))
-        {
-            this.BASE_ARMOR += 5;
-            this.recalculateArmorValue();
-        }
-        else if (PRIMARYTRIBE.Equals(Tribe.Elemental))
-        {
-            this.BASE_SPELLPOWER += 25;
-            this.BASE_ATTACKPOWER += 25;
-            recalculateSpellPowerValue();
-            recalculateAttackPowerValue();
-        }
-        else if (PRIMARYTRIBE.Equals(Tribe.Beast))
-        {
-            this.BASE_ATTACKPOWER += 25;
-            this.BASE_RETALIATION += 2;
-            recalculateAttackPowerValue();
-            recalculateRetaliationValue();
-        }
-        else if (PRIMARYTRIBE.Equals(Tribe.Assassin))
-        {
-            this.BASE_ATTACKPOWER += 100;
-            recalculateAttackPowerValue();
-        }
+
+        recalculateArmorValue();
+        recalculateAttackPowerValue();
+        recalculateHPValues();
+        recalculateRetaliationValue();
+        recalculateSpellPowerValue();
+
     }
     public void ApplyTier3Upgrades()
     {
         this.TIER = 3;
-        if (PRIMARYTRIBE.Equals(Tribe.Warrior))
+        playerController.NPC_COST_DATA.TryGetValue(this.UNIT_TYPE, out int unitCost);
+
+        if (unitCost == 2)
         {
-            this.BASE_MAXHP += 125;
-            recalculateHPValues();
-        }
-        else if (PRIMARYTRIBE.Equals(Tribe.Wizard))
-        {
-            this.BASE_SPELLPOWER += 55;
-            recalculateSpellPowerValue();
+            this.BASE_ARMOR *= 2.7f;
+            this.BASE_ATTACKPOWER *= 2.7f;
+            this.BASE_MAXHP *= 2.7f;
+            this.BASE_RETALIATION *= 2.7f;
+            this.BASE_SPELLPOWER *= 2.7f;
 
         }
-        else if (PRIMARYTRIBE.Equals(Tribe.Undead))
+        else if (unitCost == 4)
         {
-            this.BASE_RETALIATION += 7;
-            recalculateRetaliationValue();
+            this.BASE_ARMOR *= 2.8f;
+            this.BASE_ATTACKPOWER *= 2.8f;
+            this.BASE_MAXHP *= 2.8f;
+            this.BASE_RETALIATION *= 2.8f;
+            this.BASE_SPELLPOWER *= 2.8f;
         }
-        else if (PRIMARYTRIBE.Equals(Tribe.Structure))
+        else if (unitCost == 6)
         {
-            this.BASE_MAXHP += 100;
-            recalculateHPValues();
+            this.BASE_ARMOR *= 2.9f;
+            this.BASE_ATTACKPOWER *= 2.9f;
+            this.BASE_MAXHP *= 2.9f;
+            this.BASE_RETALIATION *= 2.9f;
+            this.BASE_SPELLPOWER *= 2.9f;
         }
-        else if (PRIMARYTRIBE.Equals(Tribe.Guardian))
-        {
-            this.BASE_ARMOR += 5;
-            this.recalculateArmorValue();
-        }
-        else if (PRIMARYTRIBE.Equals(Tribe.Elemental))
-        {
-            this.BASE_SPELLPOWER += 25;
-            this.BASE_ATTACKPOWER += 25;
-            recalculateSpellPowerValue();
-            recalculateAttackPowerValue();
-        }
-        else if (PRIMARYTRIBE.Equals(Tribe.Beast))
-        {
-            this.BASE_ATTACKPOWER += 25;
-            this.BASE_RETALIATION += 2;
-            recalculateAttackPowerValue();
-            recalculateRetaliationValue();
-        }
-        else if (PRIMARYTRIBE.Equals(Tribe.Assassin))
-        {
-            this.BASE_ATTACKPOWER += 100;
-            recalculateAttackPowerValue();
-        }
+
+        recalculateArmorValue();
+        recalculateAttackPowerValue();
+        recalculateHPValues();
+        recalculateRetaliationValue();
+        recalculateSpellPowerValue();
 
     }
 
@@ -923,23 +903,6 @@ public class NPC : MonoBehaviour
         this.ATTACKPOWER -= amountToReduce;
     }
 
-    public void RandomLevelUpEnemy()
-    {
-
-          int levelUpRNG = Random.Range(0, 101);
-
-        if (levelUpRNG >= 50 && levelUpRNG <= 70)
-        {
-
-            ApplyTier2Upgrades();
-
-        } else if(levelUpRNG > 70)
-        {
-            ApplyTier2Upgrades();
-            ApplyTier3Upgrades();
-        }
-  
-    }
 
     public bool LevelUpFriendly()
     {
@@ -1044,9 +1007,9 @@ public class NPC : MonoBehaviour
         }
 
 
-        if (damageReport.damageSourceNPC.HP > this.MAXHP)
+        if (damageReport.damageSourceNPC.HP > damageReport.damageSourceNPC.MAXHP)
         {
-            damageReport.damageSourceNPC.HP = this.MAXHP;
+            damageReport.damageSourceNPC.HP = damageReport.damageSourceNPC.MAXHP;
         }
 
     }

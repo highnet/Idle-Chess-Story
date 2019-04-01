@@ -10,13 +10,13 @@ public class CreepBehaviour : NPC
         StartLiveRoutine();
 
         var currentGameRound = boardController.currentGameRound;
-        Debug.Log(currentGameRound);
+ 
 
-        BASE_MAXHP *= 10 * currentGameRound; // try to scale the unit
+        BASE_MAXHP *= 300 * currentGameRound; // try to scale the unit
         BASE_ARMOR *= currentGameRound / 100;
-        BASE_ATTACKPOWER = 50 +  ((currentGameRound));
-        BASE_SPELLPOWER = 50;
-        RETALIATION *= currentGameRound / 150;
+        BASE_ATTACKPOWER = 40 +  (( currentGameRound));
+        BASE_SPELLPOWER = 0;
+        RETALIATION *=  1 - currentGameRound / 150;
 
         HP = BASE_MAXHP;
         MAXHP = BASE_MAXHP;

@@ -34,9 +34,9 @@ public class SpellbookController : MonoBehaviour
         {
             GameObject go = (GameObject)Instantiate(Resources.Load("AP_PowerUp"), this.transform.position, Quaternion.identity);
             go.transform.SetParent(casterNPC.transform);
-            float boostValue = 100;
+            float boostValue = 55;
             float boostDuration = 6;
-            casterNPC.ATTACKPOWER += 100;
+            casterNPC.ATTACKPOWER += boostValue;
             StartCoroutine(AP_SubstractBonusAfterSeconds(casterNPC, boostDuration, boostValue, go));
         }
 
@@ -44,9 +44,9 @@ public class SpellbookController : MonoBehaviour
         {
             GameObject go = (GameObject)Instantiate(Resources.Load("ARMOR_PowerUp"), this.transform.position, Quaternion.identity);
             go.transform.SetParent(casterNPC.transform);
-            float boostValue = 35;
+            float boostValue = 15;
             float boostDuration = 6;
-            casterNPC.ARMOR += 35;
+            casterNPC.ARMOR += boostValue;
             StartCoroutine(ARMOR_SubstractBonusAfterSeconds(casterNPC, boostDuration, boostValue, go));
         }
         else if (abilityToCast == Ability.MaxHP_Up_Self)
@@ -55,15 +55,15 @@ public class SpellbookController : MonoBehaviour
             go.transform.SetParent(casterNPC.transform);
             float boostValue = 100;
             float boostDuration = 6;
-            casterNPC.MAXHP += 100;
-            casterNPC.HP += 100;
+            casterNPC.MAXHP += boostValue;
+            casterNPC.HP += boostValue;
             StartCoroutine(MAXHP_SubstractBonusAfterSeconds(casterNPC, boostDuration, boostValue, go));
         }
         else if (abilityToCast == Ability.Retaliation_UP_Self)
         {
             GameObject go = (GameObject)Instantiate(Resources.Load("RETALIATION_PowerUp"), this.transform.position, Quaternion.identity);
             go.transform.SetParent(casterNPC.transform);
-            float boostValue = 35;
+            float boostValue = 15;
             float boostDuration = 6;
             casterNPC.RETALIATION += boostValue;
             StartCoroutine(RETALIATION_SubstractBonusAfterSeconds(casterNPC, boostDuration, boostValue, go));
@@ -73,7 +73,7 @@ public class SpellbookController : MonoBehaviour
             GameObject go = (GameObject)Instantiate(Resources.Load("HeroicStrike Animation"), this.transform.position, Quaternion.identity);
             go.transform.LookAt(targetNPC.transform);
             go.transform.SetParent(casterNPC.transform);
-            DamageReport dmgReport = targetNPC.CalculateDamageTaken(3 * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
+            DamageReport dmgReport = targetNPC.CalculateDamageTaken(2 * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
             uic.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DisplayMode.AbilityDamage);
             targetNPC.TakePureDamage(dmgReport);
             GameObject.Destroy(go, 4);
@@ -95,7 +95,7 @@ public class SpellbookController : MonoBehaviour
             GameObject go = (GameObject)Instantiate(Resources.Load("AP_PowerDown"), targetNPC.transform.position, Quaternion.identity);
             go.transform.LookAt(targetNPC.transform);
             go.transform.SetParent(targetNPC.transform);
-            float boostValue = 35;
+            float boostValue = 50;
             float boostDuration = 6;
             targetNPC.ReduceAttackPower(boostValue);
             StartCoroutine(AP_AddBonusAfterSeconds(targetNPC, boostDuration, boostValue, go));
@@ -106,7 +106,7 @@ public class SpellbookController : MonoBehaviour
         {
             GameObject go = (GameObject)Instantiate(Resources.Load("ARMOR_PowerDown"), targetNPC.transform.position, Quaternion.identity);
             go.transform.SetParent(targetNPC.transform);
-            float boostValue = 35;
+            float boostValue = 5;
             float boostDuration = 6;
             targetNPC.ReduceArmor(boostValue);
             StartCoroutine(ARMOR_AddBonusAfterSeconds(targetNPC, boostDuration, boostValue, go));
