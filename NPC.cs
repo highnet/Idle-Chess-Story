@@ -72,13 +72,9 @@ public class NPC : MonoBehaviour
     private VisualSideIdentifierCircleToggler visualSideIdentifierCircle;
     public AudioSource npcAudioSource;
     public AudioClip autoAttacking_SoundClip;
-    public AudioClip dying_SoundClip; // TODO: not yet implemented
-    public AudioClip battleCry_SoundClip; // TODO: not yet implemented
-    public AudioClip moving_SoundClip; // TODO: not yet implemented
-    public AudioClip lvlingUp_SoundClip; // TODO: not yet implemented
-    public AudioClip lastHit_SoundClip; // TODO: not yet implemented
-    public AudioClip takingDamage_SoundClip; // TODO: not yet implemented
-    public AudioClip laughing_SoundClip; // TODO: not yet implemented
+    public AudioClip dying_SoundClip;
+    public AudioClip battleCry_SoundClip; 
+    public AudioClip cheering_SoundClip; // TODO: not yet implemented
 
     public void Awake()
     {
@@ -589,6 +585,11 @@ public class NPC : MonoBehaviour
 
     public void RemoveFromBoard(bool isNotCombatRelatedDeath)
     {
+        if (dying_SoundClip != null && !isNotCombatRelatedDeath && !isDying_SingleRunController)
+        {
+            AudioSource.PlayClipAtPoint(dying_SoundClip, this.transform.position);
+        }
+
         if (isEnemy && !isDying_SingleRunController) // your unit dies
         {
             isDying_SingleRunController = true;
@@ -602,16 +603,17 @@ public class NPC : MonoBehaviour
             {
                 //    Debug.Log("Rewarding you " + goldBountyReward + " gold for killing: " + this.name);
                 long goldBountyReward = (long)this.baseGoldBountyReward;
+                float bonusGold = 0;
 
                 int assassinsCount = 0;
                 playerController.deployedTribesCounter.TryGetValue(Tribe.Assassin, out assassinsCount);
 
                 if (assassinsCount >= 3)
                 {
-                    float bonusGold = goldBountyReward * playerController.coefficient_Assassin_3_OnKillBonusGoldMultiplier;
+                    bonusGold = goldBountyReward * playerController.coefficient_Assassin_3_OnKillBonusGoldMultiplier;
                     goldBountyReward += (long)bonusGold;
                 }
-                playerController.sessionLogger.goldRewarded += goldBountyReward;
+                playerController.sessionLogger.goldRewarded += (long) (goldBountyReward - bonusGold);
                 playerController.SetPlayerGoldCount(playerController.playerGoldCount + goldBountyReward);
                 uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopClosedAudioClip);
             }
@@ -672,9 +674,15 @@ public class NPC : MonoBehaviour
             {
                 go.GetComponent<HealthBarController>().emptyConcentrationBar.SetActive(false);
             }
-          
+            if (this.isEnemy)
+            {
+                go.GetComponent<HealthBarController>().fullBar.GetComponentInChildren<SpriteRenderer>().color = Color.red;
+                go.GetComponent<HealthBarController>().transform.localScale *= 0.9f;
+            }
+
 
             visualIdentifierGenerated = true;
+ 
         }
     }
 
@@ -937,6 +945,7 @@ public class NPC : MonoBehaviour
                         TIER = 2;
                         firstNPC.RemoveFromBoard(true);
                         secondNPC.RemoveFromBoard(true);
+                        AudioSource.PlayClipAtPoint(uiController.levelUpAudioClip, this.transform.position);
                         this.LevelUpFriendly();
                         return true;
                     }
@@ -946,6 +955,7 @@ public class NPC : MonoBehaviour
                         TIER = 3;
                         firstNPC.RemoveFromBoard(true);
                         secondNPC.RemoveFromBoard(true);
+                        AudioSource.PlayClipAtPoint(uiController.levelUpAudioClip, this.transform.position);
                         this.LevelUpFriendly();
                         return true;
                     }
@@ -1128,6 +1138,7 @@ public class NPC : MonoBehaviour
                             deltaJ = 1;
                         }
 
+                        npcAudioSource.PlayOneShot(uiController.chessUnitclickAudioClip);
                         moveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i, occupyingTile.GetComponent<TileBehaviour>().j + deltaJ);
 
                     }

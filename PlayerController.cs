@@ -43,9 +43,6 @@ public class PlayerController : MonoBehaviour
     public Dictionary<Tribe, int> enemyActiveTribesCounter;
  
     public Unit[] shoppingOptions;
-    //
-   
-
     // Game balance constants and coefficients
     public int constant_Crit_RngRollBaseLowerBound;
     public int constant_Crit_RngRollBaseUpperBound;
@@ -91,7 +88,20 @@ public class PlayerController : MonoBehaviour
         playerProfiler = GetComponent<PlayerProfiler>();
         sessionLogger = GetComponent<SessionLogger>();
         sessionLogger.goldRewarded = (int) playerGoldCount;
-        currentPlayerHealth = maxPlayerHealth;
+    }
+
+    public void UpgradeUnitCapWithGold()
+    {
+        if (playerGoldCount >= maxDeployedUnitsLimit * 10)
+        {
+            SetPlayerGoldCount(playerGoldCount - (maxDeployedUnitsLimit * 10));
+            SetMaxDeployedUnitsLimit(maxDeployedUnitsLimit + 1);
+            uiController.ChangeCostToUnitCapUpgradeDisplayText((maxDeployedUnitsLimit * 10).ToString());
+            uiController.hudCanvasAudioSource.PlayOneShot(uiController.genericButtonSucessAudioClip);
+        } else
+        {
+            uiController.hudCanvasAudioSource.PlayOneShot(uiController.genericButtonFailureAudioClip);
+        }
     }
 
     public void ShuffleNewShopingOptions(bool isFreeShuffle) // shuffle new shopping options
@@ -292,39 +302,41 @@ public class PlayerController : MonoBehaviour
 
     }
 
+   public void CalculateMMRChangeBasedOnRoundAndSave()
+    {
+        int mmrChange = 0;
+
+        int currentGameRound = boardController.currentGameRound;
+        if (currentGameRound < 6)
+        {
+            mmrChange -= 25;
+        }
+        else if (currentGameRound >= 6 && currentGameRound <= 12)
+        {
+            mmrChange += 25;
+        }
+        else if (currentGameRound > 12)
+        {
+            mmrChange += 50;
+        }
+
+        playerMMR += mmrChange;
+        uiController.SaveToSaveFile();
+        uiController.UpdateReportDefeatPanelScreen(mmrChange);
+    }
+
     // Update is called once per frame
     void LateUpdate()
     {
         if ((boardController.gameStatus == "Fight" || boardController.gameStatus == "shopping") && currentPlayerHealth <= 0) // check lose condition
         {
-
-            int mmrChange = 0;
-
-            int currentGameRound = boardController.currentGameRound;
-            if (currentGameRound < 6)
-            {
-                mmrChange -= 25;
-            }
-            else if (currentGameRound >= 6 && currentGameRound <= 12)
-            {
-                mmrChange += 25;
-            }
-            else if (currentGameRound > 12)
-            {
-                mmrChange += 50;
-            }
-
-            playerMMR += mmrChange;
-
+            CalculateMMRChangeBasedOnRoundAndSave();
             boardController.ChangeGameStatus("report defeat");
             uiController.hudCanvasReportDefeatPanel.gameObject.SetActive(true);
             uiController.hudCanvasTribesPanel.gameObject.SetActive(false);
             uiController.hudCanvasTopBar.gameObject.SetActive(false);
             uiController.hudCanvasBottomBar.gameObject.SetActive(false);
             uiController.hudCanvasShopPanel.gameObject.SetActive(false);
-            uiController.SaveToSaveFile();
-            uiController.UpdateReportDefeatPanelScreen(mmrChange);
-
         }
 
     }
@@ -428,6 +440,7 @@ public class PlayerController : MonoBehaviour
     public void SetMaxDeployedUnitsLimit(int amount)
     {
         maxDeployedUnitsLimit = amount;
+        uiController.ChangeCostToUnitCapUpgradeDisplayText((10 * maxDeployedUnitsLimit).ToString());
         uiController.ChangeDeployedUnitCountDisplayText(currentlyDeployedUnits, maxDeployedUnitsLimit);
     }
 

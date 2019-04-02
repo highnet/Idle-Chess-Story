@@ -19,9 +19,9 @@ public class FloatingCombatText : MonoBehaviour
             dmgReport.primaryDamageDealt = 0;
         }
 
-        dmgReport.primaryDamageDealt = Mathf.Round(dmgReport.primaryDamageDealt);
-        dmgReport.lifeStealHeal = Mathf.Round(dmgReport.lifeStealHeal);
-        dmgReport.retaliationDamageRecieved = Mathf.Round(dmgReport.retaliationDamageRecieved);
+        dmgReport.primaryDamageDealt = (float) System.Math.Round(dmgReport.primaryDamageDealt,0,System.MidpointRounding.AwayFromZero);
+        dmgReport.lifeStealHeal = (float) System.Math.Round(dmgReport.lifeStealHeal,0,System.MidpointRounding.AwayFromZero);
+        dmgReport.retaliationDamageRecieved = (float) System.Math.Round(dmgReport.retaliationDamageRecieved,0,System.MidpointRounding.AwayFromZero);
 
         TextMesh textmesh = this.GetComponent<TextMesh>();
 

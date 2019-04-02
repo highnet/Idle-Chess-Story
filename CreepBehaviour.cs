@@ -14,9 +14,22 @@ public class CreepBehaviour : NPC
 
         BASE_MAXHP *= 300 * currentGameRound; // try to scale the unit
         BASE_ARMOR *= currentGameRound / 100;
-        BASE_ATTACKPOWER = 40 +  (( currentGameRound));
+        BASE_ATTACKPOWER = 10 +  (( currentGameRound));
         BASE_SPELLPOWER = 0;
-        RETALIATION *=  1 - currentGameRound / 150;
+        BASE_RETALIATION = 0;
+
+        if (uiController.wizard_difficultyPicker.value == 0)
+        {
+            BASE_MAXHP *= 0.9f;
+            BASE_ARMOR *= 0.9f;
+            BASE_ATTACKPOWER *= 0.9f;
+        }
+        else if (uiController.wizard_difficultyPicker.value == 2)
+        {
+            BASE_MAXHP *= 1.1f;
+            BASE_ARMOR *= 1.1f;
+            BASE_ATTACKPOWER *= 1.1f;
+        }
 
         HP = BASE_MAXHP;
         MAXHP = BASE_MAXHP;

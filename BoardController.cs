@@ -17,6 +17,7 @@ public class BoardController : MonoBehaviour
     public GameObject selectedObject;
     public GameObject tilePrefab;
     //
+    public MainCamera mainCameraController;
 
     public bool testMode = false;
 
@@ -114,6 +115,17 @@ public class BoardController : MonoBehaviour
             {
              float spawningBudget = playerController.sessionLogger.goldRewarded;
 
+                int currentDificulty = uiController.wizard_difficultyPicker.value;
+                Debug.Log("difficulty: " + currentDificulty);
+
+                if (currentDificulty == 0)
+                {
+                    spawningBudget *= 0.8f;
+                }
+                else if (currentDificulty == 2)
+                {
+                    spawningBudget *= 1.2f;
+                }
                 if (spawningBudget < 6)
                 {
                     spawningBudget = 6;
@@ -141,8 +153,19 @@ public class BoardController : MonoBehaviour
 
             playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
 
-                int count = playerController.maxDeployedUnitsLimit;
-                for (int i = 0; i < count; i++) // spawn tier 1 units
+                int enemySpawnCount = playerController.maxDeployedUnitsLimit;
+
+                if (currentDificulty == 0)
+                {
+                    enemySpawnCount -= 1;
+                }
+                else if (currentDificulty == 2)
+                {
+                    enemySpawnCount += 1;
+                }
+
+
+                for (int i = 0; i < enemySpawnCount; i++) // spawn tier 1 units
                 {
                 int randomI = UnityEngine.Random.Range(0, 4); // find a random i coordinate
                 int randomJ = UnityEngine.Random.Range(0, 8); // find a random j coordinate
@@ -466,23 +489,66 @@ public class BoardController : MonoBehaviour
     {
 
         yield return new WaitForSeconds(4); // wait 2 seconds
-
         float goldReward = playerController.playerGoldCount; // fetch the player's current gold
         if (npcController.enemyList.Count == 0) // combat VICTORY
         {
-            goldReward *= 1.25f; // +% increase to current gold
+
+
+            if (npcController.allyList.Count != 0)
+            {
+                foreach (NPC npc in npcController.allyList)
+                {
+                    if (npc.cheering_SoundClip != null && UnityEngine.Random.Range(0,2) == 1)
+                   {
+                        npc.npcAudioSource.PlayOneShot(npc.cheering_SoundClip);
+                   }
+                }
+            }
+
+         
+            if (uiController.wizard_difficultyPicker.value == 0)
+            {
+                goldReward *= 1.35f;
+            }else if (uiController.wizard_difficultyPicker.value == 1)
+            {
+                goldReward *= 1.25f; // +% increase to current gold
+            }
+            else if (uiController.wizard_difficultyPicker.value == 2)
+            {
+                goldReward *= 1.15f; // +% increase to current gold
+            }
+            if (goldReward < 2)
+            {
+                goldReward = 2;
+            }
+
+            Debug.Log(goldReward);
+            goldReward = (float) Math.Round(goldReward, 0, MidpointRounding.AwayFromZero);
+            Debug.Log(goldReward);
             float netGoldReward = goldReward - playerController.playerGoldCount;
             playerController.sessionLogger.goldRewarded += (long) netGoldReward;
             playerController.SetPlayerGoldCount((long)goldReward); // reward bonus gold
-            playerController.playerMMR += 1;
+            playerController.playerMMR += 1 + uiController.wizard_difficultyPicker.value;
             uiController.SaveToSaveFile();
             uiController.ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString());
         }
         else // combat DEFEAT
 
         {
-            goldReward *= 1.10f; // +% increase to current gold
 
+
+            if (uiController.wizard_difficultyPicker.value == 0)
+            {
+                goldReward *= 1.25f;
+            }
+            else if (uiController.wizard_difficultyPicker.value == 1)
+            {
+                goldReward *= 1.15f; // +% increase to current gold
+            }
+            else if (uiController.wizard_difficultyPicker.value == 2)
+            {
+                goldReward *= 1.05f; // +% increase to current gold
+            }
             if (goldReward < 2)
             {
                 goldReward = 2;
@@ -490,7 +556,7 @@ public class BoardController : MonoBehaviour
             float netGoldReward = goldReward - playerController.playerGoldCount;
             playerController.sessionLogger.goldRewarded += (long)netGoldReward;
             playerController.SetPlayerGoldCount((long)goldReward); // reward DEFEAT bonus gold
-            playerController.playerMMR -= 1;
+            playerController.playerMMR -= 1 + uiController.wizard_difficultyPicker.value;
             uiController.SaveToSaveFile();
             uiController.ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString());
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System;
 
 public class UiController : MonoBehaviour
@@ -20,6 +21,7 @@ public class UiController : MonoBehaviour
     public GameObject hudCanvasTribesPanel;
     public GameObject hudCanvasCurrentlySelectedUnitPanel;
     public GameObject hudCanvasReportDefeatPanel;
+    public GameObject hudCanvasEscapePanel;
     //
     public Button shopToggleButton;
     public Button tribesToggleButton;
@@ -31,9 +33,13 @@ public class UiController : MonoBehaviour
     public Button shopButton5;
     public Button shopButton6;
     public Button shopRefreshButton;
+    public Button shopUnitCapButton;
     public Button saveButton;
     public Button loadButton;
     public Button gameOverButton;
+    public Button forfeitButton;
+    public Button closeEscapeMenuTabButton;
+    public Button saveGameEscapeMenuButton;
     //
     public InputField wizardNewPlayerNameInputField;
     //
@@ -47,6 +53,7 @@ public class UiController : MonoBehaviour
     private Text hudCanvasTopPanelCurrentRoundText;
     private Text hudCanvasTopPanelDeployedUnitCountText;
     private Text hudCanvasShopCostToShuffleText;
+    private Text hudCanvasShopUnitCapUpgradeText;
     public Image hudCanvasRankImage;
     //
     public Text shopbutton1_hudCanvasShopCostBuyUnit;
@@ -67,6 +74,7 @@ public class UiController : MonoBehaviour
     //
     public Text wizard_playerName;
     public Text wizard_playerMMR;
+    public Dropdown wizard_difficultyPicker;
     public Button startGameButton;
     //
     public Text selectedUnitPanel_InformationText_NAME;
@@ -96,6 +104,7 @@ public class UiController : MonoBehaviour
     public Text reportdefeatPanel_userNameText;
     public Text reportdefeatPanel_userMMR;
     //
+    public AudioListener mainAudioListener;
     public AudioSource hudCanvasAudioSource;
     public AudioClip startGameAudioClip;
     public AudioClip shopRefreshAudioClip;
@@ -107,21 +116,32 @@ public class UiController : MonoBehaviour
     public AudioClip buyUnitSuccessAudioClip;
     public AudioClip chessUnitReleaseAudioClip;
     public AudioClip chessUnitclickAudioClip;
+    public AudioClip levelUpAudioClip;
     //
+    public Button muteAudioToggleButton;
+    public Image audioMutedIndicatorIcon;
+    public bool audioIsMuted;
+    public float userVolume;
+    public Slider volumeSlider;
+    public GameObject escapeMenuForfeitConfirmationPromptPanel;
+    public Button settingsButton;
+    public Button exitGameButton;
+    public Dropdown cameraModePicker;
 
     private void Awake()
     {
+        AudioListener.volume = userVolume;
         boardController = GetComponent<BoardController>();
         playerController = GetComponent<PlayerController>();
         npcController = GetComponent<NpcController>();
         playerProfiler = GetComponent<PlayerProfiler>();
-
         hudCanvas = GameObject.Find("HUDCanvas");
         hudCanvasTopBar = GameObject.Find("HUDCanvas/Top Bar");
         hudCanvasBottomBar = GameObject.Find("HUDCanvas/Bottom Bar");
         hudCanvasPlayerPanel = GameObject.Find("HUDCanvas/Player Panel");
         hudCanvasShopPanel = GameObject.Find("HUDCanvas/Player Panel/Shop Panel");
         hudCanvasTribesPanel = GameObject.Find("HUDCanvas/Player Panel/Tribes Panel");
+        hudCanvasEscapePanel = GameObject.Find("HUDCanvas/Player Panel/Escape Menu Panel");
         hudCanvasCurrentlySelectedUnitPanel = GameObject.Find("HUDCanvas/Player Panel/Currently Selected Unit Information Panel");
         hudCanvasTopPanelGoldCountText = GameObject.Find("HUDCanvas/Top Bar/Top Panel/Gold Count Text").GetComponent<Text>();
         hudCanvasTopPanelUsernameText = GameObject.Find("HUDCanvas/Top Bar/Top Panel/Username Text").GetComponent<Text>();
@@ -129,8 +149,27 @@ public class UiController : MonoBehaviour
         hudCanvasTopPanelCurrentRoundText = GameObject.Find("HUDCanvas/Top Bar/Top Panel/Round Text").GetComponent<Text>();
         hudCanvasTopPanelDeployedUnitCountText = GameObject.Find("HUDCanvas/Top Bar/Top Panel/Deployed Unit Count Text").GetComponent<Text>();
         hudCanvasShopCostToShuffleText = GameObject.Find("HUDCanvas/Player Panel/Shop Panel/Refresh Button/Gold Cost Text").GetComponent<Text>();
-        gameOverButton.onClick.RemoveAllListeners();
-        gameOverButton.onClick.AddListener(delegate { boardController.ChangeGameStatus("game over"); });
+        hudCanvasShopUnitCapUpgradeText = GameObject.Find("HUDCanvas/Player Panel/Shop Panel/Buy Unit Cap/Gold Cost Text").GetComponent<Text>();
+
+
+        cameraModePicker.onValueChanged.RemoveAllListeners();
+        cameraModePicker.onValueChanged.AddListener(delegate { PickCameraMode(); });
+
+        exitGameButton.onClick.RemoveAllListeners();
+        exitGameButton.onClick.AddListener(delegate { ExitGame(); });
+
+        settingsButton.onClick.RemoveAllListeners();
+        settingsButton.onClick.AddListener(delegate { toggleEscapeMenu(); });
+
+        muteAudioToggleButton.onClick.RemoveAllListeners();
+        muteAudioToggleButton.onClick.AddListener(delegate { ToggleAudioListener(); });
+
+        volumeSlider.onValueChanged.RemoveAllListeners();
+        volumeSlider.onValueChanged.AddListener(delegate { SetVolume(volumeSlider.value); });
+
+        resetSelectedTargetButton.onClick.RemoveAllListeners();
+        resetSelectedTargetButton.onClick.AddListener(delegate { ResetSelectedTarget(); });
+
 
         resetSelectedTargetButton.onClick.RemoveAllListeners();
         resetSelectedTargetButton.onClick.AddListener(delegate { ResetSelectedTarget(); });
@@ -177,7 +216,72 @@ public class UiController : MonoBehaviour
 
         shopRefreshButton.onClick.RemoveAllListeners();
         shopRefreshButton.onClick.AddListener(delegate { RefreshShop(); });
-  
+
+        forfeitButton.onClick.RemoveAllListeners();
+        forfeitButton.onClick.AddListener(delegate { ForfeitButtonClicked(); });
+
+        closeEscapeMenuTabButton.onClick.RemoveAllListeners();
+        closeEscapeMenuTabButton.onClick.AddListener(delegate { toggleEscapeMenu(); });
+
+        saveGameEscapeMenuButton.onClick.RemoveAllListeners();
+        saveGameEscapeMenuButton.onClick.AddListener(delegate { SaveToSaveFile(); });
+
+        shopUnitCapButton.onClick.RemoveAllListeners();
+        shopUnitCapButton.onClick.AddListener(delegate { UpgradeUnitCap(); });
+    }
+
+    public void ExitGame()
+    {
+
+        if (boardController.currentGameRound > 1)
+        {
+            playerController.CalculateMMRChangeBasedOnRoundAndSave();
+        }
+        else
+        {
+            SaveToSaveFile();
+        }
+      
+
+        Application.Quit();
+
+    }
+
+    public void PickCameraMode()
+    {
+        if (cameraModePicker.value == 0)
+        {
+            boardController.mainCameraController.cameraMode = "Normal";
+        } else if (cameraModePicker.value == 1)
+        {
+            boardController.mainCameraController.cameraMode = "Follow";
+        }
+    }
+
+    public void SetVolume(float volume)
+    {
+        if (audioIsMuted)
+        {
+            audioMutedIndicatorIcon.sprite = Resources.Load<Sprite>("audio icon");
+            audioIsMuted = false;
+        }
+        AudioListener.volume = volume;
+        userVolume = volume;
+    }
+    public void ToggleAudioListener()
+    {
+        if (!audioIsMuted)
+        {
+            audioIsMuted = true;
+            audioMutedIndicatorIcon.sprite = Resources.Load<Sprite>("audio muted icon");
+            AudioListener.volume = 0;
+        } else
+        {
+            audioIsMuted = false;
+            audioMutedIndicatorIcon.sprite = Resources.Load<Sprite>("audio icon");
+            SetVolume(userVolume);
+        }
+     
     }
 
     public void SellFriendlySelectedTarget() // sell the friendly selected target npc
@@ -210,7 +314,6 @@ public class UiController : MonoBehaviour
 
     void Update()
     {
-
         if (boardController.gameStatus != "report defeat" && boardController.selectedObject != null) // update the entire selected unit panel
         {
             hudCanvasCurrentlySelectedUnitPanel.SetActive(true);
@@ -242,12 +345,26 @@ public class UiController : MonoBehaviour
             hudCanvasShopPanel.SetActive(false);
             sellFriendlySelectedTargetButton.gameObject.SetActive(false);
             fightButton.gameObject.SetActive(false);
+            settingsButton.gameObject.SetActive(false);
         } else
         {
             fightButton.gameObject.SetActive(true);
+            settingsButton.gameObject.SetActive(true);
         }
+        if (Input.GetKeyDown(KeyCode.Escape) && boardController.gameStatus == "shopping")
+        {
+            toggleEscapeMenu();
+        }
+    }
+
+    public void toggleEscapeMenu()
+    {
+
+            hudCanvasEscapePanel.SetActive(!hudCanvasEscapePanel.activeSelf);
+            hudCanvasShopPanel.SetActive(false);
 
     }
+
 
     public void ChangeNameAndSaveToFile()
     {
@@ -325,6 +442,8 @@ public class UiController : MonoBehaviour
             playerController.playerMMR = 1500;
         }
     }
+
+
 
     public void SaveToSaveFile()
     {
@@ -454,6 +573,11 @@ public class UiController : MonoBehaviour
         playerController.ShuffleNewShopingOptions(false);
     }
 
+    void UpgradeUnitCap()
+    {
+        playerController.UpgradeUnitCapWithGold();
+    }
+
     void ShopButton1Clicked()
     {
         if (playerController.BuyUnitFromShop(playerController.shoppingOptions[0]))
@@ -519,6 +643,18 @@ public class UiController : MonoBehaviour
 
     }
 
+    void ForfeitButtonClicked()
+    {
+
+        escapeMenuForfeitConfirmationPromptPanel.SetActive(true);
+    }
+
+    public void CalculateMMRAndRestartScene()
+    {
+        playerController.CalculateMMRChangeBasedOnRoundAndSave();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     void ToggleShopPanel()
     {
         
@@ -571,9 +707,19 @@ public class UiController : MonoBehaviour
                     obj.name = npcController.deployedAllyList[i].transform.parent.gameObject.name;
                     npcController.deployedAllyList[i].enabled = true;
 
+            if (UnityEngine.Random.Range(0,2) == 0)
+                    { 
+                    if (npcController.deployedAllyList[i].battleCry_SoundClip != null)
+                    {
+                        npcController.deployedAllyList[i].npcAudioSource.PlayOneShot(npcController.deployedAllyList[i].battleCry_SoundClip);
+                    }
+                    }
+
+
                 }
             }
             hudCanvasAudioSource.PlayOneShot(fightStartAudioClip);
+
             StartCoroutine(SmoothRoundFightPhaseTransition()); // finally we can transition to combat phase.
         }
         else
@@ -677,6 +823,11 @@ public class UiController : MonoBehaviour
     public void ChangeCostToShuffleShopDisplayText(string str)
     {
         hudCanvasShopCostToShuffleText.text = str;
+    }
+
+    public void ChangeCostToUnitCapUpgradeDisplayText(string str)
+    {
+        hudCanvasShopUnitCapUpgradeText.text = str;
     }
 
     public void ChangeCurrentPlayerGoldCountDisplayText(string str)
