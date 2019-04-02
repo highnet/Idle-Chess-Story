@@ -122,6 +122,7 @@ public class PlayerController : MonoBehaviour
 
             if (!isFreeShuffle)
             {
+                sessionLogger.goldRewarded -= costToShuffleShop;
                 SetPlayerGoldCount(playerGoldCount - costToShuffleShop);
                 costToShuffleShop += timesRefreshed++;
             }

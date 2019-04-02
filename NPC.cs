@@ -195,14 +195,16 @@ public class NPC : MonoBehaviour
         if (DamageDealerIsEnemy == true && assassinsCount >= 6)
         {
             rollMiss = UnityEngine.Random.Range(playerController.constant_Miss_RngRollLowerBound, playerController.constant_Assassin_6_MissBonus_RngRollBonusUpperBound); // FRIENDLY Assassin Tribe 6 * BUFFED EVASION
+            Debug.Log(rollMiss);
         }
 
        else if (DamageDealerIsEnemy == false && enemy_AssassinsCount >= 6)
         {
             rollMiss = UnityEngine.Random.Range(playerController.constant_Miss_RngRollLowerBound, playerController.constant_Assassin_6_MissBonus_RngRollBonusUpperBound); // ENEMY Assassin Tribe 6 * BUFFED EVASION
+         
         }
 
-        if (rollMiss == 0) // hard coded explicit 1% miss chance (careful with changing rollMiss bounds)
+        if (rollMiss == 0) 
         {
             return false;
         } else
