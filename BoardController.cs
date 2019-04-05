@@ -24,6 +24,9 @@ public class BoardController : MonoBehaviour
     public string gameStatus;
     public int currentGameRound = 1;
 
+    public GameObject friendlySideIndicatorPlane;
+    public GameObject rainSystem;
+    public AmbienceSound ambienceSound;
 
     private void Awake()
     {
@@ -54,7 +57,7 @@ public class BoardController : MonoBehaviour
             for (int j = 0; j < 8; j++) // 8 collumns
             {
 
-                GameObject spawn = GameObject.Instantiate(tilePrefab, new Vector3(i == 8 ? i - 3.000f : i - 3.435f, 0, 3.435f - j), Quaternion.Euler(0, -90, 0)); // create a tile in the right position
+                GameObject spawn = GameObject.Instantiate(tilePrefab, new Vector3(i == 8 ? i - 2.85f : i - 3.435f, 0, 3.435f - j), Quaternion.Euler(0, -90, 0)); // create a tile in the right position
                 spawn.gameObject.name = "Chess Tile[" + i + "]" + "[" + j + "]"; // name the tile gameobject
                 spawn.transform.parent = this.gameObject.transform; //set the tile parent to the game board
                 spawn.GetComponent<TileBehaviour>().i = i; // store the i index inside the tile 
@@ -120,11 +123,15 @@ public class BoardController : MonoBehaviour
 
                 if (currentDificulty == 0)
                 {
+                    spawningBudget *= 0.7f;
+                }
+                if (currentDificulty == 1)
+                {
                     spawningBudget *= 0.8f;
                 }
                 else if (currentDificulty == 2)
                 {
-                    spawningBudget *= 1.2f;
+                    spawningBudget *= 0.9f;
                 }
                 if (spawningBudget < 6)
                 {

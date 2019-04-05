@@ -30,8 +30,8 @@ public class Prefab_Thumbnail : MonoBehaviour
         uicontroller.shopMouseOverInfoIcon_PRIMARYTRIBE_tribeIconVisualizer.gameObject.SetActive(true);
         uicontroller.shopMouseOverInfoIcon_SECONDARYTRIBE_tribeIconVisualizer.gameObject.SetActive(true);
  
-        uicontroller.shopMouseOverInfoIcon_PRIMARYTRIBE_tribeIconVisualizer.SetImage(this.primaryTribe);
-        uicontroller.shopMouseOverInfoIcon_SECONDARYTRIBE_tribeIconVisualizer.SetImage(this.secondaryTribe);
+        uicontroller.shopMouseOverInfoIcon_PRIMARYTRIBE_tribeIconVisualizer.SetImage(this.primaryTribe,true);
+        uicontroller.shopMouseOverInfoIcon_SECONDARYTRIBE_tribeIconVisualizer.SetImage(this.secondaryTribe,true);
   
         uicontroller.shopMouseOverInfoText_NAME.text = this.unit.ToString();
         uicontroller.shopMouseOverInfoText_PRIMARYTRIBE.text = this.primaryTribe.ToString();

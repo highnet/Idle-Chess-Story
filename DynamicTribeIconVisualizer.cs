@@ -16,7 +16,7 @@ public class DynamicTribeIconVisualizer : MonoBehaviour
 
       
 
-    public void SetImage(Tribe tribeToSet)
+    public void SetImage(Tribe tribeToSet, bool isVisible)
     {
         wizardIcon.enabled = false;
         warriorIcon.enabled = false;
@@ -27,6 +27,8 @@ public class DynamicTribeIconVisualizer : MonoBehaviour
         assassinIcon.enabled = false;
         guardianIcon.enabled = false;
 
+        if (isVisible)
+        {
         if (tribeToSet == Tribe.Wizard)
         {
             wizardIcon.enabled = true;
@@ -58,6 +60,8 @@ public class DynamicTribeIconVisualizer : MonoBehaviour
         else if (tribeToSet == Tribe.Guardian)
         {
             guardianIcon.enabled = true;
+        }
+
         }
     }
 }

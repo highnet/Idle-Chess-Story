@@ -7,7 +7,7 @@ using System;
 //  Debug.Log(string.Join(", ", (playerController.enemyActiveTribesCounter.Select(pair => $"{pair.Key} => {pair.Value}"))));
 //  Debug.Log(string.Join(", ", (playerController.deployedTribesCounter.Select(pair => $"{pair.Key} => {pair.Value}"))));
 
-public enum Unit {Grenadier, RogueSpy,Chomper,RatWarrior, Tiger, Orbling, Skeleton, AxeGuard, DeadWizard, Cactus, BabyDragon, BigLizard, RockGolem, MageTower, ShamanTotem, Spitter, GoblinZerk, Zombie,Tree,KnightTower,CursedTomb,WarriorTent,AngelStatue,DemonLord,Eyebat,AlienSoldier,Engineer,RobotCreep}
+public enum Unit {Grenadier, RogueSpy,Chomper,RatWarrior, Tiger, Orbling, Skeleton, AxeGuard, DoomBull, Cactus, BabyDragon, BigLizard, RockGolem, MageTower, ShamanTotem, Spitter, GoblinZerk, Zombie,Tree,KnightTower,CursedTomb,WarriorTent,AngelStatue,DemonLord,Eyebat,AlienSoldier,Engineer,RobotCreep}
 public enum Tribe {Warrior, Beast, Elemental, Undead, Wizard, Assassin, Guardian, Structure }
 public enum DamageSource {PhysicalDamage_AutoAttack, MagicalDamage_AutoAttack, PureDamage, Physical_Ability, Magical_Ability,NOTHING, RetaliationDamage}
 public enum HealSource { HP_Regeneration, AOEHeal, Heal, Lifesteal, Concentration_Gain,NOTHING}
@@ -163,7 +163,7 @@ public class PlayerController : MonoBehaviour
              { Unit.Cactus, 2 },
                 { Unit.Chomper, 2 },
                    { Unit.CursedTomb, 4 },
-                      { Unit.DeadWizard, 4 },
+                      { Unit.DoomBull, 4 },
                          { Unit.DemonLord, 6 },
                             { Unit.Engineer, 999 },
                                { Unit.Eyebat, 999 },
@@ -232,7 +232,7 @@ public class PlayerController : MonoBehaviour
 
         List<Unit> undeadList = new List<Unit>();
         undeadList.Add(Unit.Skeleton);
-        undeadList.Add(Unit.DeadWizard);
+        undeadList.Add(Unit.DoomBull);
         undeadList.Add(Unit.Zombie);
         undeadList.Add(Unit.CursedTomb);
         undeadList.Add(Unit.DemonLord);
@@ -250,7 +250,7 @@ public class PlayerController : MonoBehaviour
         List<Unit> wizardList = new List<Unit>();
         wizardList.Add(Unit.BabyDragon);
         wizardList.Add(Unit.Orbling);
-        wizardList.Add(Unit.DeadWizard);
+        wizardList.Add(Unit.DoomBull);
         wizardList.Add(Unit.MageTower);
         wizardList.Add(Unit.Chomper);
 

@@ -592,18 +592,23 @@ public class NPC : MonoBehaviour
             AudioSource.PlayClipAtPoint(dying_SoundClip, this.transform.position);
         }
 
-        if (isEnemy && !isDying_SingleRunController) // your unit dies
+        if (isEnemy && !isDying_SingleRunController) 
         {
             isDying_SingleRunController = true;
+            npcController.enemyList.Remove(gameObject.GetComponent<NPC>());
+            npcController.npcList.Remove(gameObject.GetComponent<NPC>());
             Helper.Decrement<Tribe>(playerController.enemyActiveTribesCounter, this.PRIMARYTRIBE);
             Helper.Decrement<Tribe>(playerController.enemyActiveTribesCounter, this.SECONDARYTRIBE);
-            npcController.enemyList.Remove(gameObject.GetComponent<NPC>());
-
-   
+            gameObject.GetComponent<NPC>().occupyingTile.GetComponent<TileBehaviour>().occupyingUnit = null;
 
             if (!isNotCombatRelatedDeath)
             {
-                //    Debug.Log("Rewarding you " + goldBountyReward + " gold for killing: " + this.name);
+                if (animator != null)
+                {
+                    animator.Play("Death");
+                }
+                this.StopCoroutine(liveRoutine);
+                this.liveRoutine = null;
                 long goldBountyReward = (long)this.baseGoldBountyReward;
                 float bonusGold = 0;
 
@@ -618,21 +623,25 @@ public class NPC : MonoBehaviour
                 playerController.sessionLogger.goldRewarded += (long) (goldBountyReward - bonusGold);
                 playerController.SetPlayerGoldCount(playerController.playerGoldCount + goldBountyReward);
                 uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopClosedAudioClip);
-            }
-            npcController.npcList.Remove(gameObject.GetComponent<NPC>());
-            gameObject.GetComponent<NPC>().occupyingTile.GetComponent<TileBehaviour>().occupyingUnit = null;
-            Object.DestroyImmediate(transform.parent.gameObject);
+                Object.Destroy(transform.parent.gameObject,2);
+                Object.Destroy(this.GetComponentInChildren<HealthBarController>().gameObject);
+     
 
-        } else if (!isEnemy && !isDying_SingleRunController) // enemy unit dies
+            } else
+            {
+                Object.DestroyImmediate(transform.parent.gameObject);
+            }
+
+   
+
+        } else if (!isEnemy && !isDying_SingleRunController)
         {
-      //      Debug.Log("Your unit died");
             isDying_SingleRunController = true;
             npcController.allyList.Remove(gameObject.GetComponent<NPC>());
             npcController.deployedAllyList.Remove(gameObject.GetComponent<NPC>());
-
-
+            npcController.npcList.Remove(gameObject.GetComponent<NPC>());
             playerController.currentPlayerUnits--;
-
+            gameObject.GetComponent<NPC>().occupyingTile.GetComponent<TileBehaviour>().occupyingUnit = null;
             if (occupyingTile.GetComponent<TileBehaviour>().i != 8)
             {
                 Helper.Decrement<Tribe>(playerController.deployedTribesCounter, this.PRIMARYTRIBE);
@@ -643,11 +652,21 @@ public class NPC : MonoBehaviour
 
             if (!isNotCombatRelatedDeath)
             {
+                if (animator != null)
+                {
+                    animator.Play("Death");
+                }
                 playerController.SetCurrentHP(playerController.currentPlayerHealth - 1);
+                this.StopCoroutine(liveRoutine);
+                this.liveRoutine = null;
+                Object.Destroy(transform.parent.gameObject, 2);
+                Object.Destroy(this.GetComponentInChildren<HealthBarController>().gameObject);
+            } else
+            {
+                Object.DestroyImmediate(transform.parent.gameObject);
             }
-            npcController.npcList.Remove(gameObject.GetComponent<NPC>());
-            gameObject.GetComponent<NPC>().occupyingTile.GetComponent<TileBehaviour>().occupyingUnit = null;
-            Object.DestroyImmediate(transform.parent.gameObject);
+
+
         }
     }
 
@@ -706,6 +725,7 @@ public class NPC : MonoBehaviour
             if (boardController.gameStatus.Equals("shopping"))
             {
                 this.beingDragged = true;
+                boardController.friendlySideIndicatorPlane.SetActive(true);
             }
         }
 
@@ -717,6 +737,7 @@ public class NPC : MonoBehaviour
             if (boardController.gameStatus.Equals("shopping"))
             {
                 this.beingDragged = true;
+                boardController.friendlySideIndicatorPlane.SetActive(true);
             }
         }
     }
@@ -745,7 +766,11 @@ public class NPC : MonoBehaviour
     private void OnMouseUp()
     {
 
-        if (isEnemy) { beingDragged = false; }
+        if (isEnemy)
+        {
+            boardController.friendlySideIndicatorPlane.SetActive(false);
+            beingDragged = false;
+        }
         if (beingDragged)
         {
             RaycastHit hit;
@@ -763,6 +788,7 @@ public class NPC : MonoBehaviour
             {
                     this.gameObject.GetComponentsInParent<Transform>()[1].position = this.occupyingTile.transform.position;
             }
+            boardController.friendlySideIndicatorPlane.SetActive(false);
             beingDragged = false;
             worldControl.GetComponent<LineRenderer>().enabled = false;
         }

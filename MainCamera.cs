@@ -43,8 +43,8 @@ public class MainCamera : MonoBehaviour
             this.transform.RotateAround(this.transform.position, this.transform.forward, Input.GetAxis("Mouse Y") / 2);
         }
 
-        if (((cam.transform.localPosition.x > 10) && (Input.mouseScrollDelta.y > 0)) || ((cam.transform.localPosition.x < 50) && (Input.mouseScrollDelta.y < 0))) {
-            cam.transform.localPosition = cam.transform.localPosition + new Vector3(-Input.mouseScrollDelta.y, 0, 0);
+        if (((cam.transform.localPosition.x > 10) && (Input.mouseScrollDelta.y > 0)) || ((cam.transform.localPosition.x < 100) && (Input.mouseScrollDelta.y < 0))) {
+            cam.transform.localPosition = cam.transform.localPosition + (0.25f * new Vector3(-Input.mouseScrollDelta.y, 0, 0));
         }
 
         if (Input.GetKey(KeyCode.LeftArrow) && rb.transform.position.z > -3.5F)

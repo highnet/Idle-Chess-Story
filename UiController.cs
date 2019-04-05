@@ -127,6 +127,8 @@ public class UiController : MonoBehaviour
     public Button settingsButton;
     public Button exitGameButton;
     public Dropdown cameraModePicker;
+    public Button CreditsButton;
+    public GameObject creditsPanel;
 
     private void Awake()
     {
@@ -151,6 +153,8 @@ public class UiController : MonoBehaviour
         hudCanvasShopCostToShuffleText = GameObject.Find("HUDCanvas/Player Panel/Shop Panel/Refresh Button/Gold Cost Text").GetComponent<Text>();
         hudCanvasShopUnitCapUpgradeText = GameObject.Find("HUDCanvas/Player Panel/Shop Panel/Buy Unit Cap/Gold Cost Text").GetComponent<Text>();
 
+        CreditsButton.onClick.RemoveAllListeners();
+        CreditsButton.onClick.AddListener(delegate { ToggleCreditsPanel(); });
 
         cameraModePicker.onValueChanged.RemoveAllListeners();
         cameraModePicker.onValueChanged.AddListener(delegate { PickCameraMode(); });
@@ -228,6 +232,11 @@ public class UiController : MonoBehaviour
 
         shopUnitCapButton.onClick.RemoveAllListeners();
         shopUnitCapButton.onClick.AddListener(delegate { UpgradeUnitCap(); });
+    }
+
+    public void ToggleCreditsPanel()
+    {
+        creditsPanel.SetActive(!creditsPanel.activeSelf);
     }
 
     public void ExitGame()
@@ -322,13 +331,22 @@ public class UiController : MonoBehaviour
             string friendOrFoe = selectedNPC.isEnemy ? "Enemy " : "";
             selectedUnitPanel_InformationText_NAME.text = friendOrFoe + selectedObject.name;
             selectedUnitPanel_InformationText_ARMORANDRETALIATION.text = "Armor: " + selectedNPC.ARMOR + " / Retaliation: " + selectedNPC.RETALIATION;
-            selectedUnitPanel_InformationText_ATTACKPOWER.text = "AP: " + selectedNPC.ATTACKPOWER;
+            selectedUnitPanel_InformationText_ATTACKPOWER.text = selectedNPC.ATTACKPOWER.ToString();
             selectedUnitPanel_InformationText_CONCENTRATION.text = "CONCENTRATION: " + selectedNPC.CONCENTRATION + "/" + selectedNPC.MAXCONCENTRATION;
             selectedUnitPanel_InformationText_HP.text = "HP: " + Mathf.Round(selectedNPC.HP) + "/" + selectedNPC.MAXHP;
-            selectedUnitPanel_InformationText_SPELLPOWER.text = "SP: " + selectedNPC.SPELLPOWER;
+            selectedUnitPanel_InformationText_SPELLPOWER.text = selectedNPC.SPELLPOWER.ToString();
             selectedUnitPanel_InformationText_TIER.text = "Level " + selectedNPC.TIER;
-            selectedUnitPanel_primaryTribeIconVisualizer.SetImage(selectedNPC.PRIMARYTRIBE);
-            selectedUnitPanel_secondaryTribeIconVisualizer.SetImage(selectedNPC.SECONDARYTRIBE);
+
+            if (selectedNPC.UNIT_TYPE != Unit.RobotCreep)
+            {
+                selectedUnitPanel_primaryTribeIconVisualizer.SetImage(selectedNPC.PRIMARYTRIBE, true);
+                selectedUnitPanel_secondaryTribeIconVisualizer.SetImage(selectedNPC.SECONDARYTRIBE, true);
+            } else
+            {
+                selectedUnitPanel_primaryTribeIconVisualizer.SetImage(selectedNPC.PRIMARYTRIBE, false);
+                selectedUnitPanel_secondaryTribeIconVisualizer.SetImage(selectedNPC.SECONDARYTRIBE, false);
+            }
+    
             selectedUnitPanel_abilityiconVisualizer.SetImage(selectedNPC.ABILITY);
             sellFriendlySelectedTargetButton.gameObject.SetActive(!selectedNPC.isEnemy);
 
@@ -696,6 +714,19 @@ public class UiController : MonoBehaviour
             boardController.ChangeGameStatus("Wait"); // smooth wait transition
             npcController.allyListBackup = new List<NPC>();
             boardController.SpawnEnemyUnitsRound_Balanced(); // spawn balanced enemies
+
+            if (UnityEngine.Random.Range(0,7) == 1)
+            {
+                boardController.rainSystem.SetActive(!boardController.rainSystem.activeSelf);
+                if (boardController.rainSystem.activeSelf)
+                {
+                    boardController.ambienceSound.PlayRainLoop();
+                } else
+                {
+                    boardController.ambienceSound.StopPlaying();
+                }
+            }
+
             for (int i = npcController.deployedAllyList.Count - 1; i >= 0; i--) // copy the human player unit deployment so we can restore it after combat
             {
                 if (npcController.deployedAllyList[i] != null)
