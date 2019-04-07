@@ -74,7 +74,11 @@ public class NPC : MonoBehaviour
     public AudioClip autoAttacking_SoundClip;
     public AudioClip dying_SoundClip;
     public AudioClip battleCry_SoundClip; 
-    public AudioClip cheering_SoundClip; // TODO: not yet implemented
+    public AudioClip cheering_SoundClip;
+    public int numberOfAttackAnimations;
+
+    public bool isBoss;
+    public bool isCreep;
 
     public void Awake()
     {
@@ -656,7 +660,6 @@ public class NPC : MonoBehaviour
                 {
                     animator.Play("Death");
                 }
-                playerController.SetCurrentHP(playerController.currentPlayerHealth - 1);
                 this.StopCoroutine(liveRoutine);
                 this.liveRoutine = null;
                 Object.Destroy(transform.parent.gameObject, 2);
@@ -695,7 +698,12 @@ public class NPC : MonoBehaviour
             {
                 go.GetComponent<HealthBarController>().emptyConcentrationBar.SetActive(false);
             }
-            if (this.isEnemy)
+            if (this.UNIT_TYPE == Unit.Eyebat || this.UNIT_TYPE == Unit.Engineer ||this.UNIT_TYPE == Unit.AlienSoldier)
+            {
+                go.GetComponent<HealthBarController>().fullBar.GetComponentInChildren<SpriteRenderer>().color = Color.red;
+                go.GetComponent<HealthBarController>().transform.localScale *= 3f;
+            }
+           else if (this.isEnemy)
             {
                 go.GetComponent<HealthBarController>().fullBar.GetComponentInChildren<SpriteRenderer>().color = Color.red;
                 go.GetComponent<HealthBarController>().transform.localScale *= 0.9f;
@@ -722,7 +730,7 @@ public class NPC : MonoBehaviour
         if (boardController.selectedObject == this.gameObject)
         {
             uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitclickAudioClip);
-            if (boardController.gameStatus.Equals("shopping"))
+            if (boardController.gameStatus.Equals(GameStatus.Shopping))
             {
                 this.beingDragged = true;
                 boardController.friendlySideIndicatorPlane.SetActive(true);
@@ -734,7 +742,7 @@ public class NPC : MonoBehaviour
             boardController.selectedObject = this.gameObject;
             
             uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitclickAudioClip);
-            if (boardController.gameStatus.Equals("shopping"))
+            if (boardController.gameStatus.Equals(GameStatus.Shopping))
             {
                 this.beingDragged = true;
                 boardController.friendlySideIndicatorPlane.SetActive(true);
@@ -813,7 +821,7 @@ public class NPC : MonoBehaviour
 
     public void moveToEmptyTile(int i, int j)
     {
-        if (((i < 8 && i >= 0 && j < 8 && j >= 0) && !boardController.gameStatus.Equals("shopping")) || ((i < 9 && i >= 0 && j < 8 && j >= 0) && boardController.gameStatus.Equals("shopping"))) {
+        if (((i < 8 && i >= 0 && j < 8 && j >= 0) && !boardController.gameStatus.Equals(GameStatus.Shopping)) || ((i < 9 && i >= 0 && j < 8 && j >= 0) && boardController.gameStatus.Equals(GameStatus.Shopping))) {
             if (boardController.chessBoard != null && boardController.chessBoard[i, j].GetComponent<TileBehaviour>().occupyingUnit == null)
             {
                 if (this.occupyingTile.GetComponent<TileBehaviour>().i == 8 && boardController.chessBoard[i, j].GetComponent<TileBehaviour>().i != 8) // swapping from reserve board into the chess board
@@ -1052,14 +1060,21 @@ public class NPC : MonoBehaviour
 
     }
 
+    public void TryPlayAttackAnimation()
+    {
+        if (animator != null)
+        {
 
-
+            int randomAttackRng = UnityEngine.Random.Range(1, numberOfAttackAnimations);
+            animator.Play("Attack" + randomAttackRng);
+        }
+    }
 
     public IEnumerator Live(int attackDistance,DamageSource autoAttack_DamageType,Ability abilityToUse,float actionTime)
     {
         for (; ; )
         {
-            if (boardController.gameStatus.Equals("Fight") && occupyingTile.GetComponent<TileBehaviour>().i != 8) {
+            if (boardController.gameStatus.Equals(GameStatus.Fight) && occupyingTile.GetComponent<TileBehaviour>().i != 8) {
 
                 float distance = 0;
                 float minDistance = 9000f;
@@ -1133,11 +1148,7 @@ public class NPC : MonoBehaviour
                                 npcAudioSource.PlayOneShot(autoAttacking_SoundClip);
                             }
                         }
-
-                        if (animator != null)
-                        {
-                            animator.Play("Attack");
-                        }
+                        TryPlayAttackAnimation();
                     }
                     else
                     {

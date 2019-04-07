@@ -47,13 +47,13 @@ public class UiController : MonoBehaviour
     //
     public Text hudCanvasTopPanelPlayerCurrentHPCounterText;
     //
-    private Text hudCanvasTopPanelGoldCountText;
-    private Text hudCanvasTopPanelUsernameText;
-    private Text hudCanvasTopPanelGameStatusText;
-    private Text hudCanvasTopPanelCurrentRoundText;
-    private Text hudCanvasTopPanelDeployedUnitCountText;
-    private Text hudCanvasShopCostToShuffleText;
-    private Text hudCanvasShopUnitCapUpgradeText;
+    public Text hudCanvasTopPanelGoldCountText;
+    public Text hudCanvasTopPanelUsernameText;
+    public Text hudCanvasTopPanelGameStatusText;
+    public Text hudCanvasTopPanelCurrentRoundText;
+    public Text hudCanvasTopPanelDeployedUnitCountText;
+    public Text hudCanvasShopCostToShuffleText;
+    public Text hudCanvasShopUnitCapUpgradeText;
     public Image hudCanvasRankImage;
     //
     public Text shopbutton1_hudCanvasShopCostBuyUnit;
@@ -103,6 +103,7 @@ public class UiController : MonoBehaviour
     public Text reportdefeatPanel_recordAchievedMMRText;
     public Text reportdefeatPanel_userNameText;
     public Text reportdefeatPanel_userMMR;
+    public Image reportdefeatPanel_rankIcon;
     //
     public AudioListener mainAudioListener;
     public AudioSource hudCanvasAudioSource;
@@ -129,29 +130,42 @@ public class UiController : MonoBehaviour
     public Dropdown cameraModePicker;
     public Button CreditsButton;
     public GameObject creditsPanel;
+    //
+    public GameObject helpPanel;
+    public Button helpButton;
+    public Button closeHelpPanelButton;
+    public HelperTipContainer helperTipContainer;
+    public Text helperText;
+    public Button nextTipButton;
+    public Button previousTipButton;
+    public Text currentTipCounterText;
+    public Toggle randomTipToggler;
 
     private void Awake()
     {
+        helperTipContainer = GetComponent<HelperTipContainer>();
+        RefreshHelperTips();
+
         AudioListener.volume = userVolume;
         boardController = GetComponent<BoardController>();
         playerController = GetComponent<PlayerController>();
         npcController = GetComponent<NpcController>();
         playerProfiler = GetComponent<PlayerProfiler>();
         hudCanvas = GameObject.Find("HUDCanvas");
-        hudCanvasTopBar = GameObject.Find("HUDCanvas/Top Bar");
-        hudCanvasBottomBar = GameObject.Find("HUDCanvas/Bottom Bar");
-        hudCanvasPlayerPanel = GameObject.Find("HUDCanvas/Player Panel");
-        hudCanvasShopPanel = GameObject.Find("HUDCanvas/Player Panel/Shop Panel");
-        hudCanvasTribesPanel = GameObject.Find("HUDCanvas/Player Panel/Tribes Panel");
-        hudCanvasEscapePanel = GameObject.Find("HUDCanvas/Player Panel/Escape Menu Panel");
-        hudCanvasCurrentlySelectedUnitPanel = GameObject.Find("HUDCanvas/Player Panel/Currently Selected Unit Information Panel");
-        hudCanvasTopPanelGoldCountText = GameObject.Find("HUDCanvas/Top Bar/Top Panel/Gold Count Text").GetComponent<Text>();
-        hudCanvasTopPanelUsernameText = GameObject.Find("HUDCanvas/Top Bar/Top Panel/Username Text").GetComponent<Text>();
-        hudCanvasTopPanelGameStatusText = GameObject.Find("HUDCanvas/Top Bar/Top Panel/Status Text").GetComponent<Text>();
-        hudCanvasTopPanelCurrentRoundText = GameObject.Find("HUDCanvas/Top Bar/Top Panel/Round Text").GetComponent<Text>();
-        hudCanvasTopPanelDeployedUnitCountText = GameObject.Find("HUDCanvas/Top Bar/Top Panel/Deployed Unit Count Text").GetComponent<Text>();
-        hudCanvasShopCostToShuffleText = GameObject.Find("HUDCanvas/Player Panel/Shop Panel/Refresh Button/Gold Cost Text").GetComponent<Text>();
-        hudCanvasShopUnitCapUpgradeText = GameObject.Find("HUDCanvas/Player Panel/Shop Panel/Buy Unit Cap/Gold Cost Text").GetComponent<Text>();
+  
+        previousTipButton.onClick.RemoveAllListeners();
+        previousTipButton.onClick.AddListener(delegate { PreviousTip(); });
+
+
+        nextTipButton.onClick.RemoveAllListeners();
+        nextTipButton.onClick.AddListener(delegate { NextTip(); });
+
+
+        closeHelpPanelButton.onClick.RemoveAllListeners();
+        closeHelpPanelButton.onClick.AddListener(delegate { ToggleHelpPanel(); });
+
+        helpButton.onClick.RemoveAllListeners();
+        helpButton.onClick.AddListener(delegate { ToggleHelpPanel(); });
 
         CreditsButton.onClick.RemoveAllListeners();
         CreditsButton.onClick.AddListener(delegate { ToggleCreditsPanel(); });
@@ -234,9 +248,55 @@ public class UiController : MonoBehaviour
         shopUnitCapButton.onClick.AddListener(delegate { UpgradeUnitCap(); });
     }
 
+    public void RefreshHelperTips()
+    {
+        helperText.text = helperTipContainer.currentTip;
+        currentTipCounterText.text = "Tip: " + (helperTipContainer.currentTipIndex+1) + "/" + helperTipContainer.totalNumberOfTips;
+    }
+
+    public void PreviousTip()
+    {
+        if (randomTipToggler.isOn)
+        {
+            helperTipContainer.RandomTip();
+        }
+        else
+        {
+            helperTipContainer.PreviousTip();
+        }
+        helperText.text = helperTipContainer.currentTip;
+        hudCanvasAudioSource.PlayOneShot(genericButtonSucessAudioClip);
+        RefreshHelperTips();
+    }
+    public void NextTip()
+    {
+        if (randomTipToggler.isOn)
+        {
+            helperTipContainer.RandomTip();
+        }
+        else
+        {
+            helperTipContainer.NextTip();
+        }
+        helperText.text = helperTipContainer.currentTip;
+        hudCanvasAudioSource.PlayOneShot(genericButtonSucessAudioClip);
+        RefreshHelperTips();
+    }
+
+    public void ToggleHelpPanel()
+    {
+        helpPanel.SetActive(!helpPanel.activeSelf);
+        if (helpPanel.activeSelf)
+        {
+            RefreshHelperTips();
+        }
+        hudCanvasAudioSource.PlayOneShot(genericButtonSucessAudioClip);
+    }
+
     public void ToggleCreditsPanel()
     {
         creditsPanel.SetActive(!creditsPanel.activeSelf);
+        hudCanvasAudioSource.PlayOneShot(genericButtonSucessAudioClip);
     }
 
     public void ExitGame()
@@ -252,7 +312,7 @@ public class UiController : MonoBehaviour
         }
       
 
-        Application.Quit();
+      // Application.Quit();
 
     }
 
@@ -323,18 +383,18 @@ public class UiController : MonoBehaviour
 
     void Update()
     {
-        if (boardController.gameStatus != "report defeat" && boardController.selectedObject != null) // update the entire selected unit panel
+        if (boardController.gameStatus != GameStatus.ReportDefeat && boardController.selectedObject != null) // update the entire selected unit panel
         {
             hudCanvasCurrentlySelectedUnitPanel.SetActive(true);
             GameObject selectedObject = boardController.selectedObject;
             NPC selectedNPC = selectedObject.GetComponent<NPC>();
             string friendOrFoe = selectedNPC.isEnemy ? "Enemy " : "";
             selectedUnitPanel_InformationText_NAME.text = friendOrFoe + selectedObject.name;
-            selectedUnitPanel_InformationText_ARMORANDRETALIATION.text = "Armor: " + selectedNPC.ARMOR + " / Retaliation: " + selectedNPC.RETALIATION;
-            selectedUnitPanel_InformationText_ATTACKPOWER.text = selectedNPC.ATTACKPOWER.ToString();
-            selectedUnitPanel_InformationText_CONCENTRATION.text = "CONCENTRATION: " + selectedNPC.CONCENTRATION + "/" + selectedNPC.MAXCONCENTRATION;
-            selectedUnitPanel_InformationText_HP.text = "HP: " + Mathf.Round(selectedNPC.HP) + "/" + selectedNPC.MAXHP;
-            selectedUnitPanel_InformationText_SPELLPOWER.text = selectedNPC.SPELLPOWER.ToString();
+            selectedUnitPanel_InformationText_ARMORANDRETALIATION.text = "Armor: " + Mathf.Round(selectedNPC.ARMOR) + " / Retaliation: " + Mathf.Round(selectedNPC.RETALIATION);
+            selectedUnitPanel_InformationText_ATTACKPOWER.text = Mathf.Round(selectedNPC.ATTACKPOWER).ToString();
+            selectedUnitPanel_InformationText_CONCENTRATION.text = "CONCENTRATION: " + Mathf.Round(selectedNPC.CONCENTRATION) + "/" + Mathf.Round(selectedNPC.MAXCONCENTRATION);
+            selectedUnitPanel_InformationText_HP.text = Mathf.Round(selectedNPC.HP) + "/" + Mathf.Round(selectedNPC.MAXHP);
+            selectedUnitPanel_InformationText_SPELLPOWER.text = Mathf.Round(selectedNPC.SPELLPOWER).ToString();
             selectedUnitPanel_InformationText_TIER.text = "Level " + selectedNPC.TIER;
 
             if (selectedNPC.UNIT_TYPE != Unit.RobotCreep)
@@ -357,19 +417,19 @@ public class UiController : MonoBehaviour
 
         }
 
-        if (!boardController.gameStatus.Equals("shopping")) // take out ui elements outside that should not be outside of the shopping phase
+        if (!boardController.gameStatus.Equals(GameStatus.Shopping)) // take out ui elements outside that should not be outside of the shopping phase
         {
             shopToggleButton.gameObject.SetActive(false);
             hudCanvasShopPanel.SetActive(false);
             sellFriendlySelectedTargetButton.gameObject.SetActive(false);
             fightButton.gameObject.SetActive(false);
-            settingsButton.gameObject.SetActive(false);
+  
         } else
         {
             fightButton.gameObject.SetActive(true);
-            settingsButton.gameObject.SetActive(true);
+
         }
-        if (Input.GetKeyDown(KeyCode.Escape) && boardController.gameStatus == "shopping")
+        if (Input.GetKeyDown(KeyCode.Escape) && boardController.gameStatus == GameStatus.Shopping)
         {
             toggleEscapeMenu();
         }
@@ -414,7 +474,7 @@ public class UiController : MonoBehaviour
             {
                 ChangeNameAndSaveToFile(); // new name has been inputted so lets save anew to file
             }
-            boardController.ChangeGameStatus("shopping", "Shopping Phase"); // set to shopping phae
+            boardController.ChangeGameStatus(GameStatus.Shopping, "Shopping Phase"); // set to shopping phae
             ChangeCurrentRoundDisplayText(boardController.currentGameRound); // update ui text element
             boardController.StartCoroutine("ProgressHealthRegeneration"); // begin health regeneration process
             boardController.StartCoroutine("ProgressConcentrationRegeneration"); // begin concentration regeneration process
@@ -444,6 +504,7 @@ public class UiController : MonoBehaviour
         reportdefeatPanel_recordReachedRoundText.text = "Record Reached Round: " + pps.highestAchievedRound;
         reportdefeatPanel_userMMR.text = "MMR: " + pps.mmr;
         reportdefeatPanel_userNameText.text = "" + pps.characterName;
+        reportdefeatPanel_rankIcon.sprite = Resources.Load<Sprite>(pps.rank + " icon");
 
     }
 
@@ -700,18 +761,17 @@ public class UiController : MonoBehaviour
     {
 
         yield return new WaitForSeconds(2);
-        if (boardController.gameStatus != "report defeat"){
-        boardController.ChangeGameStatus("Fight");
-
+        if (boardController.gameStatus != GameStatus.ReportDefeat){
+        boardController.ChangeGameStatus(GameStatus.Fight);
         }
     }
 
     void TryTransitionToFightPhase()
     {
 
-        if (boardController.gameStatus != "Fight" && boardController.gameStatus != "report defeat" && boardController.gameStatus == "shopping" && playerController.currentlyDeployedUnits > 0) // check if we are ready to proceed to combat
+        if (boardController.gameStatus != GameStatus.Fight && boardController.gameStatus != GameStatus.ReportDefeat && boardController.gameStatus == GameStatus.Shopping && playerController.currentlyDeployedUnits > 0) // check if we are ready to proceed to combat
         {
-            boardController.ChangeGameStatus("Wait"); // smooth wait transition
+            boardController.ChangeGameStatus(GameStatus.Wait); // smooth wait transition
             npcController.allyListBackup = new List<NPC>();
             boardController.SpawnEnemyUnitsRound_Balanced(); // spawn balanced enemies
 

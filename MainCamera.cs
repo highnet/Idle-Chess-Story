@@ -85,7 +85,7 @@ public class MainCamera : MonoBehaviour
         }
 
     
-        if (boardController.gameStatus.Equals("Fight") && cameraMode.Equals("Follow") && boardController.selectedObject != null)
+        if (boardController.gameStatus.Equals(GameStatus.Fight) && cameraMode.Equals("Follow") && boardController.selectedObject != null)
         {
             target = boardController.selectedObject;
             transform.position = target.transform.position + new Vector3(0, 1, 0);

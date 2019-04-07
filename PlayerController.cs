@@ -329,10 +329,10 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        if ((boardController.gameStatus == "Fight" || boardController.gameStatus == "shopping") && currentPlayerHealth <= 0) // check lose condition
+        if ((boardController.gameStatus == GameStatus.Fight || boardController.gameStatus == GameStatus.Shopping) && currentPlayerHealth <= 0) // check lose condition
         {
             CalculateMMRChangeBasedOnRoundAndSave();
-            boardController.ChangeGameStatus("report defeat");
+            boardController.ChangeGameStatus(GameStatus.ReportDefeat);
             uiController.hudCanvasReportDefeatPanel.gameObject.SetActive(true);
             uiController.hudCanvasTribesPanel.gameObject.SetActive(false);
             uiController.hudCanvasTopBar.gameObject.SetActive(false);

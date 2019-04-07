@@ -3,10 +3,9 @@ using UnityEngine;
 
 public class SpellbookController : MonoBehaviour
 {
-
     public UiController uic;
 
-    private void Start()
+    private void Start() // todo: pool me
     {
         uic = GameObject.Find("World Controller").GetComponent<UiController>();
     }
@@ -17,8 +16,9 @@ public class SpellbookController : MonoBehaviour
         if (abilityToCast == Ability.NOTHING || casterNPC == null || targetNPC == null)
         {
             return;
-        } else
+        } else if (casterNPC != null)
         {
+           casterNPC.TryPlayAttackAnimation();
            casterNPC.CONCENTRATION = 0;
         }
 

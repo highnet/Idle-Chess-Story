@@ -5,6 +5,8 @@ using System;
 using System.Linq;
 using UnityEngine.SceneManagement;
 
+public enum GameStatus {Initializing,Fight,AwaitingWizardConfirmation,Wait,Shopping,ReportDefeat,GameOver }
+
 public class BoardController : MonoBehaviour
 {
     NpcController npcController;
@@ -19,9 +21,9 @@ public class BoardController : MonoBehaviour
     //
     public MainCamera mainCameraController;
 
-    public bool testMode = false;
+    public bool testDummyMode = false;
 
-    public string gameStatus;
+    public GameStatus gameStatus;
     public int currentGameRound = 1;
 
     public GameObject friendlySideIndicatorPlane;
@@ -39,9 +41,9 @@ public class BoardController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ChangeGameStatus("initializing"); // set initalizing status
+        ChangeGameStatus(GameStatus.Initializing); // set initalizing status
         CreateBoardTiles(); // create the tile 9x8 array board
-        ChangeGameStatus("awaitingWizardConfirmation", "confirm settings"); // set to settings wizard status
+        ChangeGameStatus(GameStatus.AwaitingWizardConfirmation, "confirm settings"); // set to settings wizard status
         uiController.LoadFromSaveFile(); // load the save file stored in the user's computer
     }
 
@@ -69,7 +71,7 @@ public class BoardController : MonoBehaviour
 
     public void SpawnEnemyUnitsRound_Balanced() // copy the human players board and deply a similar team
     {
-        if (!testMode) // test mode spawns dummies instead of real units
+        if (!testDummyMode) // test mode spawns dummies instead of real units
         {
        
             if (currentGameRound  == 1 || currentGameRound == 2  || currentGameRound == 5 ||  currentGameRound == 7 || currentGameRound == 11 || currentGameRound == 15 || currentGameRound == 17)
@@ -227,66 +229,6 @@ public class BoardController : MonoBehaviour
 
     }
 
-    [Obsolete]
-    public void SpawnEnemyUnitsRound_Scaling(int roundCounter) // Spawns enemy units at the start of each round
-    {
-
-        if (!testMode) // testmode spawns dummies
-        {
-            Tribe randomTribe;
-            randomTribe = (Tribe)Enum.GetValues(typeof(Tribe)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Tribe)).Length)); // generate a random tribe
-
-
-            bool doneTrying = false;
-            while (doneTrying == false) // we dont want structure as a type
-            {
-                randomTribe = (Tribe)Enum.GetValues(typeof(Tribe)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(Tribe)).Length)); // generate a random tribe agane
-                if (randomTribe == Tribe.Structure)
-                {
-                    doneTrying = false; // go agane
-                }
-                else
-                {
-                    doneTrying = true; // we gucci
-                }
-            }
-
-            List<Unit> spawnList;
-            playerController.TRIBAL_UNIT_DATA.TryGetValue(randomTribe, out spawnList); // get a list of all units of the random tribe
-
-            int amountOfUnitsToSpawn = 1 + roundCounter; // we wanna spawn this many units
-            playerController.ReInitializeEnemyActiveTribesCounter(); // restart the enemy tribe counter
-            for (int i = 0; i < amountOfUnitsToSpawn; i++) // spawn this many units
-            {
-                int randomI = UnityEngine.Random.Range(0, 4); // random i coordinate
-                int randomJ = UnityEngine.Random.Range(0, 8); // random j coordinate
-                Unit randomUnit = spawnList.ToArray()[UnityEngine.Random.Range(0, spawnList.ToArray().Length)]; //get a random unit from the list
-
-                GameObject spawnedEnemy = TrySpawnUnit(randomI, randomJ, randomUnit, true,1,false); // try spawn the enemy unit
-                if (spawnedEnemy != null) // if we succeeded
-                {
-                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE); // increment enemy tribe counter with my primary tribe
-                    Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().SECONDARYTRIBE); // increment enemy tribe counter with my secondary tribe
-                } 
-
-            }
-
-        } else // we are in testmode
-        {
-            GameObject spawnedEnemy = TrySpawnDummy(2,4,true); // spawn dummies
-            if (spawnedEnemy != null) // this can be used for testing enemy tribe bonuses
-            {
-                Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE);
-                Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().SECONDARYTRIBE);
-            }
-
-        }
-
-
-
-    }
-
-
     public GameObject TrySpawnUnit(int i, int j, Unit unitToSpawn, bool isEnemySpawn,int tierOverride,bool isCreep) // try to spawn a unit and return it
     {
 
@@ -364,16 +306,16 @@ public class BoardController : MonoBehaviour
 
 
 
-    public void ChangeGameStatus(string developerStatus, string userDisplayText) // change game status and display string status (overload)
+    public void ChangeGameStatus(GameStatus developerStatus, string userDisplayText) // change game status and display string status (overload)
     {
         gameStatus = developerStatus;
         uiController.ChangeGameStatusDisplayText(userDisplayText);
     }
 
-    public void ChangeGameStatus(string status) // change game status and display string status
+    public void ChangeGameStatus(GameStatus status) // change game status and display string status
     {
         gameStatus = status;
-        uiController.ChangeGameStatusDisplayText(status);
+        uiController.ChangeGameStatusDisplayText(status.ToString());
     }
 
     public void ChangeCurrentRound(int round) // change the current game round
@@ -386,7 +328,7 @@ public class BoardController : MonoBehaviour
     {
         for (; ; )
         { 
-            if (gameStatus.Equals("Fight")) // only during fight phase
+            if (gameStatus.Equals(GameStatus.Fight)) // only during fight phase
             {
                 int guardiansCount = 0;
                 playerController.deployedTribesCounter.TryGetValue(Tribe.Guardian, out guardiansCount); // get the friendly count of guardians
@@ -433,7 +375,7 @@ public class BoardController : MonoBehaviour
     {
         for (; ; )
         {
-            if (gameStatus.Equals("Fight")) // only do this during fight phase 
+            if (gameStatus.Equals(GameStatus.Fight)) // only do this during fight phase 
             {
                 int warriorsCount = 0;
                 playerController.deployedTribesCounter.TryGetValue(Tribe.Warrior, out warriorsCount); // check friendly warrior count
@@ -475,18 +417,15 @@ public class BoardController : MonoBehaviour
 
     }
 
-
-
-
     // Update is called once per frame
     void LateUpdate() // at the end of every frame check if game is over or if combat is over
     {
-        if (gameStatus.Equals("game over")) // *GG* game over conditon *GG*
+        if (gameStatus.Equals(GameStatus.GameOver)) // *GG* game over conditon *GG*
         {
             TransitionToGameOverPhase(); // transition to the end of game phase
         }
 
-         else if (gameStatus.Equals("Fight") && (npcController.deployedAllyList.Count == 0 || npcController.enemyList.Count == 0)) // combat is over
+         else if (gameStatus.Equals(GameStatus.Fight) && (npcController.deployedAllyList.Count == 0 || npcController.enemyList.Count == 0)) // combat is over
         {
             TransitionToShoppingPhase(); // transition to shopping phase
         }
@@ -499,8 +438,7 @@ public class BoardController : MonoBehaviour
         float goldReward = playerController.playerGoldCount; // fetch the player's current gold
         if (npcController.enemyList.Count == 0) // combat VICTORY
         {
-
-
+            Debug.Log("combat victory");
             if (npcController.allyList.Count != 0)
             {
                 foreach (NPC npc in npcController.allyList)
@@ -511,8 +449,6 @@ public class BoardController : MonoBehaviour
                    }
                 }
             }
-
-         
             if (uiController.wizard_difficultyPicker.value == 0)
             {
                 goldReward *= 1.35f;
@@ -540,10 +476,8 @@ public class BoardController : MonoBehaviour
             uiController.ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString());
         }
         else // combat DEFEAT
-
         {
-
-
+            Debug.Log("combat defeat");
             if (uiController.wizard_difficultyPicker.value == 0)
             {
                 goldReward *= 1.25f;
@@ -563,6 +497,25 @@ public class BoardController : MonoBehaviour
             float netGoldReward = goldReward - playerController.playerGoldCount;
             playerController.sessionLogger.goldRewarded += (long)netGoldReward;
             playerController.SetPlayerGoldCount((long)goldReward); // reward DEFEAT bonus gold
+
+            bool isCreepRound = false;
+            bool isBossRound = false;
+            foreach (NPC npc in npcController.enemyList)
+            {
+                if (npc.isBoss) { isBossRound = true; }
+                else if (npc.isCreep) { isCreepRound = true; }
+            }
+            if (isCreepRound)
+            {
+                playerController.SetCurrentHP(playerController.currentPlayerHealth - 5);
+            } else if (isBossRound)
+            {
+                playerController.SetCurrentHP(playerController.currentPlayerHealth - 50);
+            } else
+            {
+                playerController.SetCurrentHP(playerController.currentPlayerHealth - 10);
+            }
+           
             playerController.playerMMR -= 1 + uiController.wizard_difficultyPicker.value;
             uiController.SaveToSaveFile();
             uiController.ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString());
@@ -607,7 +560,7 @@ public class BoardController : MonoBehaviour
             }
         }
 
-        if (gameStatus != "report defeat" || gameStatus != "game over")
+        if (gameStatus != GameStatus.ReportDefeat || gameStatus != GameStatus.GameOver)
         {
             ChangeCurrentRound(currentGameRound + 1);
         }
@@ -618,9 +571,9 @@ public class BoardController : MonoBehaviour
         }
         playerController.ShuffleNewShopingOptions(true); // shuffle the player shop for free with new options to buy
      
-        if (gameStatus != "report defeat")
+        if (gameStatus != GameStatus.ReportDefeat)
         {
-            ChangeGameStatus("shopping"); // finally, change the game status to shopping phase
+            ChangeGameStatus(GameStatus.Shopping); // finally, change the game status to shopping phase
         }
     }
 
@@ -634,7 +587,7 @@ public class BoardController : MonoBehaviour
 
     public void TransitionToShoppingPhase()
     {
-        ChangeGameStatus("wait", "Combat Over");
+        ChangeGameStatus(GameStatus.Wait, "Combat Over");
         StartCoroutine(SmoothEndCombatRoundTransition());
 
     }
