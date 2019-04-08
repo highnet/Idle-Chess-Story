@@ -34,7 +34,6 @@ public class UiController : MonoBehaviour
     public Button shopButton6;
     public Button shopRefreshButton;
     public Button shopUnitCapButton;
-    public Button saveButton;
     public Button loadButton;
     public Button mainMenuButton;
     public Button forfeitButton;
@@ -72,8 +71,8 @@ public class UiController : MonoBehaviour
     public Text hudCanvasTribePanel_AssassinCounter;
     public Text hudCanvasTribePanel_GuardianCounter;
     //
-    public Text wizard_playerName;
-    public Text playerMMR;
+    public Text intro_playerName;
+    public Text intro_playerMMR;
     public Dropdown wizard_difficultyPicker;
     public Button startGameButton;
     //
@@ -151,7 +150,13 @@ public class UiController : MonoBehaviour
         playerController = GetComponent<PlayerController>();
         npcController = GetComponent<NpcController>();
         hudCanvas = GameObject.Find("HUDCanvas");
-  
+
+        saveGameEscapeMenuButton.onClick.RemoveAllListeners();
+        saveGameEscapeMenuButton.onClick.AddListener(delegate { playerController.SavePlayer(); });
+
+        loadButton.onClick.RemoveAllListeners();
+        loadButton.onClick.AddListener(delegate { playerController.LoadPlayer(); });
+
         previousTipButton.onClick.RemoveAllListeners();
         previousTipButton.onClick.AddListener(delegate { PreviousTip(); });
 
@@ -235,11 +240,11 @@ public class UiController : MonoBehaviour
         closeEscapeMenuTabButton.onClick.RemoveAllListeners();
         closeEscapeMenuTabButton.onClick.AddListener(delegate { toggleEscapeMenu(); });
 
-     //   saveGameEscapeMenuButton.onClick.RemoveAllListeners();
-    //    saveGameEscapeMenuButton.onClick.AddListener(delegate { SaveToSaveFile(); });
-
         shopUnitCapButton.onClick.RemoveAllListeners();
         shopUnitCapButton.onClick.AddListener(delegate { UpgradeUnitCap(); });
+
+        intro_playerName.text = playerController.playerName;
+        intro_playerMMR.text = playerController.playerMMR.ToString();
     }
 
     public void RefreshHelperTips()
@@ -477,10 +482,9 @@ public class UiController : MonoBehaviour
 
     public void StartGameTransitionPhase() // set up the ui for starting the game
     {
-     //   LoadFromSaveFile(); // load from save file
-      
+        if (SaveSystem.LoadPlayer() != null)
+        {
             hudCanvasAudioSource.PlayOneShot(startGameAudioClip);
- 
             boardController.ChangeGameStatus(GameStatus.Shopping, "Shopping Phase"); // set to shopping phae
             ChangeCurrentRoundDisplayText(boardController.currentGameRound); // update ui text element
             boardController.StartCoroutine("ProgressHealthRegeneration"); // begin health regeneration process
@@ -491,7 +495,8 @@ public class UiController : MonoBehaviour
             shopToggleButton.gameObject.SetActive(true);
             hudCanvasTopBar.SetActive(true);
             hudCanvasWizardPanel.SetActive(false);
-          
+        }
+
     }
 
 
@@ -851,6 +856,18 @@ public class UiController : MonoBehaviour
     public void ChangeCurrentPlayerGoldCountDisplayText(string str)
     {
         hudCanvasTopPanelGoldCountText.text = str;
+    }
+
+    public void ChangeName(String str)
+    {
+        if (str != "")
+        { 
+        playerController.playerName = str;
+        intro_playerName.text = str;
+        ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString());
+        SaveSystem.SavePlayer(playerController);
+        }
+
     }
 
     public void ChangeCurrentPlayerUsernameDisplayText(string nameString, string mmrString)

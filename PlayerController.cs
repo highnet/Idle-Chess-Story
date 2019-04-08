@@ -88,6 +88,9 @@ public class PlayerController : MonoBehaviour
      //   playerProfiler = GetComponent<PlayerProfiler>();
         sessionLogger = GetComponent<SessionLogger>();
         sessionLogger.goldRewarded = (int) playerGoldCount;
+        LoadPlayer();
+
+      
     }
 
     public void UpgradeUnitCapWithGold()
@@ -323,6 +326,7 @@ public class PlayerController : MonoBehaviour
 
         playerMMR += mmrChange;
         uiController.SetRankImage();
+        SavePlayer();
     }
 
     // Update is called once per frame
@@ -422,7 +426,24 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    public void SavePlayer()
+    {
+        SaveSystem.SavePlayer(this);
+        LoadPlayer();
+        uiController.SetRankImage();
+    }
 
+    public void LoadPlayer()
+    {
+        PlayerSave data = SaveSystem.LoadPlayer();
+        if (data != null)
+        {
+        playerName = data.Name;
+        playerMMR = data.Mmr;
+        uiController.intro_playerName.text = playerName;
+        uiController.ChangeCurrentPlayerUsernameDisplayText(playerName, playerMMR.ToString());
+        }
+    }
 
     public void SetMaxDeployedUnitsLimit(int amount)
     {

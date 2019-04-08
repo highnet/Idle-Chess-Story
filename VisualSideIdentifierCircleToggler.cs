@@ -8,12 +8,6 @@ public class VisualSideIdentifierCircleToggler : MonoBehaviour {
       public GameObject greenCircle;
       public GameObject redCircle;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
    public void ActivateGreenCircle() // toggle
     {
         greenCircle.SetActive(true);

@@ -44,7 +44,7 @@ public class BoardController : MonoBehaviour
         ChangeGameStatus(GameStatus.Initializing); // set initalizing status
         CreateBoardTiles(); // create the tile 9x8 array board
         ChangeGameStatus(GameStatus.AwaitingWizardConfirmation, "confirm settings"); // set to settings wizard status
-   //     uiController.LoadFromSaveFile(); // load the save file stored in the user's computer
+
     }
 
     private void FixedUpdate()
@@ -431,7 +431,7 @@ public class BoardController : MonoBehaviour
     }
     IEnumerator SmoothEndCombatRoundTransition() // smoothly end combat 
     {
-
+   
         yield return new WaitForSeconds(4); // wait 2 seconds
         float goldReward = playerController.playerGoldCount; // fetch the player's current gold
         if (npcController.enemyList.Count == 0) // combat VICTORY
@@ -513,7 +513,7 @@ public class BoardController : MonoBehaviour
             uiController.SetRankImage();
             uiController.ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString());
         }
-       
+        SaveSystem.SavePlayer(playerController);
         uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopRefreshAudioClip);
 
         int i;

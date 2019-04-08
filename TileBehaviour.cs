@@ -31,9 +31,7 @@ public class TileBehaviour : MonoBehaviour
     }
 
 
-    void OnMouseDown()
-    {
-    }
+
 
 
 }
