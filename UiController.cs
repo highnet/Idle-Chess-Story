@@ -10,7 +10,7 @@ public class UiController : MonoBehaviour
     PlayerController playerController;
     BoardController boardController;
     NpcController npcController;
-    public PlayerProfiler playerProfiler;
+   // public PlayerProfiler playerProfiler;
     //
     public GameObject hudCanvas;
     public GameObject hudCanvasTopBar;
@@ -36,7 +36,7 @@ public class UiController : MonoBehaviour
     public Button shopUnitCapButton;
     public Button saveButton;
     public Button loadButton;
-    public Button gameOverButton;
+    public Button mainMenuButton;
     public Button forfeitButton;
     public Button closeEscapeMenuTabButton;
     public Button saveGameEscapeMenuButton;
@@ -73,7 +73,7 @@ public class UiController : MonoBehaviour
     public Text hudCanvasTribePanel_GuardianCounter;
     //
     public Text wizard_playerName;
-    public Text wizard_playerMMR;
+    public Text playerMMR;
     public Dropdown wizard_difficultyPicker;
     public Button startGameButton;
     //
@@ -96,14 +96,6 @@ public class UiController : MonoBehaviour
     public Text shopMouseOverInfoText_SECONDARYTRIBE;
     public DynamicTribeIconVisualizer shopMouseOverInfoIcon_PRIMARYTRIBE_tribeIconVisualizer;
     public DynamicTribeIconVisualizer shopMouseOverInfoIcon_SECONDARYTRIBE_tribeIconVisualizer;
-    //
-    public Text reportdefeatPanel_reachedRoundText;
-    public Text reportdefeatPanel_recordReachedRoundText;
-    public Text reportdefeatPanel_mmrChange;
-    public Text reportdefeatPanel_recordAchievedMMRText;
-    public Text reportdefeatPanel_userNameText;
-    public Text reportdefeatPanel_userMMR;
-    public Image reportdefeatPanel_rankIcon;
     //
     public AudioListener mainAudioListener;
     public AudioSource hudCanvasAudioSource;
@@ -140,6 +132,14 @@ public class UiController : MonoBehaviour
     public Button previousTipButton;
     public Text currentTipCounterText;
     public Toggle randomTipToggler;
+    //
+    public Camera shopCam1;
+    public Camera shopCam2;
+    public Camera shopCam3;
+    public Camera shopCam4;
+    public Camera shopCam5;
+    public Camera shopCam6;
+
 
     private void Awake()
     {
@@ -150,16 +150,16 @@ public class UiController : MonoBehaviour
         boardController = GetComponent<BoardController>();
         playerController = GetComponent<PlayerController>();
         npcController = GetComponent<NpcController>();
-        playerProfiler = GetComponent<PlayerProfiler>();
         hudCanvas = GameObject.Find("HUDCanvas");
   
         previousTipButton.onClick.RemoveAllListeners();
         previousTipButton.onClick.AddListener(delegate { PreviousTip(); });
 
-
         nextTipButton.onClick.RemoveAllListeners();
         nextTipButton.onClick.AddListener(delegate { NextTip(); });
 
+        mainMenuButton.onClick.RemoveAllListeners();
+        mainMenuButton.onClick.AddListener(delegate { boardController.TransitionToGameOverPhase(); });
 
         closeHelpPanelButton.onClick.RemoveAllListeners();
         closeHelpPanelButton.onClick.AddListener(delegate { ToggleHelpPanel(); });
@@ -198,12 +198,6 @@ public class UiController : MonoBehaviour
         startGameButton.onClick.RemoveAllListeners();
         startGameButton.onClick.AddListener(delegate { StartGameTransitionPhase(); });
 
-        saveButton.onClick.RemoveAllListeners();
-        saveButton.onClick.AddListener(delegate { ChangeNameAndSaveToFile(); });
-
-        loadButton.onClick.RemoveAllListeners();
-        loadButton.onClick.AddListener(delegate { LoadFromSaveFile(); });
-
         shopToggleButton.onClick.RemoveAllListeners();
         shopToggleButton.onClick.AddListener(delegate { ToggleShopPanel(); });
 
@@ -241,8 +235,8 @@ public class UiController : MonoBehaviour
         closeEscapeMenuTabButton.onClick.RemoveAllListeners();
         closeEscapeMenuTabButton.onClick.AddListener(delegate { toggleEscapeMenu(); });
 
-        saveGameEscapeMenuButton.onClick.RemoveAllListeners();
-        saveGameEscapeMenuButton.onClick.AddListener(delegate { SaveToSaveFile(); });
+     //   saveGameEscapeMenuButton.onClick.RemoveAllListeners();
+    //    saveGameEscapeMenuButton.onClick.AddListener(delegate { SaveToSaveFile(); });
 
         shopUnitCapButton.onClick.RemoveAllListeners();
         shopUnitCapButton.onClick.AddListener(delegate { UpgradeUnitCap(); });
@@ -304,11 +298,11 @@ public class UiController : MonoBehaviour
 
         if (boardController.currentGameRound > 1)
         {
-            playerController.CalculateMMRChangeBasedOnRoundAndSave();
+            playerController.EndOfGameplay_CalculateMMRChangeBasedOnRoundAchieved();
         }
         else
         {
-            SaveToSaveFile();
+
         }
       
 
@@ -381,6 +375,19 @@ public class UiController : MonoBehaviour
         boardController.selectedObject = null; // null it
     }
 
+    public void UpdateSelectedUnitPanel(GameObject selectedObject, NPC selectedNPC)
+    {
+        string friendOrFoe = selectedNPC.isEnemy ? "Enemy " : "";
+        selectedUnitPanel_InformationText_NAME.text = friendOrFoe + selectedObject.name;
+        selectedUnitPanel_InformationText_ARMORANDRETALIATION.text = "Armor: " + Mathf.Round(selectedNPC.ARMOR) + " / Retaliation: " + Mathf.Round(selectedNPC.RETALIATION);
+        selectedUnitPanel_InformationText_ATTACKPOWER.text = Mathf.Round(selectedNPC.ATTACKPOWER).ToString();
+        selectedUnitPanel_InformationText_CONCENTRATION.text = "CONCENTRATION: " + Mathf.Round(selectedNPC.CONCENTRATION) + "/" + Mathf.Round(selectedNPC.MAXCONCENTRATION);
+        selectedUnitPanel_InformationText_HP.text = Mathf.Round(selectedNPC.HP) + "/" + Mathf.Round(selectedNPC.MAXHP);
+        selectedUnitPanel_InformationText_SPELLPOWER.text = Mathf.Round(selectedNPC.SPELLPOWER).ToString();
+        selectedUnitPanel_InformationText_TIER.text = "Level " + selectedNPC.TIER;
+    }
+
+
     void Update()
     {
         if (boardController.gameStatus != GameStatus.ReportDefeat && boardController.selectedObject != null) // update the entire selected unit panel
@@ -388,14 +395,7 @@ public class UiController : MonoBehaviour
             hudCanvasCurrentlySelectedUnitPanel.SetActive(true);
             GameObject selectedObject = boardController.selectedObject;
             NPC selectedNPC = selectedObject.GetComponent<NPC>();
-            string friendOrFoe = selectedNPC.isEnemy ? "Enemy " : "";
-            selectedUnitPanel_InformationText_NAME.text = friendOrFoe + selectedObject.name;
-            selectedUnitPanel_InformationText_ARMORANDRETALIATION.text = "Armor: " + Mathf.Round(selectedNPC.ARMOR) + " / Retaliation: " + Mathf.Round(selectedNPC.RETALIATION);
-            selectedUnitPanel_InformationText_ATTACKPOWER.text = Mathf.Round(selectedNPC.ATTACKPOWER).ToString();
-            selectedUnitPanel_InformationText_CONCENTRATION.text = "CONCENTRATION: " + Mathf.Round(selectedNPC.CONCENTRATION) + "/" + Mathf.Round(selectedNPC.MAXCONCENTRATION);
-            selectedUnitPanel_InformationText_HP.text = Mathf.Round(selectedNPC.HP) + "/" + Mathf.Round(selectedNPC.MAXHP);
-            selectedUnitPanel_InformationText_SPELLPOWER.text = Mathf.Round(selectedNPC.SPELLPOWER).ToString();
-            selectedUnitPanel_InformationText_TIER.text = "Level " + selectedNPC.TIER;
+            UpdateSelectedUnitPanel(selectedObject, selectedNPC);
 
             if (selectedNPC.UNIT_TYPE != Unit.RobotCreep)
             {
@@ -444,36 +444,43 @@ public class UiController : MonoBehaviour
     }
 
 
-    public void ChangeNameAndSaveToFile()
+    public void SetRankImage()
     {
-        string newName = wizardNewPlayerNameInputField.text;  // fetch name from input field
-        hudCanvasAudioSource.PlayOneShot(genericButtonSucessAudioClip);
-
-        if (newName != "" && newName != playerController.playerName) // check for valid name
+        string rank = "pawn";
+        if (playerController.playerMMR < 1600)
         {
-            playerController.playerName = newName; // update player name
-            SaveToSaveFile(); // save to save file with new name
-            wizardNewPlayerNameInputField.text = ""; // reset the input field
+            rank = "pawn";
+        }
+        else if (playerController.playerMMR >= 1600 && playerController.playerMMR < 1700)
+        {
+            rank = "knight";
+        }
+        else if (playerController.playerMMR >= 1700 && playerController.playerMMR < 1800)
+        {
+         rank = "bishop";
+        }
+        else if (playerController.playerMMR >= 1900 && playerController.playerMMR < 2000)
+        {
+          rank = "rook";
+        }
+        else if (playerController.playerMMR >= 2100 && playerController.playerMMR < 2200)
+        {
+           rank = "queen";
+        }
+        else if (playerController.playerMMR >= 2200)
+        {
+          rank = "king";
         }
 
-
-    }
-
-    public void SetRankImage(string rank)
-    {
         hudCanvasRankImage.sprite = Resources.Load<Sprite>(rank + " icon");
     }
 
     public void StartGameTransitionPhase() // set up the ui for starting the game
     {
-        LoadFromSaveFile(); // load from save file
-        if (playerController.playerName != "") // dont allow to start game with an empty named save file
-        {
+     //   LoadFromSaveFile(); // load from save file
+      
             hudCanvasAudioSource.PlayOneShot(startGameAudioClip);
-            if (wizardNewPlayerNameInputField.text != "")
-            {
-                ChangeNameAndSaveToFile(); // new name has been inputted so lets save anew to file
-            }
+ 
             boardController.ChangeGameStatus(GameStatus.Shopping, "Shopping Phase"); // set to shopping phae
             ChangeCurrentRoundDisplayText(boardController.currentGameRound); // update ui text element
             boardController.StartCoroutine("ProgressHealthRegeneration"); // begin health regeneration process
@@ -484,82 +491,11 @@ public class UiController : MonoBehaviour
             shopToggleButton.gameObject.SetActive(true);
             hudCanvasTopBar.SetActive(true);
             hudCanvasWizardPanel.SetActive(false);
-           
-
-        }
-        else
-        {
-            hudCanvasAudioSource.PlayOneShot(genericButtonFailureAudioClip);
-        }
-
-
-    }
-
-    public void UpdateReportDefeatPanelScreen(int mmrChange)
-    {
-        reportdefeatPanel_mmrChange.text = "MMR Change: " + mmrChange;
-        PlayerProfileSave pps = playerProfiler.LoadProfile(0);
-        reportdefeatPanel_reachedRoundText.text = "Reached Round: " + pps.achievedRound;
-        reportdefeatPanel_recordAchievedMMRText.text = "Record Max MMR: " + pps.highestAchievedMmr;
-        reportdefeatPanel_recordReachedRoundText.text = "Record Reached Round: " + pps.highestAchievedRound;
-        reportdefeatPanel_userMMR.text = "MMR: " + pps.mmr;
-        reportdefeatPanel_userNameText.text = "" + pps.characterName;
-        reportdefeatPanel_rankIcon.sprite = Resources.Load<Sprite>(pps.rank + " icon");
-
-    }
-
-    public void LoadFromSaveFile()
-    {
-        PlayerProfileSave pps = playerProfiler.LoadProfile(0); // load profile from slot 0
-        playerController.LoadProfileFromSave(pps); // load players profile
-        ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString()); // update username display text
-        wizard_playerName.text = playerController.playerName; // update username display text 
-        wizard_playerMMR.text = "MMR: " + playerController.playerMMR.ToString(); // update mmr display text 
-
-        if (playerController.playerMMR <= 0) // reset the user mmr if its negative or zero
-        {
-            playerController.playerMMR = 1500;
-        }
+          
     }
 
 
 
-    public void SaveToSaveFile()
-    {
-        PlayerProfileSave pps = new PlayerProfileSave(); // create new save file
-        pps.characterName = playerController.playerName; // set the save file parameters
-        pps.mmr = playerController.playerMMR;
-
-        if (playerController.playerMMR < 1600)
-        {
-            pps.rank = "pawn";
-        }
-        else if (playerController.playerMMR >= 1600 && playerController.playerMMR < 1700)
-        {
-            pps.rank = "knight";
-        }
-        else if (playerController.playerMMR >= 1700 && playerController.playerMMR < 1800)
-        {
-            pps.rank = "bishop";
-        }
-        else if (playerController.playerMMR >= 1900 && playerController.playerMMR < 2000)
-        {
-            pps.rank = "rook";
-        }
-        else if (playerController.playerMMR >= 2100 && playerController.playerMMR < 2200)
-        {
-            pps.rank = "queen";
-        }
-        else if (playerController.playerMMR >= 2200)
-        {
-            pps.rank = "king";
-        }
-
-        pps.UserIconImageName = "polarbear";
-        pps.achievedRound = boardController.currentGameRound;
-        playerProfiler.SaveProfile(pps, 0); // save profile to slot 0
-        LoadFromSaveFile(); // load the new profile in
-    }
 
     public void UpdateAllShopButtons() // update all the shop buttons with the required information
     {
@@ -575,76 +511,68 @@ public class UiController : MonoBehaviour
             Destroy(go);
         }
 
+        int cameraDistance = 40;
+
         shopButton1.interactable = true;
         shopButton1.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI board Large  parchment");
         shopButton1.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[0]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[0], out unitCost);
         shopbutton1_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
-        spawned = Instantiate(shopButton1.GetComponent<Thubmnail>().SourcePrefab, new Vector3(0, 0, 0), Quaternion.identity);
-        spawned.transform.SetParent(shopButton1.transform);
-        spawned.transform.position = shopButton1.transform.position;
-        spawned.transform.rotation = Camera.main.transform.rotation;
+        spawned = Instantiate(shopButton1.GetComponent<Thubmnail>().SourcePrefab, shopCam1.transform.position + (cameraDistance * shopCam1.transform.forward), Quaternion.identity);
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
+        spawned.transform.SetParent(shopButton1.transform);
+        shopButton1.GetComponent<Thubmnail>().SpawnedAssociatedNPC = spawned;
+
 
         shopButton2.interactable = true;
         shopButton2.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI board Large  parchment");
-
         shopButton2.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[1]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[1], out unitCost);
         shopbutton2_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
-        spawned = Instantiate(shopButton2.GetComponent<Thubmnail>().SourcePrefab, new Vector3(0, 0, 0), Quaternion.identity);
-        spawned.transform.SetParent(shopButton2.transform);
-        spawned.transform.position = shopButton2.transform.position;
-        spawned.transform.rotation = Camera.main.transform.rotation;
+        spawned = Instantiate(shopButton2.GetComponent<Thubmnail>().SourcePrefab, shopCam2.transform.position + (cameraDistance * shopCam2.transform.forward), Quaternion.identity);
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
+        spawned.transform.SetParent(shopButton2.transform);
+        shopButton2.GetComponent<Thubmnail>().SpawnedAssociatedNPC = spawned;
 
         shopButton3.interactable = true;
         shopButton3.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI board Large  parchment");
-
         shopButton3.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[2]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[2], out unitCost);
         shopbutton3_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
-        spawned = Instantiate(shopButton3.GetComponent<Thubmnail>().SourcePrefab, new Vector3(0, 0, 0), Quaternion.identity);
-        spawned.transform.SetParent(shopButton3.transform);
-        spawned.transform.position = shopButton3.transform.position;
-        spawned.transform.rotation = Camera.main.transform.rotation;
+        spawned = Instantiate(shopButton3.GetComponent<Thubmnail>().SourcePrefab, shopCam3.transform.position + (cameraDistance * shopCam3.transform.forward), Quaternion.identity);
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
+        spawned.transform.SetParent(shopButton3.transform);
+        shopButton3.GetComponent<Thubmnail>().SpawnedAssociatedNPC = spawned;
 
         shopButton4.interactable = true;
         shopButton4.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI board Large  parchment");
-
         shopButton4.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[3]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[3], out unitCost);
         shopbutton4_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
-        spawned = Instantiate(shopButton4.GetComponent<Thubmnail>().SourcePrefab, new Vector3(0, 0, 0), Quaternion.identity);
-        spawned.transform.SetParent(shopButton4.transform);
-        spawned.transform.position = shopButton4.transform.position;
-        spawned.transform.rotation = Camera.main.transform.rotation;
+        spawned = Instantiate(shopButton4.GetComponent<Thubmnail>().SourcePrefab, shopCam4.transform.position + (cameraDistance * shopCam4.transform.forward), Quaternion.identity);
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
+        spawned.transform.SetParent(shopButton4.transform);
+        shopButton4.GetComponent<Thubmnail>().SpawnedAssociatedNPC = spawned;
 
         shopButton5.interactable = true;
         shopButton5.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI board Large  parchment");
-
         shopButton5.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[4]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[4], out unitCost);
         shopbutton5_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
-        spawned = Instantiate(shopButton5.GetComponent<Thubmnail>().SourcePrefab, new Vector3(0, 0, 0), Quaternion.identity);
-        spawned.transform.SetParent(shopButton5.transform);
-        spawned.transform.position = shopButton5.transform.position;
-        spawned.transform.rotation = Camera.main.transform.rotation;
+        spawned = Instantiate(shopButton5.GetComponent<Thubmnail>().SourcePrefab, shopCam5.transform.position + (cameraDistance * shopCam5.transform.forward), Quaternion.identity);
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
+        spawned.transform.SetParent(shopButton5.transform);
+        shopButton5.GetComponent<Thubmnail>().SpawnedAssociatedNPC = spawned;
 
         shopButton6.interactable = true;
         shopButton6.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI board Large  parchment");
-
         shopButton6.GetComponent<Thubmnail>().SourcePrefab = Resources.Load<GameObject>("3d_thumbnail_" + playerController.shoppingOptions[5]);
         playerController.NPC_COST_DATA.TryGetValue(playerController.shoppingOptions[5], out unitCost);
         shopbutton6_hudCanvasShopCostBuyUnit.text = unitCost.ToString();
-        spawned = Instantiate(shopButton6.GetComponent<Thubmnail>().SourcePrefab, new Vector3(0, 0, 0), Quaternion.identity);
-        spawned.transform.SetParent(shopButton6.transform);
-        spawned.transform.position = shopButton6.transform.position;
-        spawned.transform.rotation = Camera.main.transform.rotation;
+        spawned = Instantiate(shopButton6.GetComponent<Thubmnail>().SourcePrefab, shopCam6.transform.position + (cameraDistance * shopCam6.transform.forward), Quaternion.identity);
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
+        spawned.transform.SetParent(shopButton6.transform);
+        shopButton6.GetComponent<Thubmnail>().SpawnedAssociatedNPC = spawned;
     }
 
     void RefreshShop()
@@ -724,13 +652,12 @@ public class UiController : MonoBehaviour
 
     void ForfeitButtonClicked()
     {
-
         escapeMenuForfeitConfirmationPromptPanel.SetActive(true);
     }
 
     public void CalculateMMRAndRestartScene()
     {
-        playerController.CalculateMMRChangeBasedOnRoundAndSave();
+        playerController.EndOfGameplay_CalculateMMRChangeBasedOnRoundAchieved();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 

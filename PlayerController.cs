@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
      UiController uiController;
      BoardController boardController;
      NpcController npcController;
-     PlayerProfiler playerProfiler;
+  //   PlayerProfiler playerProfiler;
      public SessionLogger sessionLogger;
   
     //
@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour
         uiController = GetComponent<UiController>();
         boardController = GetComponent<BoardController>();
         npcController = GetComponent<NpcController>();
-        playerProfiler = GetComponent<PlayerProfiler>();
+     //   playerProfiler = GetComponent<PlayerProfiler>();
         sessionLogger = GetComponent<SessionLogger>();
         sessionLogger.goldRewarded = (int) playerGoldCount;
     }
@@ -276,7 +276,7 @@ public class PlayerController : MonoBehaviour
         playerOwnedNpcs = new List<NPC>();
         uiController.ChangeCurrentPlayerUsernameDisplayText(playerName,playerMMR.ToString());
         SetCurrentlyDeployedUnits(0);
-        uiController.SetRankImage(PlayerPrefs.GetString("rank_slot0"));
+        uiController.SetRankImage();
         uiController.ChangeHPPlayerDisplayText(this.currentPlayerHealth, this.maxPlayerHealth);
     }
 
@@ -303,7 +303,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
-   public void CalculateMMRChangeBasedOnRoundAndSave()
+   public void EndOfGameplay_CalculateMMRChangeBasedOnRoundAchieved()
     {
         int mmrChange = 0;
 
@@ -322,8 +322,7 @@ public class PlayerController : MonoBehaviour
         }
 
         playerMMR += mmrChange;
-        uiController.SaveToSaveFile();
-        uiController.UpdateReportDefeatPanelScreen(mmrChange);
+        uiController.SetRankImage();
     }
 
     // Update is called once per frame
@@ -331,25 +330,12 @@ public class PlayerController : MonoBehaviour
     {
         if ((boardController.gameStatus == GameStatus.Fight || boardController.gameStatus == GameStatus.Shopping) && currentPlayerHealth <= 0) // check lose condition
         {
-            CalculateMMRChangeBasedOnRoundAndSave();
-            boardController.ChangeGameStatus(GameStatus.ReportDefeat);
-            uiController.hudCanvasReportDefeatPanel.gameObject.SetActive(true);
-            uiController.hudCanvasTribesPanel.gameObject.SetActive(false);
-            uiController.hudCanvasTopBar.gameObject.SetActive(false);
-            uiController.hudCanvasBottomBar.gameObject.SetActive(false);
-            uiController.hudCanvasShopPanel.gameObject.SetActive(false);
+            EndOfGameplay_CalculateMMRChangeBasedOnRoundAchieved();
+            boardController.TransitionToReportDefeatPhase();
         }
 
     }
-
-    public void LoadProfileFromSave(PlayerProfileSave pps)
-    {
-        playerName = pps.characterName;
-        playerMMR = pps.mmr;
-    }
-
-
-
+ 
 
     public bool BuyUnitFromShop(Unit unitToBuy) // buy a unit from the shop
     {

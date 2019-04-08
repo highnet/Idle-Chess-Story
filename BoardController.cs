@@ -44,7 +44,7 @@ public class BoardController : MonoBehaviour
         ChangeGameStatus(GameStatus.Initializing); // set initalizing status
         CreateBoardTiles(); // create the tile 9x8 array board
         ChangeGameStatus(GameStatus.AwaitingWizardConfirmation, "confirm settings"); // set to settings wizard status
-        uiController.LoadFromSaveFile(); // load the save file stored in the user's computer
+   //     uiController.LoadFromSaveFile(); // load the save file stored in the user's computer
     }
 
     private void FixedUpdate()
@@ -121,8 +121,6 @@ public class BoardController : MonoBehaviour
              float spawningBudget = playerController.sessionLogger.goldRewarded;
 
                 int currentDificulty = uiController.wizard_difficultyPicker.value;
-                Debug.Log("difficulty: " + currentDificulty);
-
                 if (currentDificulty == 0)
                 {
                     spawningBudget *= 0.7f;
@@ -438,7 +436,6 @@ public class BoardController : MonoBehaviour
         float goldReward = playerController.playerGoldCount; // fetch the player's current gold
         if (npcController.enemyList.Count == 0) // combat VICTORY
         {
-            Debug.Log("combat victory");
             if (npcController.allyList.Count != 0)
             {
                 foreach (NPC npc in npcController.allyList)
@@ -464,20 +461,16 @@ public class BoardController : MonoBehaviour
             {
                 goldReward = 2;
             }
-
-            Debug.Log(goldReward);
             goldReward = (float) Math.Round(goldReward, 0, MidpointRounding.AwayFromZero);
-            Debug.Log(goldReward);
             float netGoldReward = goldReward - playerController.playerGoldCount;
             playerController.sessionLogger.goldRewarded += (long) netGoldReward;
             playerController.SetPlayerGoldCount((long)goldReward); // reward bonus gold
             playerController.playerMMR += 1 + uiController.wizard_difficultyPicker.value;
-            uiController.SaveToSaveFile();
+            uiController.SetRankImage();
             uiController.ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString());
         }
         else // combat DEFEAT
         {
-            Debug.Log("combat defeat");
             if (uiController.wizard_difficultyPicker.value == 0)
             {
                 goldReward *= 1.25f;
@@ -517,7 +510,7 @@ public class BoardController : MonoBehaviour
             }
            
             playerController.playerMMR -= 1 + uiController.wizard_difficultyPicker.value;
-            uiController.SaveToSaveFile();
+            uiController.SetRankImage();
             uiController.ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString());
         }
        
@@ -577,9 +570,19 @@ public class BoardController : MonoBehaviour
         }
     }
 
+
+    public void TransitionToReportDefeatPhase()
+    {
+       
+        uiController.hudCanvasReportDefeatPanel.gameObject.SetActive(true);
+        uiController.hudCanvasTribesPanel.gameObject.SetActive(false);
+        uiController.hudCanvasTopBar.gameObject.SetActive(false);
+        uiController.hudCanvasBottomBar.gameObject.SetActive(false);
+        uiController.hudCanvasShopPanel.gameObject.SetActive(false);
+        ChangeGameStatus(GameStatus.ReportDefeat);
+    }
     public void TransitionToGameOverPhase()
     {
-        uiController.LoadFromSaveFile();
         SceneManager.LoadScene("highnet auto chess");
     }
 

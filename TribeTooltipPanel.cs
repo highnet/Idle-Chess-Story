@@ -6,29 +6,16 @@ using UnityEngine.EventSystems;
 
 public class TribeTooltipPanel : MonoBehaviour
 {
-
     public GameObject tooltipPanel;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    private void OnMouseOver()
+    public void MouseEnterToggle()
     {
-        
         tooltipPanel.GetComponent<Image>().enabled = true;
         tooltipPanel.GetComponentInChildren<Text>().enabled = true;
     }
-    private void OnMouseExit()
+    public void MouseExitToggle()
     {
         tooltipPanel.GetComponent<Image>().enabled = false;
         tooltipPanel.GetComponentInChildren<Text>().enabled = false;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 }

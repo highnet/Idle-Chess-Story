@@ -199,7 +199,6 @@ public class NPC : MonoBehaviour
         if (DamageDealerIsEnemy == true && assassinsCount >= 6)
         {
             rollMiss = UnityEngine.Random.Range(playerController.constant_Miss_RngRollLowerBound, playerController.constant_Assassin_6_MissBonus_RngRollBonusUpperBound); // FRIENDLY Assassin Tribe 6 * BUFFED EVASION
-            Debug.Log(rollMiss);
         }
 
        else if (DamageDealerIsEnemy == false && enemy_AssassinsCount >= 6)
@@ -1110,9 +1109,7 @@ public class NPC : MonoBehaviour
                     distance = Vector3.Distance(this.transform.position, target.transform.position);
 
                     if (this.ABILITY != Ability.NOTHING && CONCENTRATION >= MAXCONCENTRATION)
-                    {
-                  //      Debug.Log(this.name + ": Concentration [" + CONCENTRATION + "/" + MAXCONCENTRATION + "] Casting Ability: " + this.ABILITY.ToString());
-                       
+                    {                       
                         if (this.spellBookController != null && target != null)
                         {
                             spellBookController.CastSpell(this, target, this.ABILITY, this.SPELLPOWER,this.ATTACKPOWER);

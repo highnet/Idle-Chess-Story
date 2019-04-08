@@ -168,10 +168,8 @@ public class SpellbookController : MonoBehaviour
     }
     public void DoStunCycle(float secondsToBeStunned,NPC tobeAffected,NPC casterNPC)
     {
-        Debug.Log("Attempting stun cycle.");
         if (tobeAffected.liveRoutine != null)
         {
-            Debug.Log("stunning");
             GameObject anim = (GameObject)Instantiate(Resources.Load("Stun Animation"), tobeAffected.transform.position, Quaternion.identity);
             anim.transform.SetParent(tobeAffected.transform);
             tobeAffected.StopCoroutine(tobeAffected.liveRoutine);
@@ -181,7 +179,6 @@ public class SpellbookController : MonoBehaviour
         else
         {
            
-            Debug.Log("dont want to stack stuns");
             if (casterNPC != null)
             {
                 casterNPC.CONCENTRATION = casterNPC.MAXCONCENTRATION;
@@ -196,7 +193,6 @@ public class SpellbookController : MonoBehaviour
 
             if (toBeAffected!= null && toBeAffected.liveRoutine == null)
             {
-            Debug.Log("waking up");
                 toBeAffected.StartLiveRoutine(); 
             }
 
