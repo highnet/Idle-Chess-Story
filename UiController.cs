@@ -10,6 +10,7 @@ public class UiController : MonoBehaviour
     PlayerController playerController;
     BoardController boardController;
     NpcController npcController;
+    SessionLogger sessionLogger;
    // public PlayerProfiler playerProfiler;
     //
     public GameObject hudCanvas;
@@ -138,7 +139,10 @@ public class UiController : MonoBehaviour
     public Camera shopCam4;
     public Camera shopCam5;
     public Camera shopCam6;
-
+    //
+    public Text reportDefeatPanel_TotalUnitsDeployedText;
+    public Text reportDefeatPanel_MostTribesDeployedText;
+    public DynamicTribeIconVisualizer reportDefeatPanel_MostTribeDeployedIconVisualizer;
 
     private void Awake()
     {
@@ -149,6 +153,7 @@ public class UiController : MonoBehaviour
         boardController = GetComponent<BoardController>();
         playerController = GetComponent<PlayerController>();
         npcController = GetComponent<NpcController>();
+        sessionLogger = GetComponent<SessionLogger>();
         hudCanvas = GameObject.Find("HUDCanvas");
 
         saveGameEscapeMenuButton.onClick.RemoveAllListeners();
@@ -499,9 +504,6 @@ public class UiController : MonoBehaviour
 
     }
 
-
-
-
     public void UpdateAllShopButtons() // update all the shop buttons with the required information
     {
 
@@ -700,7 +702,6 @@ public class UiController : MonoBehaviour
 
     void TryTransitionToFightPhase()
     {
-
         if (boardController.gameStatus != GameStatus.Fight && boardController.gameStatus != GameStatus.ReportDefeat && boardController.gameStatus == GameStatus.Shopping && playerController.currentlyDeployedUnits > 0) // check if we are ready to proceed to combat
         {
             boardController.ChangeGameStatus(GameStatus.Wait); // smooth wait transition
@@ -730,17 +731,19 @@ public class UiController : MonoBehaviour
                     obj.name = npcController.deployedAllyList[i].transform.parent.gameObject.name;
                     npcController.deployedAllyList[i].enabled = true;
 
-            if (UnityEngine.Random.Range(0,2) == 0)
+            if (UnityEngine.Random.Range(0,2) == 0 && npcController.deployedAllyList[i].battleCry_SoundClip != null)
                     { 
-                    if (npcController.deployedAllyList[i].battleCry_SoundClip != null)
-                    {
                         npcController.deployedAllyList[i].npcAudioSource.PlayOneShot(npcController.deployedAllyList[i].battleCry_SoundClip);
                     }
-                    }
-
-
                 }
             }
+
+            foreach(NPC npc in npcController.deployedAllyList)
+            {
+                sessionLogger.IncrementTribesDeployedToFightCounters(npc);
+            }
+            sessionLogger.unitsDeployedToFight += npcController.deployedAllyList.Count;
+
             hudCanvasAudioSource.PlayOneShot(fightStartAudioClip);
 
             StartCoroutine(SmoothRoundFightPhaseTransition()); // finally we can transition to combat phase.

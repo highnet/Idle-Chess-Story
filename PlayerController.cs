@@ -5,7 +5,6 @@ using System;
 
 
 //  Debug.Log(string.Join(", ", (playerController.enemyActiveTribesCounter.Select(pair => $"{pair.Key} => {pair.Value}"))));
-//  Debug.Log(string.Join(", ", (playerController.deployedTribesCounter.Select(pair => $"{pair.Key} => {pair.Value}"))));
 
 public enum Unit {Grenadier, RogueSpy,Chomper,RatWarrior, Tiger, Orbling, Skeleton, AxeGuard, DoomBull, Cactus, BabyDragon, BigLizard, RockGolem, MageTower, ShamanTotem, Spitter, GoblinZerk, Zombie,Tree,KnightTower,CursedTomb,WarriorTent,AngelStatue,DemonLord,Eyebat,AlienSoldier,Engineer,RobotCreep}
 public enum Tribe {Warrior, Beast, Elemental, Undead, Wizard, Assassin, Guardian, Structure }
@@ -432,7 +431,7 @@ public class PlayerController : MonoBehaviour
         LoadPlayer();
         uiController.SetRankImage();
     }
-
+ 
     public void LoadPlayer()
     {
         PlayerSave data = SaveSystem.LoadPlayer();

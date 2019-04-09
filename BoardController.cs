@@ -12,6 +12,7 @@ public class BoardController : MonoBehaviour
     NpcController npcController;
     UiController uiController;
     PlayerController playerController;
+    SessionLogger sessionLogger;
     //
     public GameObject[,] chessBoard;
     public GameObject[] reserveBoard;
@@ -35,7 +36,7 @@ public class BoardController : MonoBehaviour
         npcController = GetComponent<NpcController>(); //fetch world controllers
         uiController = GetComponent<UiController>();
         playerController = GetComponent<PlayerController>();
-     
+        sessionLogger = GetComponent<SessionLogger>();
     }
 
     // Start is called before the first frame update
@@ -573,12 +574,15 @@ public class BoardController : MonoBehaviour
 
     public void TransitionToReportDefeatPhase()
     {
-       
         uiController.hudCanvasReportDefeatPanel.gameObject.SetActive(true);
         uiController.hudCanvasTribesPanel.gameObject.SetActive(false);
         uiController.hudCanvasTopBar.gameObject.SetActive(false);
         uiController.hudCanvasBottomBar.gameObject.SetActive(false);
         uiController.hudCanvasShopPanel.gameObject.SetActive(false);
+        sessionLogger.CalculateMaxDeployedTribe();
+        uiController.reportDefeatPanel_TotalUnitsDeployedText.text = "You deployed: " + sessionLogger.unitsDeployedToFight.ToString() + " unit(s)";
+        uiController.reportDefeatPanel_MostTribesDeployedText.text = "Most deployed tribe: " + sessionLogger.mostDeployedTribeAmount + " " + sessionLogger.mostDeployedTribe.ToString();
+        uiController.reportDefeatPanel_MostTribeDeployedIconVisualizer.SetImage(sessionLogger.mostDeployedTribe,true);
         ChangeGameStatus(GameStatus.ReportDefeat);
     }
     public void TransitionToGameOverPhase()
