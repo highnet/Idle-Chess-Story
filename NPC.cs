@@ -76,9 +76,11 @@ public class NPC : MonoBehaviour
     public AudioClip battleCry_SoundClip; 
     public AudioClip cheering_SoundClip;
     public int numberOfAttackAnimations;
-
     public bool isBoss;
     public bool isCreep;
+    public bool isStunned;
+
+    public PowerChangeParticleControl PowerChangeParticleSystem;
 
     public void Awake()
     {
@@ -643,7 +645,7 @@ public class NPC : MonoBehaviour
             npcController.allyList.Remove(gameObject.GetComponent<NPC>());
             npcController.deployedAllyList.Remove(gameObject.GetComponent<NPC>());
             npcController.npcList.Remove(gameObject.GetComponent<NPC>());
-            playerController.currentPlayerUnits--;
+          
             gameObject.GetComponent<NPC>().occupyingTile.GetComponent<TileBehaviour>().occupyingUnit = null;
             if (occupyingTile.GetComponent<TileBehaviour>().i != 8)
             {
@@ -722,6 +724,7 @@ public class NPC : MonoBehaviour
         playerController = worldControl.GetComponent<PlayerController>();
         uiController = worldControl.GetComponent<UiController>();
         spellBookController = this.GetComponent<SpellbookController>();
+        PowerChangeParticleSystem = this.GetComponentInChildren<PowerChangeParticleControl>();
     }
 
     void OnMouseDown()
@@ -1073,6 +1076,7 @@ public class NPC : MonoBehaviour
     {
         for (; ; )
         {
+     
             if (boardController.gameStatus.Equals(GameStatus.Fight) && occupyingTile.GetComponent<TileBehaviour>().i != 8) {
 
                 float distance = 0;
@@ -1102,7 +1106,7 @@ public class NPC : MonoBehaviour
                     }
                 }
 
-                if (target != null)
+                if (isStunned == false && target != null)
                 {
 
                     transform.LookAt(new Vector3(target.transform.position.x, transform.position.y, target.transform.position.z));

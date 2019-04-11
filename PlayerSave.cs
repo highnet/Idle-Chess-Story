@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using Steamworks;
 
 [Serializable]
 public class PlayerSave
@@ -11,7 +9,11 @@ public class PlayerSave
 
     public PlayerSave(PlayerController player)
     {
-        Name = player.playerName;
+        if (SteamManager.Initialized)
+        {
+            string name = SteamFriends.GetPersonaName();
+            Name = name;
+        }
         Mmr = player.playerMMR;
     }
 }

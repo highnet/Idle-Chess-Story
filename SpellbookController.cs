@@ -37,6 +37,10 @@ public class SpellbookController : MonoBehaviour
             float boostValue = 55;
             float boostDuration = 6;
             casterNPC.ATTACKPOWER += boostValue;
+            if (casterNPC.PowerChangeParticleSystem != null)
+            {
+                casterNPC.PowerChangeParticleSystem.PowerUpObject.SetActive(true);
+            }
             StartCoroutine(AP_SubstractBonusAfterSeconds(casterNPC, boostDuration, boostValue, go));
         }
 
@@ -47,6 +51,10 @@ public class SpellbookController : MonoBehaviour
             float boostValue = 15;
             float boostDuration = 6;
             casterNPC.ARMOR += boostValue;
+            if (casterNPC.PowerChangeParticleSystem != null)
+            {
+                casterNPC.PowerChangeParticleSystem.PowerUpObject.SetActive(true);
+            }
             StartCoroutine(ARMOR_SubstractBonusAfterSeconds(casterNPC, boostDuration, boostValue, go));
         }
         else if (abilityToCast == Ability.MaxHP_Up_Self)
@@ -57,6 +65,10 @@ public class SpellbookController : MonoBehaviour
             float boostDuration = 6;
             casterNPC.MAXHP += boostValue;
             casterNPC.HP += boostValue;
+            if (casterNPC.PowerChangeParticleSystem != null)
+            {
+                casterNPC.PowerChangeParticleSystem.PowerUpObject.SetActive(true);
+            }
             StartCoroutine(MAXHP_SubstractBonusAfterSeconds(casterNPC, boostDuration, boostValue, go));
         }
         else if (abilityToCast == Ability.Retaliation_UP_Self)
@@ -66,6 +78,10 @@ public class SpellbookController : MonoBehaviour
             float boostValue = 15;
             float boostDuration = 6;
             casterNPC.RETALIATION += boostValue;
+            if (casterNPC.PowerChangeParticleSystem != null)
+            {
+                casterNPC.PowerChangeParticleSystem.PowerUpObject.SetActive(true);
+            }
             StartCoroutine(RETALIATION_SubstractBonusAfterSeconds(casterNPC, boostDuration, boostValue, go));
         }
         else if (abilityToCast == Ability.HeroicStrike)
@@ -98,6 +114,10 @@ public class SpellbookController : MonoBehaviour
             float boostValue = 50;
             float boostDuration = 6;
             targetNPC.ReduceAttackPower(boostValue);
+            if (targetNPC.PowerChangeParticleSystem != null)
+            {
+                targetNPC.PowerChangeParticleSystem.PowerDownObject.SetActive(true);
+            }
             StartCoroutine(AP_AddBonusAfterSeconds(targetNPC, boostDuration, boostValue, go));
 
         }
@@ -109,6 +129,10 @@ public class SpellbookController : MonoBehaviour
             float boostValue = 5;
             float boostDuration = 6;
             targetNPC.ReduceArmor(boostValue);
+            if (targetNPC.PowerChangeParticleSystem != null)
+            {
+                targetNPC.PowerChangeParticleSystem.PowerDownObject.SetActive(true);
+            }
             StartCoroutine(ARMOR_AddBonusAfterSeconds(targetNPC, boostDuration, boostValue, go));
         }
         else if (abilityToCast == Ability.FrostBall)
@@ -168,12 +192,11 @@ public class SpellbookController : MonoBehaviour
     }
     public void DoStunCycle(float secondsToBeStunned,NPC tobeAffected,NPC casterNPC)
     {
-        if (tobeAffected.liveRoutine != null)
+        if (tobeAffected.isStunned == false)
         {
             GameObject anim = (GameObject)Instantiate(Resources.Load("Stun Animation"), tobeAffected.transform.position, Quaternion.identity);
             anim.transform.SetParent(tobeAffected.transform);
-            tobeAffected.StopCoroutine(tobeAffected.liveRoutine);
-            tobeAffected.liveRoutine = null;
+            tobeAffected.isStunned = true;
             StartCoroutine(WakeUpAfterSeconds(secondsToBeStunned, anim, tobeAffected));
         }
         else
@@ -191,9 +214,9 @@ public class SpellbookController : MonoBehaviour
     {
         yield return new WaitForSeconds(secondsToBeStunned);
 
-            if (toBeAffected!= null && toBeAffected.liveRoutine == null)
+            if (toBeAffected!= null)
             {
-                toBeAffected.StartLiveRoutine(); 
+               toBeAffected.isStunned = false;
             }
 
             if (anim != null)
@@ -207,6 +230,10 @@ public class SpellbookController : MonoBehaviour
     {
         yield return new WaitForSeconds(seconds);
         npcToAffect.ARMOR += bonusToIncrease;
+        if (npcToAffect.PowerChangeParticleSystem != null)
+        {
+            npcToAffect.PowerChangeParticleSystem.PowerDownObject.SetActive(false);
+        }
         Object.Destroy(animation);
     }
 
@@ -215,6 +242,10 @@ public class SpellbookController : MonoBehaviour
     {
         yield return new WaitForSeconds(seconds);
         npcToAffect.ATTACKPOWER += bonusToIncrease;
+        if (npcToAffect.PowerChangeParticleSystem != null)
+        {
+            npcToAffect.PowerChangeParticleSystem.PowerDownObject.SetActive(false);
+        }
         Object.Destroy(animation);
     }
 
@@ -223,18 +254,30 @@ public class SpellbookController : MonoBehaviour
     {
         yield return new WaitForSeconds(seconds);
         npcToAffect.ATTACKPOWER -= bonusToReduce;
+        if (npcToAffect.PowerChangeParticleSystem != null)
+        {
+            npcToAffect.PowerChangeParticleSystem.PowerUpObject.SetActive(false);
+        }
         Object.Destroy(animation);
     }
     IEnumerator RETALIATION_SubstractBonusAfterSeconds(NPC npcToAffect, float seconds, float bonusToReduce,Object animation)
     {
         yield return new WaitForSeconds(seconds);
         npcToAffect.RETALIATION -= bonusToReduce;
+        if (npcToAffect.PowerChangeParticleSystem != null)
+        {
+            npcToAffect.PowerChangeParticleSystem.PowerUpObject.SetActive(false);
+        }
         Object.Destroy(animation);
     }
     IEnumerator ARMOR_SubstractBonusAfterSeconds(NPC npcToAffect, float seconds, float bonusToReduce,Object animation)
     {
         yield return new WaitForSeconds(seconds);
         npcToAffect.ARMOR -= bonusToReduce;
+        if (npcToAffect.PowerChangeParticleSystem != null)
+        {
+            npcToAffect.PowerChangeParticleSystem.PowerUpObject.SetActive(false);
+        }
         Object.Destroy(animation);
     }
     IEnumerator MAXHP_SubstractBonusAfterSeconds(NPC npcToAffect, float seconds, float bonusToReduce,Object animation)
@@ -242,6 +285,10 @@ public class SpellbookController : MonoBehaviour
         yield return new WaitForSeconds(seconds);
         npcToAffect.MAXHP -= bonusToReduce;
         npcToAffect.HP -= bonusToReduce;
+        if (npcToAffect.PowerChangeParticleSystem != null)
+        {
+            npcToAffect.PowerChangeParticleSystem.PowerUpObject.SetActive(false);
+        }
         Object.Destroy(animation);
     }
 }

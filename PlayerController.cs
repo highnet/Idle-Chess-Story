@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Steamworks;
 
 
 //  Debug.Log(string.Join(", ", (playerController.enemyActiveTribesCounter.Select(pair => $"{pair.Key} => {pair.Value}"))));
@@ -22,12 +23,9 @@ public class PlayerController : MonoBehaviour
      public SessionLogger sessionLogger;
   
     //
-    public string playerName;
     public int playerMMR;
 
     public long playerGoldCount;
-    public int playerGlobalUnitCap;
-    public int currentPlayerUnits;
     public int maxDeployedUnitsLimit;
     public int currentlyDeployedUnits;
     public List<NPC> playerOwnedNpcs;
@@ -35,7 +33,8 @@ public class PlayerController : MonoBehaviour
     //
     public int currentPlayerHealth;
     public int maxPlayerHealth;
-    int costToShuffleShop;
+    public int costToShuffleShop;
+    public int costToUpgradeUnitCap;
     public Dictionary<Unit, int> NPC_COST_DATA;
     public Dictionary<Tribe, List<Unit>> TRIBAL_UNIT_DATA;
     public Dictionary<Tribe, int> deployedTribesCounter;
@@ -74,31 +73,28 @@ public class PlayerController : MonoBehaviour
     public float constant_HP_RegenerationIntervalSeconds;
     public float constant_HP_RegenPerSecond;
     public float coefficient_Assassin_3_OnKillBonusGoldMultiplier;
-
     public float coefficient_Guardian_3_OnHit_ConcentrationGainBonusMultiplier;
     public float constant_OnHit_BaseConcentrationGain;
 
     private void Awake()
     {
-        costToShuffleShop = 1;
         uiController = GetComponent<UiController>();
         boardController = GetComponent<BoardController>();
         npcController = GetComponent<NpcController>();
-     //   playerProfiler = GetComponent<PlayerProfiler>();
         sessionLogger = GetComponent<SessionLogger>();
         sessionLogger.goldRewarded = (int) playerGoldCount;
         LoadPlayer();
-
-      
     }
 
     public void UpgradeUnitCapWithGold()
     {
-        if (playerGoldCount >= maxDeployedUnitsLimit * 10)
+        costToUpgradeUnitCap = maxDeployedUnitsLimit * 10;
+
+        if (playerGoldCount >= costToUpgradeUnitCap)
         {
-            SetPlayerGoldCount(playerGoldCount - (maxDeployedUnitsLimit * 10));
+            SetPlayerGoldCount(playerGoldCount - (costToUpgradeUnitCap));
             SetMaxDeployedUnitsLimit(maxDeployedUnitsLimit + 1);
-            uiController.ChangeCostToUnitCapUpgradeDisplayText((maxDeployedUnitsLimit * 10).ToString());
+            uiController.ChangeCostToUnitCapUpgradeDisplayText((costToUpgradeUnitCap).ToString());
             uiController.hudCanvasAudioSource.PlayOneShot(uiController.genericButtonSucessAudioClip);
         } else
         {
@@ -132,6 +128,7 @@ public class PlayerController : MonoBehaviour
             uiController.shopToggleButton.gameObject.SetActive(true);
             uiController.UpdateAllShopButtons();
             uiController.ChangeCostToShuffleShopDisplayText(costToShuffleShop.ToString());
+            uiController.ChangeCostToUnitCapUpgradeDisplayText(costToUpgradeUnitCap.ToString());
             uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopRefreshAudioClip);
         } else
         {
@@ -276,7 +273,6 @@ public class PlayerController : MonoBehaviour
         InitializeShoppingOptions();
         SetPlayerGoldCount(playerGoldCount);
         playerOwnedNpcs = new List<NPC>();
-        uiController.ChangeCurrentPlayerUsernameDisplayText(playerName,playerMMR.ToString());
         SetCurrentlyDeployedUnits(0);
         uiController.SetRankImage();
         uiController.ChangeHPPlayerDisplayText(this.currentPlayerHealth, this.maxPlayerHealth);
@@ -360,8 +356,7 @@ public class PlayerController : MonoBehaviour
     {
         string prefabName = Enum.GetName(typeof(Unit), unitToSpawn);
 
-        if (currentPlayerUnits < playerGlobalUnitCap)
-        {
+       
             bool doneSearching = false;
             bool reserveHasEmptySlot = false;
             int i = 0;
@@ -402,10 +397,10 @@ public class PlayerController : MonoBehaviour
                 go.GetComponentInChildren<NPC>().PrepareNPC3DHud();
                 npcController.UpdateNpcList();
                 SetPlayerGoldCount(playerGoldCount - unitCost);
-                currentPlayerUnits = currentPlayerUnits + 1;
+          
                 return true;
             }
-        }
+        
         return false;
     }
 
@@ -437,10 +432,12 @@ public class PlayerController : MonoBehaviour
         PlayerSave data = SaveSystem.LoadPlayer();
         if (data != null)
         {
-        playerName = data.Name;
         playerMMR = data.Mmr;
-        uiController.intro_playerName.text = playerName;
-        uiController.ChangeCurrentPlayerUsernameDisplayText(playerName, playerMMR.ToString());
+            if (SteamManager.Initialized)
+            {
+                string name = SteamFriends.GetPersonaName();
+                uiController.intro_playerName.text = name;
+            }
         }
     }
 
@@ -457,11 +454,6 @@ public class PlayerController : MonoBehaviour
         uiController.ChangeDeployedUnitCountDisplayText(currentlyDeployedUnits, maxDeployedUnitsLimit);
     }
 
-    public void SetPlayerUsername(string name)
-    {
-        playerName = name;
-        uiController.ChangeCurrentPlayerUsernameDisplayText(playerName, playerMMR.ToString());
-    }
 
     public void SetPlayerGoldCount(long amount)
     {

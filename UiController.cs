@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
+using Steamworks;
 
 public class UiController : MonoBehaviour
 {
@@ -11,8 +12,6 @@ public class UiController : MonoBehaviour
     BoardController boardController;
     NpcController npcController;
     SessionLogger sessionLogger;
-   // public PlayerProfiler playerProfiler;
-    //
     public GameObject hudCanvas;
     public GameObject hudCanvasTopBar;
     public GameObject hudCanvasBottomBar;
@@ -41,8 +40,6 @@ public class UiController : MonoBehaviour
     public Button closeEscapeMenuTabButton;
     public Button saveGameEscapeMenuButton;
     //
-    public InputField wizardNewPlayerNameInputField;
-    //
     public Image damageOverlay;
     //
     public Text hudCanvasTopPanelPlayerCurrentHPCounterText;
@@ -55,6 +52,7 @@ public class UiController : MonoBehaviour
     public Text hudCanvasShopCostToShuffleText;
     public Text hudCanvasShopUnitCapUpgradeText;
     public Image hudCanvasRankImage;
+    public Image hudCanvasTopPanelSteamUserAvatar;
     //
     public Text shopbutton1_hudCanvasShopCostBuyUnit;
     public Text shopbutton2_hudCanvasShopCostBuyUnit;
@@ -143,18 +141,30 @@ public class UiController : MonoBehaviour
     public Text reportDefeatPanel_TotalUnitsDeployedText;
     public Text reportDefeatPanel_MostTribesDeployedText;
     public DynamicTribeIconVisualizer reportDefeatPanel_MostTribeDeployedIconVisualizer;
+    //
+    public GameObject ShopPanelTooltipSubPanel;
+    //
+    public Camera mainCamera;
+    //
+    public Image steamUserAvatar;
+  
 
     private void Awake()
     {
-        helperTipContainer = GetComponent<HelperTipContainer>();
-        RefreshHelperTips();
-
-        AudioListener.volume = userVolume;
         boardController = GetComponent<BoardController>();
         playerController = GetComponent<PlayerController>();
         npcController = GetComponent<NpcController>();
         sessionLogger = GetComponent<SessionLogger>();
         hudCanvas = GameObject.Find("HUDCanvas");
+
+        steamUserAvatar.sprite = Sprite.Create(GetSmallAvatar(),new Rect(new Vector2(0,0),new Vector2(32,32)),new Vector2(32,32));
+        hudCanvasTopPanelSteamUserAvatar.sprite = Sprite.Create(GetSmallAvatar(), new Rect(new Vector2(0, 0), new Vector2(32, 32)), new Vector2(32, 32));
+
+        helperTipContainer = GetComponent<HelperTipContainer>();
+        RefreshHelperTips();
+
+        AudioListener.volume = userVolume;
+
 
         saveGameEscapeMenuButton.onClick.RemoveAllListeners();
         saveGameEscapeMenuButton.onClick.AddListener(delegate { playerController.SavePlayer(); });
@@ -248,9 +258,47 @@ public class UiController : MonoBehaviour
         shopUnitCapButton.onClick.RemoveAllListeners();
         shopUnitCapButton.onClick.AddListener(delegate { UpgradeUnitCap(); });
 
-        intro_playerName.text = playerController.playerName;
-        intro_playerMMR.text = playerController.playerMMR.ToString();
+        
+        intro_playerMMR.text = "MMR: " + playerController.playerMMR.ToString();
+
+
+        if (SteamManager.Initialized)
+        {
+            string name = SteamFriends.GetPersonaName();
+            intro_playerName.text = name;
+            hudCanvasTopPanelUsernameText.text = name;
+        }
+
+        
     }
+
+    public Texture2D GetSmallAvatar()
+    {
+        CSteamID user = SteamUser.GetSteamID();
+        int FriendAvatar = SteamFriends.GetSmallFriendAvatar(user);
+        uint ImageWidth;
+        uint ImageHeight;
+        bool success = SteamUtils.GetImageSize(FriendAvatar, out ImageWidth, out ImageHeight);
+
+        if (success && ImageWidth > 0 && ImageHeight > 0)
+        {
+            byte[] Image = new byte[ImageWidth * ImageHeight * 4];
+            Texture2D returnTexture = new Texture2D((int)ImageWidth, (int)ImageHeight, TextureFormat.RGBA32, false, true);
+            success = SteamUtils.GetImageRGBA(FriendAvatar, Image, (int)(ImageWidth * ImageHeight * 4));
+            if (success)
+            {
+                returnTexture.LoadRawTextureData(Image);
+                returnTexture.Apply();
+            }
+            return returnTexture;
+        }
+        else
+        {
+            Debug.LogError("Couldn't get avatar.");
+            return new Texture2D(0, 0);
+        }
+    }
+
 
     public void RefreshHelperTips()
     {
@@ -447,10 +495,8 @@ public class UiController : MonoBehaviour
 
     public void toggleEscapeMenu()
     {
-
             hudCanvasEscapePanel.SetActive(!hudCanvasEscapePanel.activeSelf);
             hudCanvasShopPanel.SetActive(false);
-
     }
 
 
@@ -859,18 +905,6 @@ public class UiController : MonoBehaviour
     public void ChangeCurrentPlayerGoldCountDisplayText(string str)
     {
         hudCanvasTopPanelGoldCountText.text = str;
-    }
-
-    public void ChangeName(String str)
-    {
-        if (str != "")
-        { 
-        playerController.playerName = str;
-        intro_playerName.text = str;
-        ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString());
-        SaveSystem.SavePlayer(playerController);
-        }
-
     }
 
     public void ChangeCurrentPlayerUsernameDisplayText(string nameString, string mmrString)

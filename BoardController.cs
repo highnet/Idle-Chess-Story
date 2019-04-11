@@ -468,7 +468,6 @@ public class BoardController : MonoBehaviour
             playerController.SetPlayerGoldCount((long)goldReward); // reward bonus gold
             playerController.playerMMR += 1 + uiController.wizard_difficultyPicker.value;
             uiController.SetRankImage();
-            uiController.ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString());
         }
         else // combat DEFEAT
         {
@@ -512,7 +511,6 @@ public class BoardController : MonoBehaviour
            
             playerController.playerMMR -= 1 + uiController.wizard_difficultyPicker.value;
             uiController.SetRankImage();
-            uiController.ChangeCurrentPlayerUsernameDisplayText(playerController.playerName, playerController.playerMMR.ToString());
         }
         SaveSystem.SavePlayer(playerController);
         uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopRefreshAudioClip);
