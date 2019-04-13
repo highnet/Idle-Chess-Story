@@ -19,18 +19,12 @@ public class PlayerController : MonoBehaviour
      UiController uiController;
      BoardController boardController;
      NpcController npcController;
-  //   PlayerProfiler playerProfiler;
-     public SessionLogger sessionLogger;
-  
-    //
-    public int playerMMR;
-
+    public SessionLogger sessionLogger;
     public long playerGoldCount;
     public int maxDeployedUnitsLimit;
     public int currentlyDeployedUnits;
     public List<NPC> playerOwnedNpcs;
     public int timesRefreshed;
-    //
     public int currentPlayerHealth;
     public int maxPlayerHealth;
     public int costToShuffleShop;
@@ -39,9 +33,7 @@ public class PlayerController : MonoBehaviour
     public Dictionary<Tribe, List<Unit>> TRIBAL_UNIT_DATA;
     public Dictionary<Tribe, int> deployedTribesCounter;
     public Dictionary<Tribe, int> enemyActiveTribesCounter;
- 
     public Unit[] shoppingOptions;
-    // Game balance constants and coefficients
     public int constant_Crit_RngRollBaseLowerBound;
     public int constant_Crit_RngRollBaseUpperBound;
     public int constant_Crit_RngRollBaseMinimumRequiredLuck;
@@ -76,6 +68,8 @@ public class PlayerController : MonoBehaviour
     public float coefficient_Guardian_3_OnHit_ConcentrationGainBonusMultiplier;
     public float constant_OnHit_BaseConcentrationGain;
 
+    public int playerMMR;
+
     private void Awake()
     {
         uiController = GetComponent<UiController>();
@@ -83,7 +77,6 @@ public class PlayerController : MonoBehaviour
         npcController = GetComponent<NpcController>();
         sessionLogger = GetComponent<SessionLogger>();
         sessionLogger.goldRewarded = (int) playerGoldCount;
-        LoadPlayer();
     }
 
     public void UpgradeUnitCapWithGold()
@@ -274,8 +267,9 @@ public class PlayerController : MonoBehaviour
         SetPlayerGoldCount(playerGoldCount);
         playerOwnedNpcs = new List<NPC>();
         SetCurrentlyDeployedUnits(0);
-        uiController.SetRankImage();
+   
         uiController.ChangeHPPlayerDisplayText(this.currentPlayerHealth, this.maxPlayerHealth);
+     
     }
 
     public void ReInitializeEnemyActiveTribesCounter()
@@ -301,35 +295,12 @@ public class PlayerController : MonoBehaviour
 
     }
 
-   public void EndOfGameplay_CalculateMMRChangeBasedOnRoundAchieved()
-    {
-        int mmrChange = 0;
-
-        int currentGameRound = boardController.currentGameRound;
-        if (currentGameRound < 6)
-        {
-            mmrChange -= 25;
-        }
-        else if (currentGameRound >= 6 && currentGameRound <= 12)
-        {
-            mmrChange += 25;
-        }
-        else if (currentGameRound > 12)
-        {
-            mmrChange += 50;
-        }
-
-        playerMMR += mmrChange;
-        uiController.SetRankImage();
-        SavePlayer();
-    }
 
     // Update is called once per frame
     void LateUpdate()
     {
         if ((boardController.gameStatus == GameStatus.Fight || boardController.gameStatus == GameStatus.Shopping) && currentPlayerHealth <= 0) // check lose condition
         {
-            EndOfGameplay_CalculateMMRChangeBasedOnRoundAchieved();
             boardController.TransitionToReportDefeatPhase();
         }
 
@@ -338,13 +309,17 @@ public class PlayerController : MonoBehaviour
 
     public bool BuyUnitFromShop(Unit unitToBuy) // buy a unit from the shop
     {
-
         int unitCost = 0;
         NPC_COST_DATA.TryGetValue(unitToBuy, out unitCost);
         if (unitCost <= playerGoldCount)
         {
             if (SpawnFriendlyNPC(unitToBuy))
             {
+                if (playerGoldCount == 0)
+                {
+                    uiController.ShopPanelTooltipSubPanel.SetActive(false);
+                    uiController.hudCanvasShopPanel.SetActive(false);
+                }
                 return true;
             }
         }
@@ -420,26 +395,6 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public void SavePlayer()
-    {
-        SaveSystem.SavePlayer(this);
-        LoadPlayer();
-        uiController.SetRankImage();
-    }
- 
-    public void LoadPlayer()
-    {
-        PlayerSave data = SaveSystem.LoadPlayer();
-        if (data != null)
-        {
-        playerMMR = data.Mmr;
-            if (SteamManager.Initialized)
-            {
-                string name = SteamFriends.GetPersonaName();
-                uiController.intro_playerName.text = name;
-            }
-        }
-    }
 
     public void SetMaxDeployedUnitsLimit(int amount)
     {

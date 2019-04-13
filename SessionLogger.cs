@@ -11,6 +11,7 @@ public class SessionLogger : MonoBehaviour
     public Tribe mostDeployedTribe; 
     public int mostDeployedTribeAmount; 
     public Dictionary<Tribe, int> TribesDeployedToFightTracker;
+    public int mmrChange = 0;
 
     private void Start()
     {
@@ -31,8 +32,6 @@ public class SessionLogger : MonoBehaviour
     {
         Helper.Increment<Tribe>(TribesDeployedToFightTracker, npc.PRIMARYTRIBE);
         Helper.Increment<Tribe>(TribesDeployedToFightTracker, npc.SECONDARYTRIBE);
-        Debug.Log(string.Join(", ", (TribesDeployedToFightTracker.Select(pair => $"{pair.Key} => {pair.Value}"))));
-
     }
 
     public void CalculateMaxDeployedTribe()

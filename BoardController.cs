@@ -31,6 +31,8 @@ public class BoardController : MonoBehaviour
     public GameObject rainSystem;
     public AmbienceSound ambienceSound;
 
+    public Leaderboard steamLeaderboard;
+
     private void Awake()
     {
         npcController = GetComponent<NpcController>(); //fetch world controllers
@@ -48,10 +50,6 @@ public class BoardController : MonoBehaviour
 
     }
 
-    private void FixedUpdate()
-    {
-
-    }
     void CreateBoardTiles()
     {
         chessBoard = new GameObject[9, 8]; // initialize the chessboard array
@@ -437,6 +435,7 @@ public class BoardController : MonoBehaviour
         float goldReward = playerController.playerGoldCount; // fetch the player's current gold
         if (npcController.enemyList.Count == 0) // combat VICTORY
         {
+            sessionLogger.mmrChange += 1 + uiController.wizard_difficultyPicker.value;
             if (npcController.allyList.Count != 0)
             {
                 foreach (NPC npc in npcController.allyList)
@@ -466,11 +465,10 @@ public class BoardController : MonoBehaviour
             float netGoldReward = goldReward - playerController.playerGoldCount;
             playerController.sessionLogger.goldRewarded += (long) netGoldReward;
             playerController.SetPlayerGoldCount((long)goldReward); // reward bonus gold
-            playerController.playerMMR += 1 + uiController.wizard_difficultyPicker.value;
-            uiController.SetRankImage();
         }
         else // combat DEFEAT
         {
+            sessionLogger.mmrChange -= 1 + uiController.wizard_difficultyPicker.value;
             if (uiController.wizard_difficultyPicker.value == 0)
             {
                 goldReward *= 1.25f;
@@ -508,11 +506,9 @@ public class BoardController : MonoBehaviour
             {
                 playerController.SetCurrentHP(playerController.currentPlayerHealth - 10);
             }
-           
-            playerController.playerMMR -= 1 + uiController.wizard_difficultyPicker.value;
-            uiController.SetRankImage();
+
         }
-        SaveSystem.SavePlayer(playerController);
+   
         uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopRefreshAudioClip);
 
         int i;
@@ -555,6 +551,10 @@ public class BoardController : MonoBehaviour
         if (gameStatus != GameStatus.ReportDefeat || gameStatus != GameStatus.GameOver)
         {
             ChangeCurrentRound(currentGameRound + 1);
+            if (currentGameRound == 19)
+            {
+                uiController.dialogueTriggerSystem.endOfContentDialogue.TriggerDialogue();
+            }
         }
     
         if (currentGameRound % 3 == 0) // only once every 3 rounds
@@ -569,6 +569,12 @@ public class BoardController : MonoBehaviour
         }
     }
 
+    public void QuickForfeitAndRestart()
+    {
+        steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + sessionLogger.mmrChange);
+        TransitionToGameOverPhase();
+    }
+
 
     public void TransitionToReportDefeatPhase()
     {
@@ -576,11 +582,13 @@ public class BoardController : MonoBehaviour
         uiController.hudCanvasTribesPanel.gameObject.SetActive(false);
         uiController.hudCanvasTopBar.gameObject.SetActive(false);
         uiController.hudCanvasBottomBar.gameObject.SetActive(false);
+        uiController.ShopPanelTooltipSubPanel.SetActive(false);
         uiController.hudCanvasShopPanel.gameObject.SetActive(false);
         sessionLogger.CalculateMaxDeployedTribe();
         uiController.reportDefeatPanel_TotalUnitsDeployedText.text = "You deployed: " + sessionLogger.unitsDeployedToFight.ToString() + " unit(s)";
         uiController.reportDefeatPanel_MostTribesDeployedText.text = "Most deployed tribe: " + sessionLogger.mostDeployedTribeAmount + " " + sessionLogger.mostDeployedTribe.ToString();
         uiController.reportDefeatPanel_MostTribeDeployedIconVisualizer.SetImage(sessionLogger.mostDeployedTribe,true);
+        steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + sessionLogger.mmrChange);
         ChangeGameStatus(GameStatus.ReportDefeat);
     }
     public void TransitionToGameOverPhase()

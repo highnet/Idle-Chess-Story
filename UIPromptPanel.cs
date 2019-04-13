@@ -20,7 +20,7 @@ public class UIPromptPanel : MonoBehaviour
 
     void Confirm()
     {
-        GameObject.Find("World Controller").GetComponent<UiController>().CalculateMMRAndRestartScene();
+        GameObject.Find("World Controller").GetComponent<BoardController>().QuickForfeitAndRestart();
 
     }
 

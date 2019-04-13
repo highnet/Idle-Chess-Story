@@ -12,6 +12,8 @@ public class UiController : MonoBehaviour
     BoardController boardController;
     NpcController npcController;
     SessionLogger sessionLogger;
+    DialogueManager dialogueManager;
+    //
     public GameObject hudCanvas;
     public GameObject hudCanvasTopBar;
     public GameObject hudCanvasBottomBar;
@@ -72,6 +74,7 @@ public class UiController : MonoBehaviour
     //
     public Text intro_playerName;
     public Text intro_playerMMR;
+    public Button intro_SettingsButton;
     public Dropdown wizard_difficultyPicker;
     public Button startGameButton;
     //
@@ -147,30 +150,93 @@ public class UiController : MonoBehaviour
     public Camera mainCamera;
     //
     public Image steamUserAvatar;
-  
+    public Leaderboard steamLeaderboard;
+    public bool fetchSteamLeaderboardEntry = true;
+    public bool fetchSteamLeaderboardTop10Entries = true;
+    public GameObject LeaderboardEntriesContent;
+    //
+    public GameObject dialoguePanel;
+    public Text dialoguePanelSpeakerNameText;
+    public Text dialoguePanelDialogueText;
+    public Button continueDialogueButton;
+    public DialogueTriggerSystem dialogueTriggerSystem;
+    //
+    public GameObject leaderBoardPanel;
+    public List<LeaderboardEntry> steamLeaderBoardTop10EntriesUIPrefabsList;
+
 
     private void Awake()
+    {
+        GetWorldControllers();
+        BindButtons();
+        steamUserAvatar.sprite = Sprite.Create(GetSmallAvatar(),new Rect(new Vector2(0,0),new Vector2(32,32)),new Vector2(32,32));
+        hudCanvasTopPanelSteamUserAvatar.sprite = Sprite.Create(GetSmallAvatar(), new Rect(new Vector2(0, 0), new Vector2(32, 32)), new Vector2(32, 32));
+        helperTipContainer = GetComponent<HelperTipContainer>();
+        RefreshHelperTips();
+        AudioListener.volume = userVolume;
+        if (SteamManager.Initialized)
+        {
+            string name = SteamFriends.GetPersonaName();
+            intro_playerName.text = name;
+            hudCanvasTopPanelUsernameText.text = name;
+        }
+        hudCanvasRankImage.sprite = Resources.Load<Sprite>("pawn icon");
+
+        steamLeaderBoardTop10EntriesUIPrefabsList = new List<LeaderboardEntry>();
+
+
+        for (int i = 0; i < 10; i++) // prepare the leaderboard top 10 entry display prefab objects
+        {
+           GameObject leaderBoardEntry = Instantiate(Resources.Load("Leaderboard Entry"), LeaderboardEntriesContent.transform,false) as GameObject;
+            int rank = 1 + i;
+            leaderBoardEntry.GetComponent<LeaderboardEntry>().rank = rank;
+            leaderBoardEntry.GetComponent<LeaderboardEntry>().rankText.text = rank + ")";
+            steamLeaderBoardTop10EntriesUIPrefabsList.Add(leaderBoardEntry.GetComponent<LeaderboardEntry>());
+
+        }
+    }
+
+    public void GetWorldControllers()
     {
         boardController = GetComponent<BoardController>();
         playerController = GetComponent<PlayerController>();
         npcController = GetComponent<NpcController>();
         sessionLogger = GetComponent<SessionLogger>();
+        dialogueManager = GetComponent<DialogueManager>();
         hudCanvas = GameObject.Find("HUDCanvas");
 
-        steamUserAvatar.sprite = Sprite.Create(GetSmallAvatar(),new Rect(new Vector2(0,0),new Vector2(32,32)),new Vector2(32,32));
-        hudCanvasTopPanelSteamUserAvatar.sprite = Sprite.Create(GetSmallAvatar(), new Rect(new Vector2(0, 0), new Vector2(32, 32)), new Vector2(32, 32));
+    }
 
-        helperTipContainer = GetComponent<HelperTipContainer>();
-        RefreshHelperTips();
+    public Texture2D GetSmallAvatar()
+    {
+        CSteamID user = SteamUser.GetSteamID();
+        int FriendAvatar = SteamFriends.GetSmallFriendAvatar(user);
+        uint ImageWidth;
+        uint ImageHeight;
+        bool success = SteamUtils.GetImageSize(FriendAvatar, out ImageWidth, out ImageHeight);
 
-        AudioListener.volume = userVolume;
+        if (success && ImageWidth > 0 && ImageHeight > 0)
+        {
+            byte[] Image = new byte[ImageWidth * ImageHeight * 4];
+            Texture2D returnTexture = new Texture2D((int)ImageWidth, (int)ImageHeight, TextureFormat.RGBA32, false, true);
+            success = SteamUtils.GetImageRGBA(FriendAvatar, Image, (int)(ImageWidth * ImageHeight * 4));
+            if (success)
+            {
+                returnTexture.LoadRawTextureData(Image);
+                returnTexture.Apply();
+            }
+            return returnTexture;
+        }
+        else
+        {
+            Debug.LogError("Couldn't get avatar.");
+            return new Texture2D(0, 0);
+        }
+    }
 
-
-        saveGameEscapeMenuButton.onClick.RemoveAllListeners();
-        saveGameEscapeMenuButton.onClick.AddListener(delegate { playerController.SavePlayer(); });
-
-        loadButton.onClick.RemoveAllListeners();
-        loadButton.onClick.AddListener(delegate { playerController.LoadPlayer(); });
+    public void BindButtons()
+    {
+    
 
         previousTipButton.onClick.RemoveAllListeners();
         previousTipButton.onClick.AddListener(delegate { PreviousTip(); });
@@ -195,6 +261,9 @@ public class UiController : MonoBehaviour
 
         exitGameButton.onClick.RemoveAllListeners();
         exitGameButton.onClick.AddListener(delegate { ExitGame(); });
+
+        intro_SettingsButton.onClick.RemoveAllListeners();
+        intro_SettingsButton.onClick.AddListener(delegate { toggleEscapeMenu(); });
 
         settingsButton.onClick.RemoveAllListeners();
         settingsButton.onClick.AddListener(delegate { toggleEscapeMenu(); });
@@ -258,45 +327,11 @@ public class UiController : MonoBehaviour
         shopUnitCapButton.onClick.RemoveAllListeners();
         shopUnitCapButton.onClick.AddListener(delegate { UpgradeUnitCap(); });
 
-        
-        intro_playerMMR.text = "MMR: " + playerController.playerMMR.ToString();
-
-
-        if (SteamManager.Initialized)
-        {
-            string name = SteamFriends.GetPersonaName();
-            intro_playerName.text = name;
-            hudCanvasTopPanelUsernameText.text = name;
-        }
-
-        
     }
 
-    public Texture2D GetSmallAvatar()
+    public void ToggleLeaderboardPanel()
     {
-        CSteamID user = SteamUser.GetSteamID();
-        int FriendAvatar = SteamFriends.GetSmallFriendAvatar(user);
-        uint ImageWidth;
-        uint ImageHeight;
-        bool success = SteamUtils.GetImageSize(FriendAvatar, out ImageWidth, out ImageHeight);
-
-        if (success && ImageWidth > 0 && ImageHeight > 0)
-        {
-            byte[] Image = new byte[ImageWidth * ImageHeight * 4];
-            Texture2D returnTexture = new Texture2D((int)ImageWidth, (int)ImageHeight, TextureFormat.RGBA32, false, true);
-            success = SteamUtils.GetImageRGBA(FriendAvatar, Image, (int)(ImageWidth * ImageHeight * 4));
-            if (success)
-            {
-                returnTexture.LoadRawTextureData(Image);
-                returnTexture.Apply();
-            }
-            return returnTexture;
-        }
-        else
-        {
-            Debug.LogError("Couldn't get avatar.");
-            return new Texture2D(0, 0);
-        }
+        leaderBoardPanel.gameObject.SetActive(!leaderBoardPanel.gameObject.activeSelf);
     }
 
 
@@ -353,16 +388,7 @@ public class UiController : MonoBehaviour
 
     public void ExitGame()
     {
-
-        if (boardController.currentGameRound > 1)
-        {
-            playerController.EndOfGameplay_CalculateMMRChangeBasedOnRoundAchieved();
-        }
-        else
-        {
-
-        }
-      
+    
 
       // Application.Quit();
 
@@ -445,9 +471,38 @@ public class UiController : MonoBehaviour
         selectedUnitPanel_InformationText_TIER.text = "Level " + selectedNPC.TIER;
     }
 
-
-    void Update()
+    public void SyncronizeToSteamLeaderBoardIfNessecary()
     {
+        // try fetch the players leaderboard score one time
+        if (fetchSteamLeaderboardEntry && steamLeaderboard.foundLeaderboard && steamLeaderboard.downloadedLeaderboard && !steamLeaderboard.downLoadingUserEntry)
+        {
+            int fetchedMMR = steamLeaderboard.ReadDownloadedUserLeaderboardEntry(); // read user mmr
+            Debug.Log(fetchedMMR);
+            intro_playerMMR.text = fetchedMMR.ToString(); // syncronize the ui with the fetched value
+            playerController.playerMMR = fetchedMMR;
+            fetchSteamLeaderboardEntry = false;
+        }
+
+        // try fetch the top 10 leaderboard scores one time
+        if (fetchSteamLeaderboardTop10Entries && steamLeaderboard.foundLeaderboard && steamLeaderboard.downloadedLeaderboard && !steamLeaderboard.downLoadingTop10Entries)
+        {
+            steamLeaderboard.top10Entries = steamLeaderboard.ReadDownloadedTop10Entries(); // read top 10 entries
+            for (int i = 0; i < steamLeaderboard.top10Entries.Length; i++)
+            {
+                LeaderboardEntry leaderboardEntryPrefab = steamLeaderBoardTop10EntriesUIPrefabsList.ToArray()[i]; // syncronize the ui with the fetched values
+                LeaderEntry top10Entry = steamLeaderboard.top10Entries[i];
+                leaderboardEntryPrefab.rank = top10Entry.globalRank;
+                leaderboardEntryPrefab.mmrText.text = top10Entry.score.ToString();
+                leaderboardEntryPrefab.nameText.text = SteamFriends.GetFriendPersonaName(top10Entry.id);
+                leaderboardEntryPrefab.rankText.text = top10Entry.globalRank.ToString() + ")";
+            }
+            fetchSteamLeaderboardTop10Entries = false;
+        }
+    }
+
+    public void PrepareUIAccordingly()
+    {
+
         if (boardController.gameStatus != GameStatus.ReportDefeat && boardController.selectedObject != null) // update the entire selected unit panel
         {
             hudCanvasCurrentlySelectedUnitPanel.SetActive(true);
@@ -459,12 +514,13 @@ public class UiController : MonoBehaviour
             {
                 selectedUnitPanel_primaryTribeIconVisualizer.SetImage(selectedNPC.PRIMARYTRIBE, true);
                 selectedUnitPanel_secondaryTribeIconVisualizer.SetImage(selectedNPC.SECONDARYTRIBE, true);
-            } else
+            }
+            else
             {
                 selectedUnitPanel_primaryTribeIconVisualizer.SetImage(selectedNPC.PRIMARYTRIBE, false);
                 selectedUnitPanel_secondaryTribeIconVisualizer.SetImage(selectedNPC.SECONDARYTRIBE, false);
             }
-    
+
             selectedUnitPanel_abilityiconVisualizer.SetImage(selectedNPC.ABILITY);
             sellFriendlySelectedTargetButton.gameObject.SetActive(!selectedNPC.isEnemy);
 
@@ -478,75 +534,57 @@ public class UiController : MonoBehaviour
         if (!boardController.gameStatus.Equals(GameStatus.Shopping)) // take out ui elements outside that should not be outside of the shopping phase
         {
             shopToggleButton.gameObject.SetActive(false);
+            ShopPanelTooltipSubPanel.SetActive(false);
             hudCanvasShopPanel.SetActive(false);
             sellFriendlySelectedTargetButton.gameObject.SetActive(false);
             fightButton.gameObject.SetActive(false);
-  
-        } else
+
+        }
+        else
         {
             fightButton.gameObject.SetActive(true);
 
         }
+    }
+
+    public void ListenForEscapeMenuToggle()
+    {
         if (Input.GetKeyDown(KeyCode.Escape) && boardController.gameStatus == GameStatus.Shopping)
         {
             toggleEscapeMenu();
         }
     }
 
+    void Update()
+    {
+        SyncronizeToSteamLeaderBoardIfNessecary();
+        PrepareUIAccordingly();
+        ListenForEscapeMenuToggle();
+  
+    }
+
     public void toggleEscapeMenu()
     {
             hudCanvasEscapePanel.SetActive(!hudCanvasEscapePanel.activeSelf);
-            hudCanvasShopPanel.SetActive(false);
+        ShopPanelTooltipSubPanel.SetActive(false);
+        hudCanvasShopPanel.SetActive(false);
     }
 
-
-    public void SetRankImage()
-    {
-        string rank = "pawn";
-        if (playerController.playerMMR < 1600)
-        {
-            rank = "pawn";
-        }
-        else if (playerController.playerMMR >= 1600 && playerController.playerMMR < 1700)
-        {
-            rank = "knight";
-        }
-        else if (playerController.playerMMR >= 1700 && playerController.playerMMR < 1800)
-        {
-         rank = "bishop";
-        }
-        else if (playerController.playerMMR >= 1900 && playerController.playerMMR < 2000)
-        {
-          rank = "rook";
-        }
-        else if (playerController.playerMMR >= 2100 && playerController.playerMMR < 2200)
-        {
-           rank = "queen";
-        }
-        else if (playerController.playerMMR >= 2200)
-        {
-          rank = "king";
-        }
-
-        hudCanvasRankImage.sprite = Resources.Load<Sprite>(rank + " icon");
-    }
 
     public void StartGameTransitionPhase() // set up the ui for starting the game
     {
-        if (SaveSystem.LoadPlayer() != null)
-        {
+
             hudCanvasAudioSource.PlayOneShot(startGameAudioClip);
             boardController.ChangeGameStatus(GameStatus.Shopping, "Shopping Phase"); // set to shopping phae
             ChangeCurrentRoundDisplayText(boardController.currentGameRound); // update ui text element
             boardController.StartCoroutine("ProgressHealthRegeneration"); // begin health regeneration process
             boardController.StartCoroutine("ProgressConcentrationRegeneration"); // begin concentration regeneration process
             hudCanvasPlayerPanel.SetActive(true); // activate required ui elements
-            hudCanvasShopPanel.SetActive(true);
             hudCanvasBottomBar.SetActive(true);
             shopToggleButton.gameObject.SetActive(true);
             hudCanvasTopBar.SetActive(true);
             hudCanvasWizardPanel.SetActive(false);
-        }
+            dialogueTriggerSystem.tutorialDialogue1.TriggerDialogue();
 
     }
 
@@ -575,7 +613,6 @@ public class UiController : MonoBehaviour
         spawned.transform.Rotate(0f, 180f, 0f, Space.Self);
         spawned.transform.SetParent(shopButton1.transform);
         shopButton1.GetComponent<Thubmnail>().SpawnedAssociatedNPC = spawned;
-
 
         shopButton2.interactable = true;
         shopButton2.GetComponent<Image>().sprite = Resources.Load<Sprite>("UI board Large  parchment");
@@ -708,18 +745,13 @@ public class UiController : MonoBehaviour
         escapeMenuForfeitConfirmationPromptPanel.SetActive(true);
     }
 
-    public void CalculateMMRAndRestartScene()
-    {
-        playerController.EndOfGameplay_CalculateMMRChangeBasedOnRoundAchieved();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
 
     void ToggleShopPanel()
     {
         
-        if ( hudCanvasShopPanel.activeSelf) // check if the shop panel is active
+        if (hudCanvasShopPanel.activeSelf) // check if the shop panel is active
         {
-          
+            ShopPanelTooltipSubPanel.SetActive(false);
             hudCanvasAudioSource.PlayOneShot(shopClosedAudioClip); // play the shop closing sound
         }
         else
@@ -753,6 +785,27 @@ public class UiController : MonoBehaviour
             boardController.ChangeGameStatus(GameStatus.Wait); // smooth wait transition
             npcController.allyListBackup = new List<NPC>();
             boardController.SpawnEnemyUnitsRound_Balanced(); // spawn balanced enemies
+
+            if (boardController.currentGameRound == 1)
+            {
+                dialogueTriggerSystem.tutorialDialogue2.TriggerDialogue();
+            }
+            else if (boardController.currentGameRound == 3)
+            {
+                dialogueTriggerSystem.tutorialDialogue3.TriggerDialogue();
+            }
+            else if (boardController.currentGameRound == 6)
+            {
+                dialogueTriggerSystem.bossDialogue1.TriggerDialogue();
+            }
+            else if (boardController.currentGameRound == 12)
+            {
+                dialogueTriggerSystem.bossDialogue2.TriggerDialogue();
+            }
+            else if (boardController.currentGameRound == 18)
+            {
+                dialogueTriggerSystem.bossDialogue3.TriggerDialogue();
+            }
 
             if (UnityEngine.Random.Range(0,7) == 1)
             {
