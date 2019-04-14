@@ -122,15 +122,15 @@ public class BoardController : MonoBehaviour
                 int currentDificulty = uiController.wizard_difficultyPicker.value;
                 if (currentDificulty == 0)
                 {
-                    spawningBudget *= 0.7f;
+                    spawningBudget *= 0.5f;
                 }
                 if (currentDificulty == 1)
                 {
-                    spawningBudget *= 0.8f;
+                    spawningBudget *= 0.6f;
                 }
                 else if (currentDificulty == 2)
                 {
-                    spawningBudget *= 0.9f;
+                    spawningBudget *= 0.7f;
                 }
                 if (spawningBudget < 6)
                 {
@@ -190,14 +190,29 @@ public class BoardController : MonoBehaviour
 
                 }
 
+                bool skippedOne = false;
+                bool skippedOneTierThree = false;
+
                 foreach (NPC npc in npcController.enemyList)
                 {
+                    if (!skippedOne)
+                    {
+                        skippedOne = true;
+                        continue;
+                    }
                     playerController.NPC_COST_DATA.TryGetValue(npc.UNIT_TYPE, out int unitCost);
                     float t2UpgradeCost = 3 * unitCost;
                     float t3UpgradeCost = 3 * t2UpgradeCost;
                     if (spawningBudget >= t3UpgradeCost)
                     {
                         npc.ApplyTier2Upgrades();
+                        if (!skippedOneTierThree)
+                        {
+                            npc.ApplyTier2Upgrades();
+                            spawningBudget -= t2UpgradeCost;
+                            skippedOneTierThree = true;
+                            continue;
+                        }
                         npc.ApplyTier3Upgrades();
                         spawningBudget -= t3UpgradeCost;
                     } else if (spawningBudget >= t2UpgradeCost)
@@ -435,7 +450,8 @@ public class BoardController : MonoBehaviour
         float goldReward = playerController.playerGoldCount; // fetch the player's current gold
         if (npcController.enemyList.Count == 0) // combat VICTORY
         {
-            sessionLogger.mmrChange += 1 + uiController.wizard_difficultyPicker.value;
+            sessionLogger.calculateFIDEMMRChange(true, (float)playerController.playerMMR, (float)playerController.enemyMMR,playerController.FIDE_KFactor++);
+
             if (npcController.allyList.Count != 0)
             {
                 foreach (NPC npc in npcController.allyList)
@@ -446,17 +462,9 @@ public class BoardController : MonoBehaviour
                    }
                 }
             }
-            if (uiController.wizard_difficultyPicker.value == 0)
-            {
-                goldReward *= 1.35f;
-            }else if (uiController.wizard_difficultyPicker.value == 1)
-            {
-                goldReward *= 1.25f; // +% increase to current gold
-            }
-            else if (uiController.wizard_difficultyPicker.value == 2)
-            {
-                goldReward *= 1.15f; // +% increase to current gold
-            }
+
+                goldReward *= 1.10f;
+
             if (goldReward < 2)
             {
                 goldReward = 2;
@@ -468,19 +476,10 @@ public class BoardController : MonoBehaviour
         }
         else // combat DEFEAT
         {
-            sessionLogger.mmrChange -= 1 + uiController.wizard_difficultyPicker.value;
-            if (uiController.wizard_difficultyPicker.value == 0)
-            {
-                goldReward *= 1.25f;
-            }
-            else if (uiController.wizard_difficultyPicker.value == 1)
-            {
-                goldReward *= 1.15f; // +% increase to current gold
-            }
-            else if (uiController.wizard_difficultyPicker.value == 2)
-            {
-                goldReward *= 1.05f; // +% increase to current gold
-            }
+            sessionLogger.calculateFIDEMMRChange(false,(float) playerController.playerMMR,(float) playerController.enemyMMR,playerController.FIDE_KFactor++);
+
+                goldReward *= 1.05f;
+
             if (goldReward < 2)
             {
                 goldReward = 2;
@@ -551,10 +550,6 @@ public class BoardController : MonoBehaviour
         if (gameStatus != GameStatus.ReportDefeat || gameStatus != GameStatus.GameOver)
         {
             ChangeCurrentRound(currentGameRound + 1);
-            if (currentGameRound == 19)
-            {
-                uiController.dialogueTriggerSystem.endOfContentDialogue.TriggerDialogue();
-            }
         }
     
         if (currentGameRound % 3 == 0) // only once every 3 rounds
@@ -571,7 +566,11 @@ public class BoardController : MonoBehaviour
 
     public void QuickForfeitAndRestart()
     {
-        steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + sessionLogger.mmrChange);
+        if ((int)sessionLogger.mmrChange < 0)
+        {
+            steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + (int)sessionLogger.mmrChange);
+        }
+      
         TransitionToGameOverPhase();
     }
 
@@ -588,7 +587,7 @@ public class BoardController : MonoBehaviour
         uiController.reportDefeatPanel_TotalUnitsDeployedText.text = "You deployed: " + sessionLogger.unitsDeployedToFight.ToString() + " unit(s)";
         uiController.reportDefeatPanel_MostTribesDeployedText.text = "Most deployed tribe: " + sessionLogger.mostDeployedTribeAmount + " " + sessionLogger.mostDeployedTribe.ToString();
         uiController.reportDefeatPanel_MostTribeDeployedIconVisualizer.SetImage(sessionLogger.mostDeployedTribe,true);
-        steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + sessionLogger.mmrChange);
+        steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + (int) sessionLogger.mmrChange);
         ChangeGameStatus(GameStatus.ReportDefeat);
     }
     public void TransitionToGameOverPhase()

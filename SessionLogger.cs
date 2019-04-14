@@ -11,13 +11,33 @@ public class SessionLogger : MonoBehaviour
     public Tribe mostDeployedTribe; 
     public int mostDeployedTribeAmount; 
     public Dictionary<Tribe, int> TribesDeployedToFightTracker;
-    public int mmrChange = 0;
+    public float mmrChange = 0;
 
     private void Start()
     {
         ReinitializeTribesDeployedToFightTrackerDictionary();
     }
-    
+    public void calculateFIDEMMRChange(bool combatVictory, float player1Rating, float player2Rating, int FIDE_KFactor)
+    {
+        float player1transformed_rating = (float) Math.Pow(10, (player1Rating / 400));
+        float player2transformed_rating = (float)Math.Pow(10, (player2Rating / 400));
+        float player1ExpectedScore = player1transformed_rating / (player1transformed_rating + player2transformed_rating);
+        
+        if (combatVictory)
+        {
+            mmrChange +=  player1Rating + (FIDE_KFactor * (1 - player1ExpectedScore)) - player1Rating;
+            Debug.Log(player1Rating + (FIDE_KFactor * (1 - player1ExpectedScore)) - player1Rating);
+        } else
+        {
+            mmrChange += (player1Rating + (FIDE_KFactor * (0 - player1ExpectedScore))) - player1Rating;
+            Debug.Log(player1Rating + (FIDE_KFactor * (0 - player1ExpectedScore)) - player1Rating);
+        }
+
+       
+
+    }
+
+
     public void ReinitializeTribesDeployedToFightTrackerDictionary()
     {
         TribesDeployedToFightTracker = new Dictionary<Tribe, int>();

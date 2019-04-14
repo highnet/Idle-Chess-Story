@@ -13,7 +13,7 @@ public class Thubmnail : MonoBehaviour
     public float shopThumbnailRotationSpeed = 5f;
     private bool mousedOver = false;
     private int xOffset = 0;
-    private int yOffset = -Screen.width / 2;
+    private int yOffset = -200;
     private Vector3 offsetVector;
 
     private void Start()
@@ -34,7 +34,7 @@ public class Thubmnail : MonoBehaviour
         {
             SpawnedAssociatedNPC.transform.Rotate(new Vector3(0f, randomRotationOrientation * shopThumbnailRotationSpeed, 0f), Space.Self);
             RectTransform rectTrans = uicontroller.ShopPanelTooltipSubPanel.GetComponent<RectTransform>();
-         rectTrans.anchoredPosition = Input.mousePosition + offsetVector;
+            rectTrans.position =   Input.mousePosition + offsetVector;
         }
     }
 

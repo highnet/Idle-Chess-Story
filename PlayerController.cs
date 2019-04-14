@@ -67,8 +67,11 @@ public class PlayerController : MonoBehaviour
     public float coefficient_Assassin_3_OnKillBonusGoldMultiplier;
     public float coefficient_Guardian_3_OnHit_ConcentrationGainBonusMultiplier;
     public float constant_OnHit_BaseConcentrationGain;
-
     public int playerMMR;
+    public bool newPlayer;
+
+    public int enemyMMR;
+    public int FIDE_KFactor = 1;
 
     private void Awake()
     {
@@ -77,6 +80,7 @@ public class PlayerController : MonoBehaviour
         npcController = GetComponent<NpcController>();
         sessionLogger = GetComponent<SessionLogger>();
         sessionLogger.goldRewarded = (int) playerGoldCount;
+
     }
 
     public void UpgradeUnitCapWithGold()

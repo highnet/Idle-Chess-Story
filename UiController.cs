@@ -180,11 +180,9 @@ public class UiController : MonoBehaviour
             intro_playerName.text = name;
             hudCanvasTopPanelUsernameText.text = name;
         }
-        hudCanvasRankImage.sprite = Resources.Load<Sprite>("pawn icon");
+    
 
         steamLeaderBoardTop10EntriesUIPrefabsList = new List<LeaderboardEntry>();
-
-
         for (int i = 0; i < 10; i++) // prepare the leaderboard top 10 entry display prefab objects
         {
            GameObject leaderBoardEntry = Instantiate(Resources.Load("Leaderboard Entry"), LeaderboardEntriesContent.transform,false) as GameObject;
@@ -390,7 +388,7 @@ public class UiController : MonoBehaviour
     {
     
 
-      // Application.Quit();
+      Application.Quit();
 
     }
 
@@ -495,6 +493,14 @@ public class UiController : MonoBehaviour
                 leaderboardEntryPrefab.mmrText.text = top10Entry.score.ToString();
                 leaderboardEntryPrefab.nameText.text = SteamFriends.GetFriendPersonaName(top10Entry.id);
                 leaderboardEntryPrefab.rankText.text = top10Entry.globalRank.ToString() + ")";
+                leaderboardEntryPrefab.steamAvatar.sprite = top10Entry.avatar;
+                if (top10Entry.globalRank == 1 || top10Entry.globalRank == 2 || top10Entry.globalRank == 3 )
+                {
+                    leaderboardEntryPrefab.trophyIcon.gameObject.SetActive(true);
+                    leaderboardEntryPrefab.trophyIcon.sprite = top10Entry.trophyIcon;
+                } 
+               
+
             }
             fetchSteamLeaderboardTop10Entries = false;
         }
@@ -584,7 +590,22 @@ public class UiController : MonoBehaviour
             shopToggleButton.gameObject.SetActive(true);
             hudCanvasTopBar.SetActive(true);
             hudCanvasWizardPanel.SetActive(false);
+        if (playerController.newPlayer)
+        {
             dialogueTriggerSystem.tutorialDialogue1.TriggerDialogue();
+        }
+       
+
+        if (wizard_difficultyPicker.value == 0)
+        {
+            playerController.enemyMMR = 1200;
+        } else if (wizard_difficultyPicker.value == 1)
+        {
+            playerController.enemyMMR = 1600;
+        } else
+        {
+            playerController.enemyMMR = 1900;
+        }
 
     }
 
@@ -786,11 +807,11 @@ public class UiController : MonoBehaviour
             npcController.allyListBackup = new List<NPC>();
             boardController.SpawnEnemyUnitsRound_Balanced(); // spawn balanced enemies
 
-            if (boardController.currentGameRound == 1)
+            if (playerController.newPlayer && boardController.currentGameRound == 1)
             {
                 dialogueTriggerSystem.tutorialDialogue2.TriggerDialogue();
             }
-            else if (boardController.currentGameRound == 3)
+            else if (playerController.newPlayer && boardController.currentGameRound == 3)
             {
                 dialogueTriggerSystem.tutorialDialogue3.TriggerDialogue();
             }
