@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour
     public bool newPlayer;
 
     public int enemyMMR;
-    public int FIDE_KFactor = 1;
+    public int FIDE_KFactor = 31;
 
     private void Awake()
     {
@@ -95,6 +95,7 @@ public class PlayerController : MonoBehaviour
             uiController.hudCanvasAudioSource.PlayOneShot(uiController.genericButtonSucessAudioClip);
         } else
         {
+            uiController.ChangeCostToUnitCapUpgradeDisplayText((costToUpgradeUnitCap).ToString());
             uiController.hudCanvasAudioSource.PlayOneShot(uiController.genericButtonFailureAudioClip);
         }
     }
@@ -306,6 +307,9 @@ public class PlayerController : MonoBehaviour
         if ((boardController.gameStatus == GameStatus.Fight || boardController.gameStatus == GameStatus.Shopping) && currentPlayerHealth <= 0) // check lose condition
         {
             boardController.TransitionToReportDefeatPhase();
+        } else if(boardController.currentGameRound == 19 && boardController.gameStatus == GameStatus.Shopping)
+        {
+            boardController.TransitionToReportVictoryPhase();
         }
 
     }

@@ -24,6 +24,7 @@ public class UiController : MonoBehaviour
     public GameObject hudCanvasCurrentlySelectedUnitPanel;
     public GameObject hudCanvasReportDefeatPanel;
     public GameObject hudCanvasEscapePanel;
+    public GameObject hudCanvasreportVictoryPanel;
     //
     public Button shopToggleButton;
     public Button tribesToggleButton;
@@ -40,7 +41,7 @@ public class UiController : MonoBehaviour
     public Button mainMenuButton;
     public Button forfeitButton;
     public Button closeEscapeMenuTabButton;
-    public Button saveGameEscapeMenuButton;
+   
     //
     public Image damageOverlay;
     //
@@ -53,7 +54,6 @@ public class UiController : MonoBehaviour
     public Text hudCanvasTopPanelDeployedUnitCountText;
     public Text hudCanvasShopCostToShuffleText;
     public Text hudCanvasShopUnitCapUpgradeText;
-    public Image hudCanvasRankImage;
     public Image hudCanvasTopPanelSteamUserAvatar;
     //
     public Text shopbutton1_hudCanvasShopCostBuyUnit;
@@ -144,6 +144,9 @@ public class UiController : MonoBehaviour
     public Text reportDefeatPanel_TotalUnitsDeployedText;
     public Text reportDefeatPanel_MostTribesDeployedText;
     public DynamicTribeIconVisualizer reportDefeatPanel_MostTribeDeployedIconVisualizer;
+    public Text reportVictoryPanel_TotalUnitsDeployedText;
+    public Text reportVictoryPanel_MostTribesDeployedText;
+    public DynamicTribeIconVisualizer reportVictoryPanel_MostTribeDeployedIconVisualizer;
     //
     public GameObject ShopPanelTooltipSubPanel;
     //
@@ -163,6 +166,8 @@ public class UiController : MonoBehaviour
     //
     public GameObject leaderBoardPanel;
     public List<LeaderboardEntry> steamLeaderBoardTop10EntriesUIPrefabsList;
+    //
+   
 
 
     private void Awake()
@@ -433,8 +438,7 @@ public class UiController : MonoBehaviour
     {
         if (npcController.allyList.Count > 1 && boardController.selectedObject != null && boardController.selectedObject.GetComponent<NPC>().isEnemy == false)
         {
-            int goldReward;
-            playerController.NPC_COST_DATA.TryGetValue(boardController.selectedObject.GetComponent<NPC>().UNIT_TYPE, out goldReward); // fetch the gold reward for the unit type
+            int goldReward = (int) boardController.selectedObject.GetComponent<NPC>().baseGoldBountyReward;
             if (boardController.selectedObject.GetComponent<NPC>().TIER == 2)
             {
                 goldReward = (int)(goldReward * 2f); // gold bonus for selling a tier 2 unit
@@ -509,7 +513,7 @@ public class UiController : MonoBehaviour
     public void PrepareUIAccordingly()
     {
 
-        if (boardController.gameStatus != GameStatus.ReportDefeat && boardController.selectedObject != null) // update the entire selected unit panel
+        if (boardController.gameStatus != GameStatus.ReportVictory && boardController.gameStatus != GameStatus.ReportDefeat && boardController.selectedObject != null) // update the entire selected unit panel
         {
             hudCanvasCurrentlySelectedUnitPanel.SetActive(true);
             GameObject selectedObject = boardController.selectedObject;
@@ -794,7 +798,7 @@ public class UiController : MonoBehaviour
     {
 
         yield return new WaitForSeconds(2);
-        if (boardController.gameStatus != GameStatus.ReportDefeat){
+        if (boardController.gameStatus != GameStatus.ReportDefeat || boardController.gameStatus != GameStatus.ReportVictory){
         boardController.ChangeGameStatus(GameStatus.Fight);
         }
     }

@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using UnityEngine.SceneManagement;
 
-public enum GameStatus {Initializing,Fight,AwaitingWizardConfirmation,Wait,Shopping,ReportDefeat,GameOver }
+public enum GameStatus {Initializing,Fight,AwaitingWizardConfirmation,Wait,Shopping,ReportDefeat,GameOver,ReportVictory}
 
 public class BoardController : MonoBehaviour
 {
@@ -450,34 +450,34 @@ public class BoardController : MonoBehaviour
         float goldReward = playerController.playerGoldCount; // fetch the player's current gold
         if (npcController.enemyList.Count == 0) // combat VICTORY
         {
-            sessionLogger.calculateFIDEMMRChange(true, (float)playerController.playerMMR, (float)playerController.enemyMMR,playerController.FIDE_KFactor++);
-
+            sessionLogger.calculateFIDEMMRChange(true, (float)playerController.playerMMR, (float)playerController.enemyMMR, playerController.FIDE_KFactor);
+            playerController.enemyMMR += 5;
             if (npcController.allyList.Count != 0)
             {
                 foreach (NPC npc in npcController.allyList)
                 {
-                    if (npc.cheering_SoundClip != null && UnityEngine.Random.Range(0,2) == 1)
-                   {
+                    if (npc.cheering_SoundClip != null && UnityEngine.Random.Range(0, 2) == 1)
+                    {
                         npc.npcAudioSource.PlayOneShot(npc.cheering_SoundClip);
-                   }
+                    }
                 }
             }
 
-                goldReward *= 1.10f;
+            goldReward *= 1.10f;
 
             if (goldReward < 2)
             {
                 goldReward = 2;
             }
-            goldReward = (float) Math.Round(goldReward, 0, MidpointRounding.AwayFromZero);
+            goldReward = (float)Math.Round(goldReward, 0, MidpointRounding.AwayFromZero);
             float netGoldReward = goldReward - playerController.playerGoldCount;
-            playerController.sessionLogger.goldRewarded += (long) netGoldReward;
+            playerController.sessionLogger.goldRewarded += (long)netGoldReward;
             playerController.SetPlayerGoldCount((long)goldReward); // reward bonus gold
         }
         else // combat DEFEAT
         {
-            sessionLogger.calculateFIDEMMRChange(false,(float) playerController.playerMMR,(float) playerController.enemyMMR,playerController.FIDE_KFactor++);
-
+            sessionLogger.calculateFIDEMMRChange(false, (float)playerController.playerMMR, (float)playerController.enemyMMR, playerController.FIDE_KFactor);
+            playerController.enemyMMR += 5;
                 goldReward *= 1.05f;
 
             if (goldReward < 2)
@@ -547,20 +547,23 @@ public class BoardController : MonoBehaviour
             }
         }
 
-        if (gameStatus != GameStatus.ReportDefeat || gameStatus != GameStatus.GameOver)
+        if (gameStatus != GameStatus.ReportDefeat || gameStatus != GameStatus.GameOver || gameStatus != GameStatus.ReportVictory)
         {
             ChangeCurrentRound(currentGameRound + 1);
         }
-    
+
+        playerController.ShuffleNewShopingOptions(true); // shuffle the player shop for free with new options to buy
+     
+        if (gameStatus != GameStatus.ReportDefeat || gameStatus != GameStatus.ReportVictory)
+        {
+            ChangeGameStatus(GameStatus.Shopping); // finally, change the game status to shopping phase
+        }
+
         if (currentGameRound % 3 == 0) // only once every 3 rounds
         {
             playerController.SetMaxDeployedUnitsLimit(playerController.maxDeployedUnitsLimit + 1); // increment the max deployed unit limit
-        }
-        playerController.ShuffleNewShopingOptions(true); // shuffle the player shop for free with new options to buy
-     
-        if (gameStatus != GameStatus.ReportDefeat)
-        {
-            ChangeGameStatus(GameStatus.Shopping); // finally, change the game status to shopping phase
+            playerController.costToUpgradeUnitCap = 10 * playerController.maxDeployedUnitsLimit;
+            uiController.ChangeCostToUnitCapUpgradeDisplayText((10 * playerController.maxDeployedUnitsLimit).ToString());
         }
     }
 
@@ -570,7 +573,7 @@ public class BoardController : MonoBehaviour
         {
             steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + (int)sessionLogger.mmrChange);
         }
-      
+        
         TransitionToGameOverPhase();
     }
 
@@ -590,6 +593,23 @@ public class BoardController : MonoBehaviour
         steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + (int) sessionLogger.mmrChange);
         ChangeGameStatus(GameStatus.ReportDefeat);
     }
+
+    public void TransitionToReportVictoryPhase()
+    {
+        uiController.hudCanvasreportVictoryPanel.gameObject.SetActive(true);
+        uiController.hudCanvasTribesPanel.gameObject.SetActive(false);
+        uiController.hudCanvasTopBar.gameObject.SetActive(false);
+        uiController.hudCanvasBottomBar.gameObject.SetActive(false);
+        uiController.ShopPanelTooltipSubPanel.SetActive(false);
+        uiController.hudCanvasShopPanel.gameObject.SetActive(false);
+        sessionLogger.CalculateMaxDeployedTribe();
+        uiController.reportVictoryPanel_TotalUnitsDeployedText.text = "You deployed: " + sessionLogger.unitsDeployedToFight.ToString() + " unit(s)";
+        uiController.reportVictoryPanel_MostTribesDeployedText.text = "Most deployed tribe: " + sessionLogger.mostDeployedTribeAmount + " " + sessionLogger.mostDeployedTribe.ToString();
+        uiController.reportVictoryPanel_MostTribeDeployedIconVisualizer.SetImage(sessionLogger.mostDeployedTribe, true);
+        steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + (int)sessionLogger.mmrChange);
+        ChangeGameStatus(GameStatus.ReportVictory);
+    }
+
     public void TransitionToGameOverPhase()
     {
         SceneManager.LoadScene("highnet auto chess");

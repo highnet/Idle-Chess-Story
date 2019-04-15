@@ -17,7 +17,7 @@ public class SessionLogger : MonoBehaviour
     {
         ReinitializeTribesDeployedToFightTrackerDictionary();
     }
-    public void calculateFIDEMMRChange(bool combatVictory, float player1Rating, float player2Rating, int FIDE_KFactor)
+    public void calculateFIDEMMRChange(bool combatVictory, float player1Rating, float player2Rating, float FIDE_KFactor)
     {
         float player1transformed_rating = (float) Math.Pow(10, (player1Rating / 400));
         float player2transformed_rating = (float)Math.Pow(10, (player2Rating / 400));
@@ -25,16 +25,20 @@ public class SessionLogger : MonoBehaviour
         
         if (combatVictory)
         {
-            mmrChange +=  player1Rating + (FIDE_KFactor * (1 - player1ExpectedScore)) - player1Rating;
-            Debug.Log(player1Rating + (FIDE_KFactor * (1 - player1ExpectedScore)) - player1Rating);
+            Debug.Log(".......");
+            Debug.Log(FIDE_KFactor);
+            Debug.Log(player1ExpectedScore);
+            Debug.Log((FIDE_KFactor * (1 - player1ExpectedScore)));
+            Debug.Log(".......");
+            mmrChange += (FIDE_KFactor * (1 - player1ExpectedScore));
+        
         } else
         {
-            mmrChange += (player1Rating + (FIDE_KFactor * (0 - player1ExpectedScore))) - player1Rating;
-            Debug.Log(player1Rating + (FIDE_KFactor * (0 - player1ExpectedScore)) - player1Rating);
+            mmrChange +=  (FIDE_KFactor * (0 - player1ExpectedScore)); 
+
         }
 
-       
-
+  
     }
 
 

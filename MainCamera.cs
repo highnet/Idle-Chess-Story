@@ -13,10 +13,12 @@ public class MainCamera : MonoBehaviour
     private Rigidbody rb;
     private Vector3 nextPosition;
 
-    public float lookSpeed;
+    public float panningSpeed;
     public float cameraSpeed;
 
     private bool moveFlag;
+    public float scrollSpeed;
+    public float lookAroundSpeed;
 
 
     private GameObject gameBoard;
@@ -28,10 +30,7 @@ public class MainCamera : MonoBehaviour
         worldController = GameObject.FindGameObjectWithTag("Controller");
         boardController = worldController.GetComponent<BoardController>();
         rb = GetComponent<Rigidbody>();
-        cameraMode = "Normal";
         moveFlag = false;
-
-
 
         if (target != null)
         {  // move to position behind target.
@@ -47,7 +46,7 @@ public class MainCamera : MonoBehaviour
 
         Vector3 direction = rb.transform.position - cam.transform.position;
         Quaternion toRotation = Quaternion.LookRotation(direction, cam.transform.up);
-        cam.transform.rotation = Quaternion.Lerp(cam.transform.rotation, toRotation, lookSpeed * Time.deltaTime);
+        cam.transform.rotation = Quaternion.Lerp(cam.transform.rotation, toRotation, panningSpeed * Time.deltaTime);
 
         transform.position = Vector3.Lerp(transform.position, nextPosition, cameraSpeed * Time.deltaTime);
 
@@ -56,32 +55,31 @@ public class MainCamera : MonoBehaviour
 
         if (Input.GetMouseButton(1) || Input.GetMouseButton(2))
         {  // Rotate camera with mouse.
-            this.transform.RotateAround(this.transform.position, Vector3.up, -Input.GetAxis("Mouse X") / 2);
-            this.transform.RotateAround(this.transform.position, this.transform.forward, Input.GetAxis("Mouse Y") / 2);
+            this.transform.RotateAround(this.transform.position, Vector3.up, -Input.GetAxis("Mouse X") * lookAroundSpeed);
+            this.transform.RotateAround(this.transform.position, this.transform.forward, Input.GetAxis("Mouse Y") * lookAroundSpeed);
         }
 
-        if (((cam.transform.localPosition.x > 10) && (Input.mouseScrollDelta.y > 0)) || ((cam.transform.localPosition.x < 100) && (Input.mouseScrollDelta.y < 0)))
+        if (((cam.transform.localPosition.x > 40) && (Input.mouseScrollDelta.y > 0)) || ((cam.transform.localPosition.x < 65) && (Input.mouseScrollDelta.y < 0)))
         {
-            cam.transform.localPosition = cam.transform.localPosition + (0.4f * new Vector3(-Input.mouseScrollDelta.y, 0, 0));
+            cam.transform.localPosition = cam.transform.localPosition + (scrollSpeed * new Vector3(-Input.mouseScrollDelta.y, 0, 0));
         }
 
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
             nextPosition = rb.transform.position - transform.forward * cameraSpeed;
         }
 
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {
             nextPosition = rb.transform.position + transform.forward * cameraSpeed;
         }
 
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
         {
             nextPosition = rb.transform.position + (Quaternion.Euler(0, -90, 0) * transform.forward * cameraSpeed);
         }
 
-
-        if (Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
         {
             nextPosition = rb.transform.position + (Quaternion.Euler(0, 90, 0) * transform.forward * cameraSpeed);
         }

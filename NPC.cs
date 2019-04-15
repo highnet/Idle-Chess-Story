@@ -80,12 +80,23 @@ public class NPC : MonoBehaviour
     public bool isCreep;
     public bool isStunned;
 
+    public bool doingMovementJump;
+    public Vector3 movementJumpStartPosition;
+    public Vector3 movementJumpendPosition;
+    public float movementJumpSpeed = 3.0F;
+    private float movementJumpStartTime;
+    private float movementJumpJourneyLength;
+    public AnimationCurve movementJumpYOffset;
+
     public PowerChangeParticleControl PowerChangeParticleSystem;
 
     public void Awake()
     {
         FindWorldControllers();
         animator = GetComponent<Animator>();
+        movementJumpYOffset.AddKey(new Keyframe(0, 0));
+        movementJumpYOffset.AddKey(new Keyframe(0.5f, 1));
+        movementJumpYOffset.AddKey(new Keyframe(1, 0));
     }
 
     // Start is called before the first frame update
@@ -98,6 +109,7 @@ public class NPC : MonoBehaviour
         ATTACKPOWER = BASE_ATTACKPOWER;
         SPELLPOWER = BASE_SPELLPOWER;
         RETALIATION = BASE_RETALIATION;
+
     }
 
     public void StartLiveRoutine()
@@ -111,6 +123,20 @@ public class NPC : MonoBehaviour
         if (target != null)
         {
             transform.LookAt(new Vector3(target.transform.position.x, transform.position.y, target.transform.position.z));
+        }
+        if (doingMovementJump && movementJumpStartPosition != null && movementJumpendPosition != null)
+        {
+            float distanceCovered = (Time.time - movementJumpStartTime) * movementJumpSpeed;
+            float fractionOfJourney = distanceCovered / movementJumpJourneyLength;
+            Vector3 newPositionInJourney = Vector3.Lerp(movementJumpStartPosition, movementJumpendPosition, fractionOfJourney);
+            newPositionInJourney.y += movementJumpYOffset.Evaluate(fractionOfJourney);
+            Debug.Log(newPositionInJourney);
+            this.gameObject.GetComponentsInParent<Transform>()[1].position = newPositionInJourney;
+      
+            if (Vector3.Distance(this.transform.position, movementJumpendPosition) < 0.1)
+            {
+                doingMovementJump = false;
+            }
         }
     }
 
@@ -789,7 +815,7 @@ public class NPC : MonoBehaviour
                 if (hit.collider.GetComponent<TileBehaviour>().i >= 4)
                 {
                     uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitReleaseAudioClip);
-                    moveToEmptyTile(hit.collider.GetComponent<TileBehaviour>().i, hit.collider.GetComponent<TileBehaviour>().j);
+                    MoveToEmptyTile(hit.collider.GetComponent<TileBehaviour>().i, hit.collider.GetComponent<TileBehaviour>().j,true);
                 }
 
             }
@@ -821,7 +847,7 @@ public class NPC : MonoBehaviour
     }
 
 
-    public void moveToEmptyTile(int i, int j)
+    public bool MoveToEmptyTile(int i, int j, bool forceTransformMove)
     {
         if (((i < 8 && i >= 0 && j < 8 && j >= 0) && !boardController.gameStatus.Equals(GameStatus.Shopping)) || ((i < 9 && i >= 0 && j < 8 && j >= 0) && boardController.gameStatus.Equals(GameStatus.Shopping))) {
             if (boardController.chessBoard != null && boardController.chessBoard[i, j].GetComponent<TileBehaviour>().occupyingUnit == null)
@@ -846,10 +872,16 @@ public class NPC : MonoBehaviour
                 }
 
                 if (playerController.currentlyDeployedUnits <= playerController.maxDeployedUnitsLimit) {
+                  
                     this.occupyingTile.gameObject.GetComponent<TileBehaviour>().occupyingUnit = null;
                     this.occupyingTile = boardController.chessBoard[i, j];
                     boardController.chessBoard[i, j].GetComponent<TileBehaviour>().occupyingUnit = this.gameObject;
-                    this.gameObject.GetComponentsInParent<Transform>()[1].position = boardController.chessBoard[i, j].GetComponent<TileBehaviour>().transform.position;
+                    if (forceTransformMove)
+                    {
+                        this.gameObject.GetComponentsInParent<Transform>()[1].position = boardController.chessBoard[i, j].GetComponent<TileBehaviour>().transform.position;
+
+                    }
+                    return true;
                 } else
                 {
                     playerController.SetCurrentlyDeployedUnits(playerController.currentlyDeployedUnits - 1);                     
@@ -857,9 +889,12 @@ public class NPC : MonoBehaviour
                     Helper.Decrement<Tribe>(playerController.deployedTribesCounter, this.PRIMARYTRIBE);
                     Helper.Decrement<Tribe>(playerController.deployedTribesCounter, this.SECONDARYTRIBE);
                     uiController.RefreshDeployedTribesCounter();
+                    return false;
                 }
-            } 
+            }
+            return false;
         }
+        return false;
     }
 
     public void ApplyTier2Upgrades()
@@ -1151,36 +1186,47 @@ public class NPC : MonoBehaviour
                         }
                         TryPlayAttackAnimation();
                     }
-                    else
+                    else if (!doingMovementJump)
                     {
-                  
+
                         int deltaI = 0;
                         int deltaJ = 0;
-
+                        int oldI = this.occupyingTile.GetComponent<TileBehaviour>().i;
+                        int oldJ = this.occupyingTile.GetComponent<TileBehaviour>().j;
+                        movementJumpStartPosition = this.transform.position;
 
                         if (target.occupyingTile.GetComponent<TileBehaviour>().i < occupyingTile.GetComponent<TileBehaviour>().i)
                         {
-                            deltaI = -1;
+                            deltaI = UnityEngine.Random.Range(-2, 0);
                         }
                         else if (target.occupyingTile.GetComponent<TileBehaviour>().i > occupyingTile.GetComponent<TileBehaviour>().i)
                         {
-                            deltaI = 1;
+                            deltaI = UnityEngine.Random.Range(1, 3);
                         }
-
-                        moveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + deltaI, occupyingTile.GetComponent<TileBehaviour>().j);
 
                         if (target.occupyingTile.GetComponent<TileBehaviour>().j < occupyingTile.GetComponent<TileBehaviour>().j)
                         {
-                            deltaJ = -1;
+                            deltaJ = UnityEngine.Random.Range(-2, 0);
                         }
                         else if (target.occupyingTile.GetComponent<TileBehaviour>().j > occupyingTile.GetComponent<TileBehaviour>().j)
                         {
-                            deltaJ = 1;
+                            deltaJ = UnityEngine.Random.Range(1, 3);
+                        }
+                      
+                        bool moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + deltaI, occupyingTile.GetComponent<TileBehaviour>().j + deltaJ, false);
+
+                        if (moved)
+                        {
+                            int newI = oldI + deltaI;
+                            int newJ = oldJ + deltaJ;
+                            movementJumpendPosition = boardController.chessBoard[newI, newJ].GetComponent<TileBehaviour>().transform.position;
+                            movementJumpStartTime = Time.time;
+                            movementJumpJourneyLength = Vector3.Distance(movementJumpStartPosition, movementJumpendPosition);
+                            doingMovementJump = true;
+                            uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitReleaseAudioClip);
                         }
 
-                        npcAudioSource.PlayOneShot(uiController.chessUnitclickAudioClip);
-                        moveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i, occupyingTile.GetComponent<TileBehaviour>().j + deltaJ);
-
+           
                     }
 
                 }

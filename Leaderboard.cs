@@ -129,6 +129,7 @@ public class Leaderboard : MonoBehaviour
 
     public void SetLeaderBoardScore(int score)
     {
+        Debug.Log("Setting leaderboard score to: " + score);
         if (score >= 0 && score <= 5000)
         {
             SteamAPICall_t handle2 = SteamUserStats.UploadLeaderboardScore(hSteamLeaderboard, eLeaderboardUploadScoreMethod, score, pScoreDetails, cScoreDetailsCount);
