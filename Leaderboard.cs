@@ -40,7 +40,7 @@ public class Leaderboard : MonoBehaviour
     {
         if (pCallback.m_cEntryCount == 0)
         {
-            Debug.Log("No entries Found");
+            Debug.Log("[LeaderBoard] No entries Found");
             SetLeaderBoardScore(1200);
             uic.intro_playerMMR.text = "mmr: 1200";
             pc.playerMMR = 1200;
@@ -49,7 +49,7 @@ public class Leaderboard : MonoBehaviour
         }
         else
         {
-            Debug.Log(pCallback.m_cEntryCount + " entry found");
+            Debug.Log("[LeaderBoard] " + pCallback.m_cEntryCount + " entry found");
             hSteamLeaderboardEntry = pCallback.m_hSteamLeaderboardEntries;
             downLoadingUserEntry = false;
             downloadedLeaderboard = true;
@@ -61,11 +61,11 @@ public class Leaderboard : MonoBehaviour
     {
         if (pCallback.m_cEntryCount == 0)
         {
-            Debug.Log("Top10: No entries Found");
+            Debug.Log("[LeaderBoard] Top10: No entries Found");
         }
         else
         {
-            Debug.Log("Top10: " + pCallback.m_cEntryCount + " entries found");
+            Debug.Log("[LeaderBoardTop10] Top10: " + pCallback.m_cEntryCount + " entries found");
             topEntriesCount = pCallback.m_cEntryCount;
             hSteamTop10Entries = pCallback.m_hSteamLeaderboardEntries;
             downLoadingTop10Entries = false;
@@ -76,13 +76,13 @@ public class Leaderboard : MonoBehaviour
     {
         if (pCallback.m_bLeaderboardFound == 0 || bIOFailure)
         {
-            Debug.Log("There was an error finding leaderboard.");
+            Debug.Log("[LeaderBoard] There was an error finding leaderboard.");
 
         }
         else
         {
             hSteamLeaderboard = pCallback.m_hSteamLeaderboard;
-            Debug.Log("Leaderboard Found: " + hSteamLeaderboard);
+            Debug.Log("[LeaderBoard] Leaderboard Found: " + hSteamLeaderboard);
             foundLeaderboard = true;
 
         }
@@ -92,14 +92,11 @@ public class Leaderboard : MonoBehaviour
     {
         if (pCallback.m_bSuccess == 0 || bIOFailure)
         {
-            Debug.Log("There was an error uploading scores.");
-            Debug.Log(pCallback.m_bSuccess);
-            Debug.Log(hSteamLeaderboard);
-            Debug.Log(pCallback.m_hSteamLeaderboard);
+            Debug.Log("[LeaderBoard] There was an error uploading scores.");
         }
         else
         {
-            Debug.Log("Score Uploaded to Leaderboard");
+            Debug.Log("[LeaderBoard] Score Uploaded to Leaderboard");
         }
     }
 
@@ -129,7 +126,7 @@ public class Leaderboard : MonoBehaviour
 
     public void SetLeaderBoardScore(int score)
     {
-        Debug.Log("Setting leaderboard score to: " + score);
+        Debug.Log("[LeaderBoard] Setting leaderboard score to: " + score);
         if (score >= 0 && score <= 5000)
         {
             SteamAPICall_t handle2 = SteamUserStats.UploadLeaderboardScore(hSteamLeaderboard, eLeaderboardUploadScoreMethod, score, pScoreDetails, cScoreDetailsCount);
@@ -140,7 +137,7 @@ public class Leaderboard : MonoBehaviour
 
     public void DownloadUserEntry()
     {
-        Debug.Log("downloading your leaderboard entry");
+        Debug.Log("[LeaderBoard] downloading your leaderboard entry");
         downLoadingUserEntry = true;
         CSteamID[] cSteamID = new CSteamID[1];
         cSteamID[0] = SteamUser.GetSteamID();
@@ -150,7 +147,7 @@ public class Leaderboard : MonoBehaviour
 
     public void DownloadTop10Entries()
     {
-        Debug.Log("downloading top 10 leaderboard entries");
+        Debug.Log("[LeaderBoard] downloading top 10 leaderboard entries");
         downLoadingTop10Entries = true;
         SteamAPICall_t handle4 = SteamUserStats.DownloadLeaderboardEntries(hSteamLeaderboard,ELeaderboardDataRequest.k_ELeaderboardDataRequestGlobal,0,11);
         m_LeaderBoardTop10Downloaded.Set(handle4); // set m_LeaderBoardTop10Downloaded with the top 10 downloaded leaderboard entries
@@ -159,7 +156,7 @@ public class Leaderboard : MonoBehaviour
     public LeaderEntry[] ReadDownloadedTop10Entries()
     {
       
-        Debug.Log("reading top 10 entries");
+        Debug.Log("[LeaderBoard] reading top 10 entries");
         LeaderEntry[] vals = new LeaderEntry[topEntriesCount];
         
         for (int i = 0; i < topEntriesCount; i++)
@@ -175,7 +172,7 @@ public class Leaderboard : MonoBehaviour
 
     public int ReadDownloadedUserLeaderboardEntry()
     {
-        Debug.Log("reading your leaderboard entry");
+        Debug.Log("[LeaderBoard] reading your leaderboard entry");
         LeaderboardEntry_t entry_T;
         SteamUserStats.GetDownloadedLeaderboardEntry(hSteamLeaderboardEntry, 0, out entry_T, pScoreDetails, cScoreDetailsCount);
         return entry_T.m_nScore;

@@ -479,7 +479,6 @@ public class UiController : MonoBehaviour
         if (fetchSteamLeaderboardEntry && steamLeaderboard.foundLeaderboard && steamLeaderboard.downloadedLeaderboard && !steamLeaderboard.downLoadingUserEntry)
         {
             int fetchedMMR = steamLeaderboard.ReadDownloadedUserLeaderboardEntry(); // read user mmr
-            Debug.Log(fetchedMMR);
             intro_playerMMR.text = fetchedMMR.ToString(); // syncronize the ui with the fetched value
             playerController.playerMMR = fetchedMMR;
             fetchSteamLeaderboardEntry = false;

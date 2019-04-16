@@ -25,11 +25,7 @@ public class SessionLogger : MonoBehaviour
         
         if (combatVictory)
         {
-            Debug.Log(".......");
-            Debug.Log(FIDE_KFactor);
-            Debug.Log(player1ExpectedScore);
-            Debug.Log((FIDE_KFactor * (1 - player1ExpectedScore)));
-            Debug.Log(".......");
+
             mmrChange += (FIDE_KFactor * (1 - player1ExpectedScore));
         
         } else

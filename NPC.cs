@@ -130,7 +130,6 @@ public class NPC : MonoBehaviour
             float fractionOfJourney = distanceCovered / movementJumpJourneyLength;
             Vector3 newPositionInJourney = Vector3.Lerp(movementJumpStartPosition, movementJumpendPosition, fractionOfJourney);
             newPositionInJourney.y += movementJumpYOffset.Evaluate(fractionOfJourney);
-            Debug.Log(newPositionInJourney);
             this.gameObject.GetComponentsInParent<Transform>()[1].position = newPositionInJourney;
       
             if (Vector3.Distance(this.transform.position, movementJumpendPosition) < 0.1)

@@ -34,8 +34,8 @@ public class SpellbookController : MonoBehaviour
         {
             GameObject go = (GameObject)Instantiate(Resources.Load("AP_PowerUp"), this.transform.position, Quaternion.identity);
             go.transform.SetParent(casterNPC.transform);
-            float boostValue = 55;
-            float boostDuration = 6;
+            float boostValue = CasterAttackPower * (0.1f + (casterNPC.TIER * 0.05f));
+            float boostDuration = 5 + (1 * casterNPC.TIER);
             casterNPC.ATTACKPOWER += boostValue;
             if (casterNPC.PowerChangeParticleSystem != null)
             {
@@ -48,8 +48,8 @@ public class SpellbookController : MonoBehaviour
         {
             GameObject go = (GameObject)Instantiate(Resources.Load("ARMOR_PowerUp"), this.transform.position, Quaternion.identity);
             go.transform.SetParent(casterNPC.transform);
-            float boostValue = 15;
-            float boostDuration = 6;
+            float boostValue = 7;
+            float boostDuration = 5 + (1 * casterNPC.TIER);
             casterNPC.ARMOR += boostValue;
             if (casterNPC.PowerChangeParticleSystem != null)
             {
@@ -61,8 +61,8 @@ public class SpellbookController : MonoBehaviour
         {
             GameObject go = (GameObject)Instantiate(Resources.Load("MAXHP_PowerUp"), this.transform.position, Quaternion.identity);
             go.transform.SetParent(casterNPC.transform);
-            float boostValue = 100;
-            float boostDuration = 6;
+            float boostValue = casterNPC.BASE_MAXHP * 0.25f;
+            float boostDuration = 5 + (1 * casterNPC.TIER);
             casterNPC.MAXHP += boostValue;
             casterNPC.HP += boostValue;
             if (casterNPC.PowerChangeParticleSystem != null)
@@ -75,8 +75,8 @@ public class SpellbookController : MonoBehaviour
         {
             GameObject go = (GameObject)Instantiate(Resources.Load("RETALIATION_PowerUp"), this.transform.position, Quaternion.identity);
             go.transform.SetParent(casterNPC.transform);
-            float boostValue = 15;
-            float boostDuration = 6;
+            float boostValue = 7;
+            float boostDuration = 5 + (1 * casterNPC.TIER);
             casterNPC.RETALIATION += boostValue;
             if (casterNPC.PowerChangeParticleSystem != null)
             {
@@ -89,7 +89,7 @@ public class SpellbookController : MonoBehaviour
             GameObject go = (GameObject)Instantiate(Resources.Load("HeroicStrike Animation"), this.transform.position, Quaternion.identity);
             go.transform.LookAt(targetNPC.transform);
             go.transform.SetParent(casterNPC.transform);
-            DamageReport dmgReport = targetNPC.CalculateDamageTaken(2 * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
+            DamageReport dmgReport = targetNPC.CalculateDamageTaken(1.9f * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
             uic.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DisplayMode.AbilityDamage);
             targetNPC.TakePureDamage(dmgReport);
             GameObject.Destroy(go, 4);
@@ -100,7 +100,7 @@ public class SpellbookController : MonoBehaviour
             GameObject go = (GameObject)Instantiate(Resources.Load("Stab Animation"), this.transform.position, Quaternion.identity);
             go.transform.LookAt(targetNPC.transform);
             go.transform.SetParent(casterNPC.transform);
-            DamageReport dmgReport = targetNPC.CalculateDamageTaken(1.5f * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
+            DamageReport dmgReport = targetNPC.CalculateDamageTaken(1.4f * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
             uic.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DisplayMode.AbilityDamage);
             targetNPC.TakePureDamage(dmgReport);
             GameObject.Destroy(go, 3);
@@ -111,7 +111,7 @@ public class SpellbookController : MonoBehaviour
             GameObject go = (GameObject)Instantiate(Resources.Load("AP_PowerDown"), targetNPC.transform.position, Quaternion.identity);
             go.transform.LookAt(targetNPC.transform);
             go.transform.SetParent(targetNPC.transform);
-            float boostValue = 50;
+            float boostValue = targetNPC.BASE_ATTACKPOWER * (0.1f + (casterNPC.TIER * 0.05f));
             float boostDuration = 6;
             targetNPC.ReduceAttackPower(boostValue);
             if (targetNPC.PowerChangeParticleSystem != null)
@@ -126,7 +126,7 @@ public class SpellbookController : MonoBehaviour
         {
             GameObject go = (GameObject)Instantiate(Resources.Load("ARMOR_PowerDown"), targetNPC.transform.position, Quaternion.identity);
             go.transform.SetParent(targetNPC.transform);
-            float boostValue = 5;
+            float boostValue = 7;
             float boostDuration = 6;
             targetNPC.ReduceArmor(boostValue);
             if (targetNPC.PowerChangeParticleSystem != null)

@@ -61,7 +61,7 @@ public class LeaderEntry
         }
         else
         {
-            Debug.LogError("Couldn't get avatar.");
+            Debug.LogError("[Leaderboard] Couldn't get a steam avatar.");
             return new Texture2D(0, 0);
         }
     }
