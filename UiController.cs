@@ -167,8 +167,8 @@ public class UiController : MonoBehaviour
     public GameObject leaderBoardPanel;
     public List<LeaderboardEntry> steamLeaderBoardTop10EntriesUIPrefabsList;
     //
-   
-
+    public GameObject combatTimerPanel;
+    public Text combatTimerPanelText;
 
     private void Awake()
     {
@@ -467,7 +467,7 @@ public class UiController : MonoBehaviour
         selectedUnitPanel_InformationText_NAME.text = friendOrFoe + selectedObject.name;
         selectedUnitPanel_InformationText_ARMORANDRETALIATION.text = "Armor: " + Mathf.Round(selectedNPC.ARMOR) + " / Retaliation: " + Mathf.Round(selectedNPC.RETALIATION);
         selectedUnitPanel_InformationText_ATTACKPOWER.text = Mathf.Round(selectedNPC.ATTACKPOWER).ToString();
-        selectedUnitPanel_InformationText_CONCENTRATION.text = "CONCENTRATION: " + Mathf.Round(selectedNPC.CONCENTRATION) + "/" + Mathf.Round(selectedNPC.MAXCONCENTRATION);
+        selectedUnitPanel_InformationText_CONCENTRATION.text = "Concentration: " + Mathf.Round(selectedNPC.CONCENTRATION) + "/" + Mathf.Round(selectedNPC.MAXCONCENTRATION);
         selectedUnitPanel_InformationText_HP.text = Mathf.Round(selectedNPC.HP) + "/" + Mathf.Round(selectedNPC.MAXHP);
         selectedUnitPanel_InformationText_SPELLPOWER.text = Mathf.Round(selectedNPC.SPELLPOWER).ToString();
         selectedUnitPanel_InformationText_TIER.text = "Level " + selectedNPC.TIER;
@@ -866,6 +866,7 @@ public class UiController : MonoBehaviour
                 sessionLogger.IncrementTribesDeployedToFightCounters(npc);
             }
             sessionLogger.unitsDeployedToFight += npcController.deployedAllyList.Count;
+            combatTimerPanel.gameObject.SetActive(true); // toggle the combat timer panel
 
             hudCanvasAudioSource.PlayOneShot(fightStartAudioClip);
 

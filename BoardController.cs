@@ -33,6 +33,9 @@ public class BoardController : MonoBehaviour
 
     public Leaderboard steamLeaderboard;
 
+    public float constant_TimeAllowedForCombatBeforeForceStop;
+    public float combatRoundTimer = 0f;
+
     private void Awake()
     {
         npcController = GetComponent<NpcController>(); //fetch world controllers
@@ -230,7 +233,7 @@ public class BoardController : MonoBehaviour
         else // if in test mode
         {
             playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
-            GameObject spawnedEnemy = TrySpawnDummy(2, 4, true); // spawn dummy
+            GameObject spawnedEnemy = TrySpawnDummy(2, 5, true); // spawn dummy
             if (spawnedEnemy != null) // this can be used to test enemy tribe bonuses
             {
                 Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE); //
@@ -401,11 +404,14 @@ public class BoardController : MonoBehaviour
                     if (warriorsCount >= 3) // FRIENDLY TRIBAL BONUS CHECK 3* WARRIORS FOR EXTRA REGEN
                     {
                         nPC.GainHP(playerController.constant_HP_BaseTickRegeneration + (playerController.coefficient_Warrior_3_HPRegenBonus_RegenPerTickBonusMultiplier * nPC.HPRegeneration), HealSource.HP_Regeneration); // FRIENDLY Warrior Tribe 3* BUFFED HP REGEN
-
+                        float regened = playerController.constant_HP_BaseTickRegeneration + (playerController.coefficient_Warrior_3_HPRegenBonus_RegenPerTickBonusMultiplier * nPC.HPRegeneration);
+                        Debug.Log("Regening for " + regened);
                     }
                     else // we dont have warrior 3 bonus
                     {
                         nPC.GainHP(playerController.constant_HP_BaseTickRegeneration + nPC.HPRegeneration, HealSource.HP_Regeneration); // FRIENDLY regular hp regen
+                        float regened = playerController.constant_HP_BaseTickRegeneration + nPC.HPRegeneration;
+                        Debug.Log("Regening for " + regened);
                     }
                 }
 
@@ -414,7 +420,6 @@ public class BoardController : MonoBehaviour
                     if (enemy_WarriorsCount >= 3) // ENEMY TRIBAL BONUS CHECK 3* WARRIORS FOR EXTRA REGEN
                     {
                         nPC.GainHP(playerController.constant_HP_BaseTickRegeneration + (playerController.coefficient_Warrior_3_HPRegenBonus_RegenPerTickBonusMultiplier * nPC.HPRegeneration), HealSource.HP_Regeneration);
-
                     }
                     else // enemy does not have warrior 3 bonus
                     {
@@ -429,6 +434,21 @@ public class BoardController : MonoBehaviour
 
     }
 
+    private void Update()
+    {
+        if (gameStatus.Equals(GameStatus.Fight))
+        {
+            Debug.Log(combatRoundTimer);
+            combatRoundTimer += Time.deltaTime;
+            uiController.combatTimerPanelText.text = (constant_TimeAllowedForCombatBeforeForceStop - Mathf.Round(combatRoundTimer)).ToString();
+            if (combatRoundTimer >= constant_TimeAllowedForCombatBeforeForceStop)
+            {
+    
+                TransitionToShoppingPhase();
+            }
+        }
+    }
+
     // Update is called once per frame
     void LateUpdate() // at the end of every frame check if game is over or if combat is over
     {
@@ -436,7 +456,6 @@ public class BoardController : MonoBehaviour
         {
             TransitionToGameOverPhase(); // transition to the end of game phase
         }
-
          else if (gameStatus.Equals(GameStatus.Fight) && (npcController.deployedAllyList.Count == 0 || npcController.enemyList.Count == 0)) // combat is over
         {
             TransitionToShoppingPhase(); // transition to shopping phase
@@ -445,16 +464,15 @@ public class BoardController : MonoBehaviour
     }
     IEnumerator SmoothEndCombatRoundTransition() // smoothly end combat 
     {
-   
-        yield return new WaitForSeconds(4); // wait 2 seconds
-        float goldReward = playerController.playerGoldCount; // fetch the player's current gold
-        if (npcController.enemyList.Count == 0) // combat VICTORY
+        combatRoundTimer = 0;
+        uiController.combatTimerPanel.gameObject.SetActive(false);
+      
+
+        if (npcController.enemyList.Count == 0) // combat victory
         {
-            sessionLogger.calculateFIDEMMRChange(true, (float)playerController.playerMMR, (float)playerController.enemyMMR, playerController.FIDE_KFactor);
-            playerController.enemyMMR += 5;
             if (npcController.allyList.Count != 0)
             {
-                foreach (NPC npc in npcController.allyList)
+                foreach (NPC npc in npcController.deployedAllyList)
                 {
                     if (npc.cheering_SoundClip != null && UnityEngine.Random.Range(0, 2) == 1)
                     {
@@ -462,7 +480,15 @@ public class BoardController : MonoBehaviour
                     }
                 }
             }
+        }
 
+        yield return new WaitForSeconds(4); // wait 2 seconds
+        float goldReward = playerController.playerGoldCount; // fetch the player's current gold
+        playerController.enemyMMR += 5;
+        if (npcController.enemyList.Count == 0) // combat VICTORY
+        {
+            sessionLogger.calculateFIDEMMRChange(true, (float)playerController.playerMMR, (float)playerController.enemyMMR, playerController.FIDE_KFactor);
+        
             goldReward *= 1.10f;
 
             if (goldReward < 2)
@@ -477,7 +503,7 @@ public class BoardController : MonoBehaviour
         else // combat DEFEAT
         {
             sessionLogger.calculateFIDEMMRChange(false, (float)playerController.playerMMR, (float)playerController.enemyMMR, playerController.FIDE_KFactor);
-            playerController.enemyMMR += 5;
+       
                 goldReward *= 1.05f;
 
             if (goldReward < 2)

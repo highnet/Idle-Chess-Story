@@ -83,10 +83,11 @@ public class NPC : MonoBehaviour
     public bool doingMovementJump;
     public Vector3 movementJumpStartPosition;
     public Vector3 movementJumpendPosition;
-    public float movementJumpSpeed = 3.0F;
+    public float movementJumpSpeed;
     private float movementJumpStartTime;
     private float movementJumpJourneyLength;
     public AnimationCurve movementJumpYOffset;
+    public int movementJumpFailedAttempts;
 
     public PowerChangeParticleControl PowerChangeParticleSystem;
 
@@ -94,8 +95,9 @@ public class NPC : MonoBehaviour
     {
         FindWorldControllers();
         animator = GetComponent<Animator>();
+        movementJumpYOffset = new AnimationCurve();
         movementJumpYOffset.AddKey(new Keyframe(0, 0));
-        movementJumpYOffset.AddKey(new Keyframe(0.5f, 1));
+        movementJumpYOffset.AddKey(new Keyframe(0.7f, 1));
         movementJumpYOffset.AddKey(new Keyframe(1, 0));
     }
 
@@ -132,8 +134,9 @@ public class NPC : MonoBehaviour
             newPositionInJourney.y += movementJumpYOffset.Evaluate(fractionOfJourney);
             this.gameObject.GetComponentsInParent<Transform>()[1].position = newPositionInJourney;
       
-            if (Vector3.Distance(this.transform.position, movementJumpendPosition) < 0.1)
+            if (Vector3.Distance(this.transform.position, movementJumpendPosition) < 0.3)
             {
+                this.gameObject.GetComponentsInParent<Transform>()[1].position = this.occupyingTile.transform.position;
                 doingMovementJump = false;
             }
         }
@@ -901,31 +904,11 @@ public class NPC : MonoBehaviour
         this.TIER = 2;
         playerController.NPC_COST_DATA.TryGetValue(this.UNIT_TYPE, out int unitCost);
 
-        if (unitCost == 2)
-        {
-            this.BASE_ARMOR *= 2.6f;
-            this.BASE_ATTACKPOWER *= 2.6f;
-            this.BASE_MAXHP *= 2.6f;
-            this.BASE_RETALIATION *= 2.6f;
-            this.BASE_SPELLPOWER *= 2.6f;
-
-        }
-        else if (unitCost == 4)
-        {
-            this.BASE_ARMOR *= 2.7f;
+            this.BASE_ARMOR *= 1.25f;
             this.BASE_ATTACKPOWER *= 2.7f;
-            this.BASE_MAXHP *= 2.7f;
-            this.BASE_RETALIATION *= 2.7f;
+            this.BASE_MAXHP *= 2.4f;
+            this.BASE_RETALIATION *= 1.25f;
             this.BASE_SPELLPOWER *= 2.7f;
-        }
-        else if (unitCost == 6)
-        {
-            this.BASE_ARMOR *= 2.8f;
-            this.BASE_ATTACKPOWER *= 2.8f;
-            this.BASE_MAXHP *= 2.8f;
-            this.BASE_RETALIATION *= 2.8f;
-            this.BASE_SPELLPOWER *= 2.8f;
-        }
 
         recalculateArmorValue();
         recalculateAttackPowerValue();
@@ -939,31 +922,12 @@ public class NPC : MonoBehaviour
         this.TIER = 3;
         playerController.NPC_COST_DATA.TryGetValue(this.UNIT_TYPE, out int unitCost);
 
-        if (unitCost == 2)
-        {
-            this.BASE_ARMOR *= 2.7f;
+  
+            this.BASE_ARMOR *= 1.25f;
             this.BASE_ATTACKPOWER *= 2.7f;
-            this.BASE_MAXHP *= 2.7f;
-            this.BASE_RETALIATION *= 2.7f;
+            this.BASE_MAXHP *= 2.4f;
+            this.BASE_RETALIATION *= 1.25f;
             this.BASE_SPELLPOWER *= 2.7f;
-
-        }
-        else if (unitCost == 4)
-        {
-            this.BASE_ARMOR *= 2.8f;
-            this.BASE_ATTACKPOWER *= 2.8f;
-            this.BASE_MAXHP *= 2.8f;
-            this.BASE_RETALIATION *= 2.8f;
-            this.BASE_SPELLPOWER *= 2.8f;
-        }
-        else if (unitCost == 6)
-        {
-            this.BASE_ARMOR *= 2.9f;
-            this.BASE_ATTACKPOWER *= 2.9f;
-            this.BASE_MAXHP *= 2.9f;
-            this.BASE_RETALIATION *= 2.9f;
-            this.BASE_SPELLPOWER *= 2.9f;
-        }
 
         recalculateArmorValue();
         recalculateAttackPowerValue();
@@ -1194,39 +1158,274 @@ public class NPC : MonoBehaviour
                         int oldJ = this.occupyingTile.GetComponent<TileBehaviour>().j;
                         movementJumpStartPosition = this.transform.position;
 
-                        if (target.occupyingTile.GetComponent<TileBehaviour>().i < occupyingTile.GetComponent<TileBehaviour>().i)
+                        if (movementJumpFailedAttempts >= 1 || (this.PRIMARYTRIBE != Tribe.Assassin && this.SECONDARYTRIBE != Tribe.Assassin)) // normal movement
                         {
-                            deltaI = UnityEngine.Random.Range(-2, 0);
-                        }
-                        else if (target.occupyingTile.GetComponent<TileBehaviour>().i > occupyingTile.GetComponent<TileBehaviour>().i)
-                        {
-                            deltaI = UnityEngine.Random.Range(1, 3);
-                        }
+                            movementJumpSpeed = 2f;
+                            Debug.Log("normal movement");
+                            if (target.occupyingTile.GetComponent<TileBehaviour>().i < occupyingTile.GetComponent<TileBehaviour>().i)
+                            {
+                                deltaI = -1;
+                            }
+                            else if (target.occupyingTile.GetComponent<TileBehaviour>().i > occupyingTile.GetComponent<TileBehaviour>().i)
+                            {
+                                deltaI = 1;
+                            }
 
-                        if (target.occupyingTile.GetComponent<TileBehaviour>().j < occupyingTile.GetComponent<TileBehaviour>().j)
-                        {
-                            deltaJ = UnityEngine.Random.Range(-2, 0);
-                        }
-                        else if (target.occupyingTile.GetComponent<TileBehaviour>().j > occupyingTile.GetComponent<TileBehaviour>().j)
-                        {
-                            deltaJ = UnityEngine.Random.Range(1, 3);
-                        }
-                      
-                        bool moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + deltaI, occupyingTile.GetComponent<TileBehaviour>().j + deltaJ, false);
+                            if (target.occupyingTile.GetComponent<TileBehaviour>().j < occupyingTile.GetComponent<TileBehaviour>().j)
+                            {
+                                deltaJ = -1;
+                            }
+                            else if (target.occupyingTile.GetComponent<TileBehaviour>().j > occupyingTile.GetComponent<TileBehaviour>().j)
+                            {
+                                deltaJ = 1;
+                            }
 
-                        if (moved)
-                        {
-                            int newI = oldI + deltaI;
-                            int newJ = oldJ + deltaJ;
-                            movementJumpendPosition = boardController.chessBoard[newI, newJ].GetComponent<TileBehaviour>().transform.position;
-                            movementJumpStartTime = Time.time;
-                            movementJumpJourneyLength = Vector3.Distance(movementJumpStartPosition, movementJumpendPosition);
-                            doingMovementJump = true;
-                            uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitReleaseAudioClip);
-                        }
+                            bool moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + deltaI, occupyingTile.GetComponent<TileBehaviour>().j + deltaJ, false);
 
-           
+                            if (moved)
+                            {
+                                int newI = oldI + deltaI;
+                                int newJ = oldJ + deltaJ;
+                                movementJumpendPosition = boardController.chessBoard[newI, newJ].GetComponent<TileBehaviour>().transform.position;
+                                movementJumpStartTime = Time.time;
+                                movementJumpJourneyLength = Vector3.Distance(movementJumpStartPosition, movementJumpendPosition);
+                                doingMovementJump = true;
+                                uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitReleaseAudioClip);
+                                movementJumpFailedAttempts = 0;
+                            }
+                            else
+                            {
+                                ++movementJumpFailedAttempts;
+                            }
+
+                            if (!moved && movementJumpFailedAttempts >= 3)
+                            {
+
+                                int newI = oldI;
+                                int newJ = oldJ;
+
+
+                                if ((deltaI == 1 && deltaJ == 0) || (deltaI == -1 && deltaJ == 0))
+                                {
+                                    Debug.Log("VERTICAL BLOCKED");
+                                    Debug.Log(deltaJ);
+                                    Debug.Log(deltaI);
+                                    moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + deltaI, occupyingTile.GetComponent<TileBehaviour>().j + 1, false);
+                                    if (moved)
+                                    {
+                                        Debug.Log("SIDESTEP LEFT");
+                                        newJ = newJ + 1;
+                                        newI = newI + deltaI;
+                                    }
+                                    else
+                                    {
+                                        moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + deltaI, occupyingTile.GetComponent<TileBehaviour>().j - 1, false);
+
+                                        if (moved)
+                                        {
+                                            Debug.Log("SIDESTEP RIGHT");
+                                            newJ = newJ - 1;
+                                            newI = newI + deltaI;
+
+                                        }
+                                    }
+
+                                }
+
+                                if (!moved)
+                                {
+                                    if ((deltaI == 0 && deltaJ == 1) || (deltaI == 0 && deltaJ == -1))
+                                    {
+                                        Debug.Log("HORIZONTAL BLOCKED");
+                                        moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + 1, occupyingTile.GetComponent<TileBehaviour>().j + deltaJ, false);
+                                        if (moved)
+                                        {
+                                            Debug.Log("SIDESTEP down");
+                                            newI = newI + 1;
+                                            newJ = newJ + deltaJ;
+                                        }
+                                        else
+                                        {
+                                            moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i - 1, occupyingTile.GetComponent<TileBehaviour>().j + deltaJ, false);
+
+                                            if (moved)
+                                            {
+                                                Debug.Log("SIDESTEP up");
+                                                newI = newI - 1;
+                                                newJ = newJ + deltaJ;
+
+                                            }
+                                        }
+
+                                    }
+                                }
+
+
+                                if (!moved)
+                                {
+                                    if ((deltaI == 1 && deltaJ == 1))
+                                    {
+                                        Debug.Log("diagonal down left up BLOCKED");
+                                        moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i, occupyingTile.GetComponent<TileBehaviour>().j + 1, false);
+                                        if (moved)
+                                        {
+                                            Debug.Log("SIDESTEP down");
+                                            newJ = newJ + 1;
+                                        }
+                                        else
+                                        {
+                                            moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i - 1, occupyingTile.GetComponent<TileBehaviour>().j, false);
+
+                                            if (moved)
+                                            {
+                                                Debug.Log("SIDESTEP up");
+                                                newI = newI - 1;
+
+                                            }
+                                        }
+
+                                    }
+                                }
+
+                                if (!moved)
+                                {
+                                    if ((deltaI == 1 && deltaJ == -1))
+                                    {
+                                        Debug.Log("diagonal down right BLOCKED");
+                                        moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i, occupyingTile.GetComponent<TileBehaviour>().j - 1, false);
+                                        if (moved)
+                                        {
+                                            Debug.Log("SIDESTEP down");
+                                            newJ = newJ - 1;
+                                        }
+                                        else
+                                        {
+                                            moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + 1, occupyingTile.GetComponent<TileBehaviour>().j, false);
+
+                                            if (moved)
+                                            {
+                                                Debug.Log("SIDESTEP up");
+                                                newI = newI + 1;
+
+                                            }
+                                        }
+
+                                    }
+                                }
+
+                                if (!moved)
+                                {
+                                    if ((deltaI == -1 && deltaJ == -1))
+                                    {
+                                        Debug.Log("diagonal down right BLOCKED");
+                                        moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i, occupyingTile.GetComponent<TileBehaviour>().j - 1, false);
+                                        if (moved)
+                                        {
+                                            Debug.Log("SIDESTEP down");
+                                            newJ = newJ - 1;
+                                        }
+                                        else
+                                        {
+                                            moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i - 1, occupyingTile.GetComponent<TileBehaviour>().j, false);
+
+                                            if (moved)
+                                            {
+                                                Debug.Log("SIDESTEP up");
+                                                newI = newI - 1;
+
+                                            }
+                                        }
+
+                                    }
+                                }
+
+                                if (!moved)
+                                {
+                                    if ((deltaI == -1 && deltaJ == 1))
+                                    {
+                                        Debug.Log("diagonal down right BLOCKED");
+                                        moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i, occupyingTile.GetComponent<TileBehaviour>().j + 1, false);
+                                        if (moved)
+                                        {
+                                            Debug.Log("SIDESTEP down");
+                                            newJ = newJ + 1;
+                                        }
+                                        else
+                                        {
+                                            moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i - 1, occupyingTile.GetComponent<TileBehaviour>().j, false);
+
+                                            if (moved)
+                                            {
+                                                Debug.Log("SIDESTEP up");
+                                                newI = newI - 1;
+
+                                            }
+                                        }
+
+                                    }
+                                }
+
+
+
+
+
+
+                                if (moved)
+                                {
+                                    movementJumpendPosition = boardController.chessBoard[newI, newJ].GetComponent<TileBehaviour>().transform.position;
+                                    movementJumpStartTime = Time.time;
+                                    movementJumpJourneyLength = Vector3.Distance(movementJumpStartPosition, movementJumpendPosition);
+                                    doingMovementJump = true;
+                                    uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitReleaseAudioClip);
+                                    movementJumpFailedAttempts = 0;
+                                }
+
+                            }
+
+                        } else // assassin teleport movement
+                        {
+                            movementJumpSpeed = 5f;
+                            Debug.Log("assassin movement");
+                            movementJumpStartPosition = this.transform.position;
+                            int newI = 0;
+                            int newJ = 0;
+                            bool moved;
+                            if (!isEnemy)
+                            {
+                                 moved = MoveToEmptyTile(target.occupyingTile.GetComponent<TileBehaviour>().i - 1, target.occupyingTile.GetComponent<TileBehaviour>().j ,false);
+                                if (moved)
+                                {
+                                    newI = target.occupyingTile.GetComponent<TileBehaviour>().i - 1;
+                                    newJ = target.occupyingTile.GetComponent<TileBehaviour>().j;
+                                }
+                            } else
+                            {
+                                 moved = MoveToEmptyTile(target.occupyingTile.GetComponent<TileBehaviour>().i + 1, target.occupyingTile.GetComponent<TileBehaviour>().j ,false);
+                                if (moved)
+                                {
+                                    newI = target.occupyingTile.GetComponent<TileBehaviour>().i + 1;
+                                    newJ = target.occupyingTile.GetComponent<TileBehaviour>().j;
+                                }
+                            }
+
+                            if (moved)
+                            {
+                                  
+                                movementJumpendPosition = boardController.chessBoard[newI, newJ].GetComponent<TileBehaviour>().transform.position;
+                                movementJumpStartTime = Time.time;
+                                movementJumpJourneyLength = Vector3.Distance(movementJumpStartPosition, movementJumpendPosition);
+                                doingMovementJump = true;
+                                uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitReleaseAudioClip);
+                                movementJumpFailedAttempts = 0;
+                            }
+                            else
+                            {
+                                ++movementJumpFailedAttempts;
+                            }
+
+                        }
                     }
+
 
                 }
             }
