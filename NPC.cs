@@ -77,6 +77,7 @@ public class NPC : MonoBehaviour
     public AudioClip cheering_SoundClip;
     public int numberOfAttackAnimations;
     public bool isBoss;
+    public int bossNumberID;
     public bool isCreep;
     public bool isStunned;
 
@@ -90,6 +91,7 @@ public class NPC : MonoBehaviour
     public int movementJumpFailedAttempts;
 
     public PowerChangeParticleControl PowerChangeParticleSystem;
+    public DustParticleControl DustParticleSystem;
 
     public void Awake()
     {
@@ -137,6 +139,11 @@ public class NPC : MonoBehaviour
             if (Vector3.Distance(this.transform.position, movementJumpendPosition) < 0.3)
             {
                 this.gameObject.GetComponentsInParent<Transform>()[1].position = this.occupyingTile.transform.position;
+                if (DustParticleSystem != null)
+                {
+                    DustParticleSystem.dustParticles.Play();
+
+                }
                 doingMovementJump = false;
             }
         }
@@ -653,13 +660,18 @@ public class NPC : MonoBehaviour
                     bonusGold = goldBountyReward * playerController.coefficient_Assassin_3_OnKillBonusGoldMultiplier;
                     goldBountyReward += (long)bonusGold;
                 }
+
+                if (this.isBoss) // check for boss kill to reward steam achievement
+                {
+                        boardController.steamAchievements.RewardBossKill(this.bossNumberID);
+                }
+         
                 playerController.sessionLogger.goldRewarded += (long) (goldBountyReward - bonusGold);
                 playerController.SetPlayerGoldCount(playerController.playerGoldCount + goldBountyReward);
                 uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopClosedAudioClip);
                 Object.Destroy(transform.parent.gameObject,2);
                 Object.Destroy(this.GetComponentInChildren<HealthBarController>().gameObject);
      
-
             } else
             {
                 Object.DestroyImmediate(transform.parent.gameObject);
@@ -753,6 +765,7 @@ public class NPC : MonoBehaviour
         uiController = worldControl.GetComponent<UiController>();
         spellBookController = this.GetComponent<SpellbookController>();
         PowerChangeParticleSystem = this.GetComponentInChildren<PowerChangeParticleControl>();
+        DustParticleSystem = this.GetComponentInChildren<DustParticleControl>();
     }
 
     void OnMouseDown()

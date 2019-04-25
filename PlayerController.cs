@@ -120,9 +120,9 @@ public class PlayerController : MonoBehaviour
             {
                 sessionLogger.goldRewarded -= costToShuffleShop;
                 SetPlayerGoldCount(playerGoldCount - costToShuffleShop);
-                costToShuffleShop += timesRefreshed++;
+                costToShuffleShop = (int)(3 * Mathf.Pow((1 + 0.25f), timesRefreshed++));
             }
-
+           
             uiController.shopToggleButton.gameObject.SetActive(true);
             uiController.UpdateAllShopButtons();
             uiController.ChangeCostToShuffleShopDisplayText(costToShuffleShop.ToString());
@@ -310,7 +310,7 @@ public class PlayerController : MonoBehaviour
         } else if(boardController.currentGameRound == 19 && boardController.gameStatus == GameStatus.Shopping)
         {
             boardController.TransitionToReportVictoryPhase();
-        }
+        } 
 
     }
  

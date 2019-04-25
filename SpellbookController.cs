@@ -196,7 +196,7 @@ public class SpellbookController : MonoBehaviour
         {
             GameObject anim = (GameObject)Instantiate(Resources.Load("Stun Animation"), tobeAffected.transform.position, Quaternion.identity);
             anim.transform.SetParent(tobeAffected.transform);
-            tobeAffected.isStunned = true;
+            tobeAffected.GetComponent<NPC>().isStunned = true;
             StartCoroutine(WakeUpAfterSeconds(secondsToBeStunned, anim, tobeAffected));
         }
         else

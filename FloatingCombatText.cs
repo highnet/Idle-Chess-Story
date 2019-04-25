@@ -12,18 +12,20 @@ public class FloatingCombatText : MonoBehaviour
     public string ExtraDisplayString;
     public DisplayMode displayMode;
     // Start is called before the first frame update
-    void Start()
+
+
+    public void Init()
     {
-        if (dmgReport.primaryDamageDealt < 0)
+                if (dmgReport.primaryDamageDealt< 0)
         {
             dmgReport.primaryDamageDealt = 0;
         }
 
-        dmgReport.primaryDamageDealt = (float) System.Math.Round(dmgReport.primaryDamageDealt,0,System.MidpointRounding.AwayFromZero);
-        dmgReport.lifeStealHeal = (float) System.Math.Round(dmgReport.lifeStealHeal,0,System.MidpointRounding.AwayFromZero);
-        dmgReport.retaliationDamageRecieved = (float) System.Math.Round(dmgReport.retaliationDamageRecieved,0,System.MidpointRounding.AwayFromZero);
+dmgReport.primaryDamageDealt = (float) System.Math.Round(dmgReport.primaryDamageDealt,0, System.MidpointRounding.AwayFromZero);
+dmgReport.lifeStealHeal = (float) System.Math.Round(dmgReport.lifeStealHeal,0, System.MidpointRounding.AwayFromZero);
+dmgReport.retaliationDamageRecieved = (float) System.Math.Round(dmgReport.retaliationDamageRecieved,0, System.MidpointRounding.AwayFromZero);
 
-        TextMesh textmesh = this.GetComponent<TextMesh>();
+TextMesh textmesh = this.GetComponent<TextMesh>();
 
         if (displayMode == DisplayMode.Retaliation)
         {
@@ -57,7 +59,9 @@ public class FloatingCombatText : MonoBehaviour
         else if (dmgReport.wasDampenedMiss && displayMode != DisplayMode.Retaliation)
         {
             ExtraDisplayString = "DAMPENED";
-        }
+        } else { ExtraDisplayString = ""; }
+
+
         if (ExtraDisplayString != "")
         {
             textmesh.text += " (" + ExtraDisplayString + ")";
@@ -91,7 +95,6 @@ public class FloatingCombatText : MonoBehaviour
                 textmesh.color = Color.green;
         }
     }
-    
 
     // Update is called once per frame
     void Update()

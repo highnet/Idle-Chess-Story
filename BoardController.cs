@@ -32,6 +32,7 @@ public class BoardController : MonoBehaviour
     public AmbienceSound ambienceSound;
 
     public Leaderboard steamLeaderboard;
+    public Achievements steamAchievements;
 
     public float constant_TimeAllowedForCombatBeforeForceStop;
     public float combatRoundTimer = 0f;
@@ -438,7 +439,6 @@ public class BoardController : MonoBehaviour
     {
         if (gameStatus.Equals(GameStatus.Fight))
         {
-            Debug.Log(combatRoundTimer);
             combatRoundTimer += Time.deltaTime;
             uiController.combatTimerPanelText.text = (constant_TimeAllowedForCombatBeforeForceStop - Mathf.Round(combatRoundTimer)).ToString();
             if (combatRoundTimer >= constant_TimeAllowedForCombatBeforeForceStop)
@@ -466,7 +466,6 @@ public class BoardController : MonoBehaviour
     {
         combatRoundTimer = 0;
         uiController.combatTimerPanel.gameObject.SetActive(false);
-      
 
         if (npcController.enemyList.Count == 0) // combat victory
         {
@@ -487,6 +486,8 @@ public class BoardController : MonoBehaviour
         playerController.enemyMMR += 5;
         if (npcController.enemyList.Count == 0) // combat VICTORY
         {
+            steamAchievements.IncrementRoundsWon(1);
+     
             sessionLogger.calculateFIDEMMRChange(true, (float)playerController.playerMMR, (float)playerController.enemyMMR, playerController.FIDE_KFactor);
         
             goldReward *= 1.10f;
@@ -502,6 +503,7 @@ public class BoardController : MonoBehaviour
         }
         else // combat DEFEAT
         {
+     
             sessionLogger.calculateFIDEMMRChange(false, (float)playerController.playerMMR, (float)playerController.enemyMMR, playerController.FIDE_KFactor);
        
                 goldReward *= 1.05f;
@@ -533,7 +535,8 @@ public class BoardController : MonoBehaviour
             }
 
         }
-   
+
+      
         uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopRefreshAudioClip);
 
         int i;
@@ -617,6 +620,8 @@ public class BoardController : MonoBehaviour
         uiController.reportDefeatPanel_MostTribesDeployedText.text = "Most deployed tribe: " + sessionLogger.mostDeployedTribeAmount + " " + sessionLogger.mostDeployedTribe.ToString();
         uiController.reportDefeatPanel_MostTribeDeployedIconVisualizer.SetImage(sessionLogger.mostDeployedTribe,true);
         steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + (int) sessionLogger.mmrChange);
+        steamAchievements.IncrementDeployedTribesStats(sessionLogger.TribesDeployedToFightTracker);
+        steamAchievements.IncrementGoldEarnedStats(sessionLogger.goldRewarded);
         ChangeGameStatus(GameStatus.ReportDefeat);
     }
 
@@ -633,6 +638,9 @@ public class BoardController : MonoBehaviour
         uiController.reportVictoryPanel_MostTribesDeployedText.text = "Most deployed tribe: " + sessionLogger.mostDeployedTribeAmount + " " + sessionLogger.mostDeployedTribe.ToString();
         uiController.reportVictoryPanel_MostTribeDeployedIconVisualizer.SetImage(sessionLogger.mostDeployedTribe, true);
         steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + (int)sessionLogger.mmrChange);
+        steamAchievements.IncrementGamesWon();
+        steamAchievements.IncrementDeployedTribesStats(sessionLogger.TribesDeployedToFightTracker);
+        steamAchievements.IncrementGoldEarnedStats(sessionLogger.goldRewarded);
         ChangeGameStatus(GameStatus.ReportVictory);
     }
 

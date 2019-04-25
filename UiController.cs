@@ -10,6 +10,7 @@ public class UiController : MonoBehaviour
 {
     PlayerController playerController;
     BoardController boardController;
+    ObjectPoolController objectPoolController;
     NpcController npcController;
     SessionLogger sessionLogger;
     DialogueManager dialogueManager;
@@ -206,6 +207,7 @@ public class UiController : MonoBehaviour
         npcController = GetComponent<NpcController>();
         sessionLogger = GetComponent<SessionLogger>();
         dialogueManager = GetComponent<DialogueManager>();
+        objectPoolController = GetComponent<ObjectPoolController>();
         hudCanvas = GameObject.Find("HUDCanvas");
 
     }
@@ -865,6 +867,7 @@ public class UiController : MonoBehaviour
             {
                 sessionLogger.IncrementTribesDeployedToFightCounters(npc);
             }
+
             sessionLogger.unitsDeployedToFight += npcController.deployedAllyList.Count;
             combatTimerPanel.gameObject.SetActive(true); // toggle the combat timer panel
 
@@ -883,11 +886,12 @@ public class UiController : MonoBehaviour
     {
         if (TargetDestinationNPC != null)
         {
-            GameObject fct = (GameObject)Instantiate(Resources.Load("Floating Combat Text"), TargetDestinationNPC.transform.position, Quaternion.identity);
+            GameObject fct = objectPoolController.InstantiateFloatingCombatText(TargetDestinationNPC);
             FloatingCombatText floatingCombatTextScript = fct.GetComponentInChildren<FloatingCombatText>();
             floatingCombatTextScript.displayMode = displayMode;
             floatingCombatTextScript.dmgReport = dmgReport;
-            UnityEngine.Object.Destroy(fct, 1f);
+            floatingCombatTextScript.Init();
+            objectPoolController.DestroyFloatingCombatTextAfterSeconds(1f,fct);
         }
     }
 

@@ -12,7 +12,7 @@ public class Thubmnail : MonoBehaviour
     public int randomRotationOrientation;
     public float shopThumbnailRotationSpeed = 5f;
     private bool mousedOver = false;
-    private int xOffset = 0;
+    private int xOffset = -100;
     private int yOffset = -200;
     private Vector3 offsetVector;
 
