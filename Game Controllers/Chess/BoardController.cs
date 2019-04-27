@@ -1,8 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
-using System.Linq;
 using UnityEngine.SceneManagement;
 
 public enum GameStatus {Initializing,Fight,AwaitingWizardConfirmation,Wait,Shopping,ReportDefeat,GameOver,ReportVictory}
@@ -13,29 +12,26 @@ public class BoardController : MonoBehaviour
     UiController uiController;
     PlayerController playerController;
     SessionLogger sessionLogger;
-    //
     public GameObject[,] chessBoard;
     public GameObject[] reserveBoard;
     public List<GameObject> unitsList;
-    public GameObject selectedObject;
+    public GameObject selectedNPC;
+    public ItemDrop selectedItemDrop;
     public GameObject tilePrefab;
-    //
     public MainCamera mainCameraController;
-
     public bool testDummyMode = false;
-
     public GameStatus gameStatus;
     public int currentGameRound = 1;
-
     public GameObject friendlySideIndicatorPlane;
     public GameObject rainSystem;
     public AmbienceSound ambienceSound;
-
     public Leaderboard steamLeaderboard;
     public Achievements steamAchievements;
-
     public float constant_TimeAllowedForCombatBeforeForceStop;
     public float combatRoundTimer = 0f;
+    public List<GameObject> DroppedItemList;
+    public Camera mainCamera;
+    public NPC mousedOverNPC;
 
     private void Awake()
     {
@@ -571,7 +567,8 @@ public class BoardController : MonoBehaviour
                 playerController.SetCurrentlyDeployedUnits(playerController.currentlyDeployedUnits + 1);;
                 npcController.deployedAllyList.Add(npcController.allyListBackup[i]);
                 npcController.allyList.Add(npcController.allyListBackup[i]);
-                selectedObject = npcController.deployedAllyList.ToArray()[0].gameObject;
+                selectedNPC = npcController.deployedAllyList.ToArray()[0].gameObject;
+    
 
             }
         }

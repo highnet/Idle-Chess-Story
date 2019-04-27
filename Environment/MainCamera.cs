@@ -123,9 +123,9 @@ public class MainCamera : MonoBehaviour
 
 
 
-        if (boardController.gameStatus.Equals(GameStatus.Fight) && cameraMode.Equals("Follow") && boardController.selectedObject != null)
+        if (boardController.gameStatus.Equals(GameStatus.Fight) && cameraMode.Equals("Follow") && boardController.selectedNPC != null)
         {
-            target = boardController.selectedObject;
+            target = boardController.selectedNPC;
             nextPosition = target.transform.position + new Vector3(0, 1, 0);
         }
         else if (cameraMode.Equals("Follow"))

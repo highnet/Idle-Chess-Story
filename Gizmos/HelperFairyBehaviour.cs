@@ -13,15 +13,11 @@ public class HelperFairyBehaviour : MonoBehaviour
     {
         boardController = GameObject.FindGameObjectWithTag("Controller").GetComponent<BoardController>();
     }
-    void Start()
-    {
-       
-    }
 
     // Update is called once per frame
     void Update()
     {
-            selectedObject = boardController.selectedObject;
+            selectedObject = boardController.selectedNPC;
         if (selectedObject != null)
         {
             this.transform.position = selectedObject.transform.position;

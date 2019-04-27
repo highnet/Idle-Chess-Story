@@ -18,7 +18,7 @@ public class LeaderEntry
         id = _id;
         globalRank = _globalRank;
         score = _score;
-        avatar = Sprite.Create(GetSmallAvatar(), new Rect(new Vector2(0, 0), new Vector2(32, 32)), new Vector2(32, 32));
+        avatar = Sprite.Create(GetSteamAvatar(), new Rect(new Vector2(0, 0), new Vector2(64, 64)), new Vector2(64, 64));
 
         if (globalRank == 1)
         {
@@ -39,10 +39,10 @@ public class LeaderEntry
     }
     
 
-    private Texture2D GetSmallAvatar()
+    private Texture2D GetSteamAvatar()
     {
       
-        int FriendAvatar = SteamFriends.GetSmallFriendAvatar(id);
+        int FriendAvatar = SteamFriends.GetMediumFriendAvatar(id);
         uint ImageWidth;
         uint ImageHeight;
         bool success = SteamUtils.GetImageSize(FriendAvatar, out ImageWidth, out ImageHeight);

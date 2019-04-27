@@ -16,7 +16,7 @@ public class DialogueManager : MonoBehaviour
     public void StartDialogue(Dialogue dialogue)
     {
         uic.dialoguePanel.gameObject.SetActive(true);
-        uic.hudCanvasAudioSource.PlayOneShot(uic.genericButtonSucessAudioClip);
+        uic.hudCanvasAudioSource.PlayOneShot(uic.genericSucessAudioClip);
         sentences.Clear();
         foreach(string sentence in dialogue.sentences)
         {
@@ -28,7 +28,7 @@ public class DialogueManager : MonoBehaviour
 
     public void DisplayNextSentence()
     {
-        uic.hudCanvasAudioSource.PlayOneShot(uic.genericButtonSucessAudioClip);
+        uic.hudCanvasAudioSource.PlayOneShot(uic.genericSucessAudioClip);
 
         if (sentences.Count == 0)
         {

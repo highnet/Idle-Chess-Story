@@ -14,7 +14,6 @@ public class UiController : MonoBehaviour
     NpcController npcController;
     SessionLogger sessionLogger;
     DialogueManager dialogueManager;
-    //
     public GameObject hudCanvas;
     public GameObject hudCanvasTopBar;
     public GameObject hudCanvasBottomBar;
@@ -26,7 +25,6 @@ public class UiController : MonoBehaviour
     public GameObject hudCanvasReportDefeatPanel;
     public GameObject hudCanvasEscapePanel;
     public GameObject hudCanvasreportVictoryPanel;
-    //
     public Button shopToggleButton;
     public Button tribesToggleButton;
     public Button fightButton;
@@ -42,12 +40,8 @@ public class UiController : MonoBehaviour
     public Button mainMenuButton;
     public Button forfeitButton;
     public Button closeEscapeMenuTabButton;
-   
-    //
     public Image damageOverlay;
-    //
     public Text hudCanvasTopPanelPlayerCurrentHPCounterText;
-    //
     public Text hudCanvasTopPanelGoldCountText;
     public Text hudCanvasTopPanelUsernameText;
     public Text hudCanvasTopPanelGameStatusText;
@@ -56,14 +50,12 @@ public class UiController : MonoBehaviour
     public Text hudCanvasShopCostToShuffleText;
     public Text hudCanvasShopUnitCapUpgradeText;
     public Image hudCanvasTopPanelSteamUserAvatar;
-    //
     public Text shopbutton1_hudCanvasShopCostBuyUnit;
     public Text shopbutton2_hudCanvasShopCostBuyUnit;
     public Text shopbutton3_hudCanvasShopCostBuyUnit;
     public Text shopbutton4_hudCanvasShopCostBuyUnit;
     public Text shopbutton5_hudCanvasShopCostBuyUnit;
     public Text shopbutton6_hudCanvasShopCostBuyUnit;
-    //
     public Text hudCanvasTribePanel_WizardCounter;
     public Text hudCanvasTribePanel_WarriorCounter;
     public Text hudCanvasTribePanel_UndeadCounter;
@@ -72,13 +64,11 @@ public class UiController : MonoBehaviour
     public Text hudCanvasTribePanel_BeastCounter;
     public Text hudCanvasTribePanel_AssassinCounter;
     public Text hudCanvasTribePanel_GuardianCounter;
-    //
     public Text intro_playerName;
     public Text intro_playerMMR;
     public Button intro_SettingsButton;
     public Dropdown wizard_difficultyPicker;
     public Button startGameButton;
-    //
     public Text selectedUnitPanel_InformationText_NAME;
     public Text selectedUnitPanel_InformationText_TIER;
     public Text selectedUnitPanel_InformationText_HP;
@@ -89,16 +79,13 @@ public class UiController : MonoBehaviour
     public DynamicTribeIconVisualizer selectedUnitPanel_primaryTribeIconVisualizer;
     public DynamicTribeIconVisualizer selectedUnitPanel_secondaryTribeIconVisualizer;
     public DynamicAbilityIconVisualizer selectedUnitPanel_abilityiconVisualizer;
-    //
     public Button resetSelectedTargetButton;
     public Button sellFriendlySelectedTargetButton;
-    //
     public Text shopMouseOverInfoText_NAME;
     public Text shopMouseOverInfoText_PRIMARYTRIBE;
     public Text shopMouseOverInfoText_SECONDARYTRIBE;
     public DynamicTribeIconVisualizer shopMouseOverInfoIcon_PRIMARYTRIBE_tribeIconVisualizer;
     public DynamicTribeIconVisualizer shopMouseOverInfoIcon_SECONDARYTRIBE_tribeIconVisualizer;
-    //
     public AudioListener mainAudioListener;
     public AudioSource hudCanvasAudioSource;
     public AudioClip startGameAudioClip;
@@ -106,13 +93,12 @@ public class UiController : MonoBehaviour
     public AudioClip shopOpenAudioClip;
     public AudioClip shopClosedAudioClip;
     public AudioClip fightStartAudioClip;
-    public AudioClip genericButtonSucessAudioClip;
+    public AudioClip genericSucessAudioClip;
     public AudioClip genericButtonFailureAudioClip;
     public AudioClip buyUnitSuccessAudioClip;
     public AudioClip chessUnitReleaseAudioClip;
     public AudioClip chessUnitclickAudioClip;
     public AudioClip levelUpAudioClip;
-    //
     public Button muteAudioToggleButton;
     public Image audioMutedIndicatorIcon;
     public bool audioIsMuted;
@@ -124,7 +110,6 @@ public class UiController : MonoBehaviour
     public Dropdown cameraModePicker;
     public Button CreditsButton;
     public GameObject creditsPanel;
-    //
     public GameObject helpPanel;
     public Button helpButton;
     public Button closeHelpPanelButton;
@@ -134,49 +119,42 @@ public class UiController : MonoBehaviour
     public Button previousTipButton;
     public Text currentTipCounterText;
     public Toggle randomTipToggler;
-    //
     public Camera shopCam1;
     public Camera shopCam2;
     public Camera shopCam3;
     public Camera shopCam4;
     public Camera shopCam5;
     public Camera shopCam6;
-    //
     public Text reportDefeatPanel_TotalUnitsDeployedText;
     public Text reportDefeatPanel_MostTribesDeployedText;
     public DynamicTribeIconVisualizer reportDefeatPanel_MostTribeDeployedIconVisualizer;
     public Text reportVictoryPanel_TotalUnitsDeployedText;
     public Text reportVictoryPanel_MostTribesDeployedText;
     public DynamicTribeIconVisualizer reportVictoryPanel_MostTribeDeployedIconVisualizer;
-    //
     public GameObject ShopPanelTooltipSubPanel;
-    //
     public Camera mainCamera;
-    //
     public Image steamUserAvatar;
     public Leaderboard steamLeaderboard;
     public bool fetchSteamLeaderboardEntry = true;
-    public bool fetchSteamLeaderboardTop10Entries = true;
+    public bool fetchSteamLeaderboardTop100Entries = true;
     public GameObject LeaderboardEntriesContent;
-    //
     public GameObject dialoguePanel;
     public Text dialoguePanelSpeakerNameText;
     public Text dialoguePanelDialogueText;
     public Button continueDialogueButton;
     public DialogueTriggerSystem dialogueTriggerSystem;
-    //
     public GameObject leaderBoardPanel;
-    public List<LeaderboardEntry> steamLeaderBoardTop10EntriesUIPrefabsList;
-    //
+    public List<LeaderboardEntry> steamLeaderBoardTop100EntriesUIPrefabsList;
     public GameObject combatTimerPanel;
     public Text combatTimerPanelText;
+    public Text versionText;
 
     private void Awake()
     {
         GetWorldControllers();
         BindButtons();
-        steamUserAvatar.sprite = Sprite.Create(GetSmallAvatar(),new Rect(new Vector2(0,0),new Vector2(32,32)),new Vector2(32,32));
-        hudCanvasTopPanelSteamUserAvatar.sprite = Sprite.Create(GetSmallAvatar(), new Rect(new Vector2(0, 0), new Vector2(32, 32)), new Vector2(32, 32));
+        steamUserAvatar.sprite = Sprite.Create(GetSteamAvatar(),new Rect(new Vector2(0,0),new Vector2(64,64)),new Vector2(64, 64));
+        hudCanvasTopPanelSteamUserAvatar.sprite = Sprite.Create(GetSteamAvatar(), new Rect(new Vector2(0, 0), new Vector2(64, 64)), new Vector2(64, 64));
         helperTipContainer = GetComponent<HelperTipContainer>();
         RefreshHelperTips();
         AudioListener.volume = userVolume;
@@ -185,17 +163,18 @@ public class UiController : MonoBehaviour
             string name = SteamFriends.GetPersonaName();
             intro_playerName.text = name;
             hudCanvasTopPanelUsernameText.text = name;
+            versionText.text = "Steam Build: " +  SteamApps.GetAppBuildId().ToString();
         }
     
 
-        steamLeaderBoardTop10EntriesUIPrefabsList = new List<LeaderboardEntry>();
-        for (int i = 0; i < 10; i++) // prepare the leaderboard top 10 entry display prefab objects
+        steamLeaderBoardTop100EntriesUIPrefabsList = new List<LeaderboardEntry>();
+        for (int i = 0; i < 100; i++) // prepare the leaderboard top 10 entry display prefab objects
         {
            GameObject leaderBoardEntry = Instantiate(Resources.Load("Leaderboard Entry"), LeaderboardEntriesContent.transform,false) as GameObject;
             int rank = 1 + i;
             leaderBoardEntry.GetComponent<LeaderboardEntry>().rank = rank;
             leaderBoardEntry.GetComponent<LeaderboardEntry>().rankText.text = rank + ")";
-            steamLeaderBoardTop10EntriesUIPrefabsList.Add(leaderBoardEntry.GetComponent<LeaderboardEntry>());
+            steamLeaderBoardTop100EntriesUIPrefabsList.Add(leaderBoardEntry.GetComponent<LeaderboardEntry>());
 
         }
     }
@@ -212,10 +191,10 @@ public class UiController : MonoBehaviour
 
     }
 
-    public Texture2D GetSmallAvatar()
+    public Texture2D GetSteamAvatar()
     {
         CSteamID user = SteamUser.GetSteamID();
-        int FriendAvatar = SteamFriends.GetSmallFriendAvatar(user);
+        int FriendAvatar = SteamFriends.GetMediumFriendAvatar(user);
         uint ImageWidth;
         uint ImageHeight;
         bool success = SteamUtils.GetImageSize(FriendAvatar, out ImageWidth, out ImageHeight);
@@ -225,6 +204,7 @@ public class UiController : MonoBehaviour
             byte[] Image = new byte[ImageWidth * ImageHeight * 4];
             Texture2D returnTexture = new Texture2D((int)ImageWidth, (int)ImageHeight, TextureFormat.RGBA32, false, true);
             success = SteamUtils.GetImageRGBA(FriendAvatar, Image, (int)(ImageWidth * ImageHeight * 4));
+            
             if (success)
             {
                 returnTexture.LoadRawTextureData(Image);
@@ -357,7 +337,7 @@ public class UiController : MonoBehaviour
             helperTipContainer.PreviousTip();
         }
         helperText.text = helperTipContainer.currentTip;
-        hudCanvasAudioSource.PlayOneShot(genericButtonSucessAudioClip);
+        hudCanvasAudioSource.PlayOneShot(genericSucessAudioClip);
         RefreshHelperTips();
     }
     public void NextTip()
@@ -371,7 +351,7 @@ public class UiController : MonoBehaviour
             helperTipContainer.NextTip();
         }
         helperText.text = helperTipContainer.currentTip;
-        hudCanvasAudioSource.PlayOneShot(genericButtonSucessAudioClip);
+        hudCanvasAudioSource.PlayOneShot(genericSucessAudioClip);
         RefreshHelperTips();
     }
 
@@ -382,13 +362,13 @@ public class UiController : MonoBehaviour
         {
             RefreshHelperTips();
         }
-        hudCanvasAudioSource.PlayOneShot(genericButtonSucessAudioClip);
+        hudCanvasAudioSource.PlayOneShot(genericSucessAudioClip);
     }
 
     public void ToggleCreditsPanel()
     {
         creditsPanel.SetActive(!creditsPanel.activeSelf);
-        hudCanvasAudioSource.PlayOneShot(genericButtonSucessAudioClip);
+        hudCanvasAudioSource.PlayOneShot(genericSucessAudioClip);
     }
 
     public void ExitGame()
@@ -438,18 +418,18 @@ public class UiController : MonoBehaviour
 
     public void SellFriendlySelectedTarget() // sell the friendly selected target npc
     {
-        if (npcController.allyList.Count > 1 && boardController.selectedObject != null && boardController.selectedObject.GetComponent<NPC>().isEnemy == false)
+        if (npcController.allyList.Count > 1 && boardController.selectedNPC != null && boardController.selectedNPC.GetComponent<NPC>().isEnemy == false)
         {
-            int goldReward = (int) boardController.selectedObject.GetComponent<NPC>().baseGoldBountyReward;
-            if (boardController.selectedObject.GetComponent<NPC>().TIER == 2)
+            int goldReward = (int) boardController.selectedNPC.GetComponent<NPC>().baseGoldBountyReward;
+            if (boardController.selectedNPC.GetComponent<NPC>().TIER == 2)
             {
                 goldReward = (int)(goldReward * 2f); // gold bonus for selling a tier 2 unit
             }
-            else if (boardController.selectedObject.GetComponent<NPC>().TIER == 3)
+            else if (boardController.selectedNPC.GetComponent<NPC>().TIER == 3)
             {
                 goldReward = (int)(goldReward * 8f); // gold bonus for selling a tier 3 unit
             }
-            boardController.selectedObject.GetComponent<NPC>().RemoveFromBoard(true); // remove the sold npc from the board 
+            boardController.selectedNPC.GetComponent<NPC>().RemoveFromBoard(true); // remove the sold npc from the board 
             playerController.SetPlayerGoldCount(playerController.playerGoldCount + (long)goldReward); // apply the gold reward to the player
             hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);
         } else
@@ -460,7 +440,7 @@ public class UiController : MonoBehaviour
 
     public void ResetSelectedTarget() // reset the selected target
     {
-        boardController.selectedObject = null; // null it
+        boardController.selectedNPC = null; // null it
     }
 
     public void UpdateSelectedUnitPanel(GameObject selectedObject, NPC selectedNPC)
@@ -487,37 +467,37 @@ public class UiController : MonoBehaviour
         }
 
         // try fetch the top 10 leaderboard scores one time
-        if (fetchSteamLeaderboardTop10Entries && steamLeaderboard.foundLeaderboard && steamLeaderboard.downloadedLeaderboard && !steamLeaderboard.downLoadingTop10Entries)
+        if (fetchSteamLeaderboardTop100Entries && steamLeaderboard.foundLeaderboard && steamLeaderboard.downloadedLeaderboard && !steamLeaderboard.downLoadingTop100Entries)
         {
-            steamLeaderboard.top10Entries = steamLeaderboard.ReadDownloadedTop10Entries(); // read top 10 entries
-            for (int i = 0; i < steamLeaderboard.top10Entries.Length; i++)
+            steamLeaderboard.top100Entries = steamLeaderboard.ReadDownloadedTop100Entries(); // read top 10 entries
+            for (int i = 0; i < steamLeaderboard.top100Entries.Length; i++)
             {
-                LeaderboardEntry leaderboardEntryPrefab = steamLeaderBoardTop10EntriesUIPrefabsList.ToArray()[i]; // syncronize the ui with the fetched values
-                LeaderEntry top10Entry = steamLeaderboard.top10Entries[i];
-                leaderboardEntryPrefab.rank = top10Entry.globalRank;
-                leaderboardEntryPrefab.mmrText.text = top10Entry.score.ToString();
-                leaderboardEntryPrefab.nameText.text = SteamFriends.GetFriendPersonaName(top10Entry.id);
-                leaderboardEntryPrefab.rankText.text = top10Entry.globalRank.ToString() + ")";
-                leaderboardEntryPrefab.steamAvatar.sprite = top10Entry.avatar;
-                if (top10Entry.globalRank == 1 || top10Entry.globalRank == 2 || top10Entry.globalRank == 3 )
+                LeaderboardEntry leaderboardEntryPrefab = steamLeaderBoardTop100EntriesUIPrefabsList.ToArray()[i]; // syncronize the ui with the fetched values
+                LeaderEntry top100Entry = steamLeaderboard.top100Entries[i];
+                leaderboardEntryPrefab.rank = top100Entry.globalRank;
+                leaderboardEntryPrefab.mmrText.text = top100Entry.score.ToString();
+                leaderboardEntryPrefab.nameText.text = SteamFriends.GetFriendPersonaName(top100Entry.id);
+                leaderboardEntryPrefab.rankText.text = top100Entry.globalRank.ToString() + ")";
+                leaderboardEntryPrefab.steamAvatar.sprite = top100Entry.avatar;
+                if (top100Entry.globalRank == 1 || top100Entry.globalRank == 2 || top100Entry.globalRank == 3 )
                 {
                     leaderboardEntryPrefab.trophyIcon.gameObject.SetActive(true);
-                    leaderboardEntryPrefab.trophyIcon.sprite = top10Entry.trophyIcon;
+                    leaderboardEntryPrefab.trophyIcon.sprite = top100Entry.trophyIcon;
                 } 
                
 
             }
-            fetchSteamLeaderboardTop10Entries = false;
+            fetchSteamLeaderboardTop100Entries = false;
         }
     }
 
     public void PrepareUIAccordingly()
     {
 
-        if (boardController.gameStatus != GameStatus.ReportVictory && boardController.gameStatus != GameStatus.ReportDefeat && boardController.selectedObject != null) // update the entire selected unit panel
+        if (boardController.gameStatus != GameStatus.ReportVictory && boardController.gameStatus != GameStatus.ReportDefeat && boardController.selectedNPC != null) // update the entire selected unit panel
         {
             hudCanvasCurrentlySelectedUnitPanel.SetActive(true);
-            GameObject selectedObject = boardController.selectedObject;
+            GameObject selectedObject = boardController.selectedNPC;
             NPC selectedNPC = selectedObject.GetComponent<NPC>();
             UpdateSelectedUnitPanel(selectedObject, selectedNPC);
 
@@ -791,7 +771,7 @@ public class UiController : MonoBehaviour
 
     void ToggleTribePanel()
     {
-        hudCanvasAudioSource.PlayOneShot(genericButtonSucessAudioClip);
+        hudCanvasAudioSource.PlayOneShot(genericSucessAudioClip);
         hudCanvasTribesPanel.SetActive(!hudCanvasTribesPanel.activeSelf);
     }
 
@@ -866,6 +846,10 @@ public class UiController : MonoBehaviour
             foreach(NPC npc in npcController.deployedAllyList)
             {
                 sessionLogger.IncrementTribesDeployedToFightCounters(npc);
+            }
+
+            foreach (GameObject treasure in boardController.DroppedItemList) {
+                GameObject.Destroy(treasure);
             }
 
             sessionLogger.unitsDeployedToFight += npcController.deployedAllyList.Count;

@@ -33,10 +33,6 @@ public class NPC : MonoBehaviour
     public BoardController boardController;
     public PlayerController playerController;
     public UiController uiController;
-    public List<GameObject> inventory;
-    public List<GameObject> equipment;
-    public GameObject currentInventorySelection;
-    public GameObject currentTarget;
     public SpellbookController spellBookController;
     public Animator animator;
     public float HP;
@@ -80,7 +76,6 @@ public class NPC : MonoBehaviour
     public int bossNumberID;
     public bool isCreep;
     public bool isStunned;
-
     public bool doingMovementJump;
     public Vector3 movementJumpStartPosition;
     public Vector3 movementJumpendPosition;
@@ -89,9 +84,9 @@ public class NPC : MonoBehaviour
     private float movementJumpJourneyLength;
     public AnimationCurve movementJumpYOffset;
     public int movementJumpFailedAttempts;
-
     public PowerChangeParticleControl PowerChangeParticleSystem;
     public DustParticleControl DustParticleSystem;
+    public List<Item> Inventory = new List<Item>();
 
     public void Awake()
     {
@@ -113,13 +108,32 @@ public class NPC : MonoBehaviour
         ATTACKPOWER = BASE_ATTACKPOWER;
         SPELLPOWER = BASE_SPELLPOWER;
         RETALIATION = BASE_RETALIATION;
-
+        RecalculateInventoryItemValues();
     }
 
     public void StartLiveRoutine()
     {
         liveRoutine = StartCoroutine(Live(this.AttackDistance, this.autoattack_DamageType, this.ABILITY, this.actionTime));
 
+    }
+
+    public void RecalculateInventoryItemValues()
+    {
+        recalculateArmorValue();
+        recalculateAttackPowerValue();
+        recalculateHPValues();
+        recalculateRetaliationValue();
+        recalculateSpellPowerValue();
+        foreach (Item item in Inventory)
+        {
+            Debug.Log(item.ItemName.ToString());
+            this.ARMOR += item.ARMOR_Bonus;
+            this.ATTACKPOWER += item.ATTACKPOWER_Bonus;
+            this.MAXHP += item.MAXHP_Bonus;
+            this.HP = MAXHP;
+            this.RETALIATION += item.RETALIATION_Bonus;
+            this.SPELLPOWER += item.SPELLPOWER_Bonus;
+        }
     }
 
     private void Update()
@@ -669,6 +683,14 @@ public class NPC : MonoBehaviour
                 playerController.sessionLogger.goldRewarded += (long) (goldBountyReward - bonusGold);
                 playerController.SetPlayerGoldCount(playerController.playerGoldCount + goldBountyReward);
                 uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopClosedAudioClip);
+
+                GameObject LootDrop = (GameObject) Instantiate(Resources.Load("Treasure"), boardController.transform);
+                boardController.DroppedItemList.Add(LootDrop);
+                LootDrop.transform.position = this.transform.position + new Vector3(0f, 1.5f, 0f);
+
+                Vector3 lootDropForce = new Vector3(UnityEngine.Random.Range(-200, 201), UnityEngine.Random.Range(100, 201), UnityEngine.Random.Range(-200,201));
+                LootDrop.GetComponent<Rigidbody>().AddForce(lootDropForce);
+
                 Object.Destroy(transform.parent.gameObject,2);
                 Object.Destroy(this.GetComponentInChildren<HealthBarController>().gameObject);
      
@@ -770,20 +792,22 @@ public class NPC : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (boardController.selectedObject == this.gameObject)
+        if (boardController.selectedItemDrop != null && this.Inventory.Count < 4)
         {
-            uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitclickAudioClip);
-            if (boardController.gameStatus.Equals(GameStatus.Shopping))
-            {
-                this.beingDragged = true;
-                boardController.friendlySideIndicatorPlane.SetActive(true);
-            }
+            Debug.Log("Adding item: " + boardController.selectedItemDrop.ItemDroppedInChest.ItemName.ToString());
+            this.Inventory.Add(boardController.selectedItemDrop.ItemDroppedInChest);
+            RecalculateInventoryItemValues();
+            GameObject.Destroy(boardController.selectedItemDrop.gameObject);
+            uiController.hudCanvasAudioSource.PlayOneShot(uiController.genericSucessAudioClip);
+            boardController.selectedItemDrop = null;
         }
+        else
+        {
+            if (boardController.selectedNPC != this.gameObject)
+            {
+                boardController.selectedNPC = this.gameObject;
+            }
 
-        if (boardController.selectedObject != this.gameObject)
-        {
-            boardController.selectedObject = this.gameObject;
-            
             uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitclickAudioClip);
             if (boardController.gameStatus.Equals(GameStatus.Shopping))
             {
@@ -791,6 +815,18 @@ public class NPC : MonoBehaviour
                 boardController.friendlySideIndicatorPlane.SetActive(true);
             }
         }
+    }
+
+    private void OnMouseOver()
+    {
+        if (!isEnemy)
+        {
+            boardController.mousedOverNPC = this;
+        }
+    }
+    private void OnMouseExit()
+    {
+        boardController.mousedOverNPC = null;
     }
 
     private void OnMouseDrag()

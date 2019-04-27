@@ -16,8 +16,9 @@ public class ChessBoardBehaviour : MonoBehaviour
     {
         if (!EventSystem.current.IsPointerOverGameObject(-1) && Input.GetMouseButtonDown(0))
         {
+            boardController.selectedNPC = null;
+            boardController.selectedItemDrop = null;
 
-            boardController.selectedObject = null;
         }
     }
 }

@@ -92,7 +92,7 @@ public class PlayerController : MonoBehaviour
             SetPlayerGoldCount(playerGoldCount - (costToUpgradeUnitCap));
             SetMaxDeployedUnitsLimit(maxDeployedUnitsLimit + 1);
             uiController.ChangeCostToUnitCapUpgradeDisplayText((costToUpgradeUnitCap).ToString());
-            uiController.hudCanvasAudioSource.PlayOneShot(uiController.genericButtonSucessAudioClip);
+            uiController.hudCanvasAudioSource.PlayOneShot(uiController.genericSucessAudioClip);
         } else
         {
             uiController.ChangeCostToUnitCapUpgradeDisplayText((costToUpgradeUnitCap).ToString());

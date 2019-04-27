@@ -10,20 +10,20 @@ public class Leaderboard : MonoBehaviour
     private CallResult<LeaderboardFindResult_t> m_LeaderBoardResults;
     private CallResult<LeaderboardScoreUploaded_t> m_LeaderBoardScoreUploaded;
     private CallResult<LeaderboardScoresDownloaded_t> m_LeaderBoardUserScoreDownloaded;
-    private CallResult<LeaderboardScoresDownloaded_t> m_LeaderBoardTop10Downloaded;
-    public SteamLeaderboard_t hSteamLeaderboard;
-    public SteamLeaderboardEntries_t hSteamLeaderboardEntry;
-    public SteamLeaderboardEntries_t hSteamTop10Entries;
-    public ELeaderboardUploadScoreMethod eLeaderboardUploadScoreMethod = ELeaderboardUploadScoreMethod.k_ELeaderboardUploadScoreMethodForceUpdate;
-    public int[] pScoreDetails = new int[0];
-    public int cScoreDetailsCount = 0;
-    public string SourceLeaderBoard = "TEST";
+    private CallResult<LeaderboardScoresDownloaded_t> m_LeaderBoardTop100Downloaded;
+    private SteamLeaderboard_t hSteamLeaderboard;
+    private SteamLeaderboardEntries_t hSteamLeaderboardEntry;
+    private SteamLeaderboardEntries_t hSteamTop100Entries;
+    private ELeaderboardUploadScoreMethod eLeaderboardUploadScoreMethod = ELeaderboardUploadScoreMethod.k_ELeaderboardUploadScoreMethodForceUpdate;
+    private int[] pScoreDetails = new int[0];
+    private int cScoreDetailsCount = 0;
+    private string SourceLeaderBoard = "TEST";
     public bool  foundLeaderboard = false;
     public bool downLoadingUserEntry = false;
-    public bool downLoadingTop10Entries = false;
+    public bool downLoadingTop100Entries = false;
     public bool downloadedLeaderboard = false;
     public int topEntriesCount;
-    public LeaderEntry[] top10Entries;
+    public LeaderEntry[] top100Entries;
 
     private void OnEnable()
     {
@@ -32,7 +32,7 @@ public class Leaderboard : MonoBehaviour
             m_LeaderBoardResults = CallResult<LeaderboardFindResult_t>.Create(OnLeaderBoardResults);
             m_LeaderBoardScoreUploaded = CallResult<LeaderboardScoreUploaded_t>.Create(OnLeaderBoardScoresUploaded);
             m_LeaderBoardUserScoreDownloaded = CallResult<LeaderboardScoresDownloaded_t>.Create(OnleaderboardScoresDownloaded);
-            m_LeaderBoardTop10Downloaded = CallResult<LeaderboardScoresDownloaded_t>.Create(OnLeaderboardTop10Downloaded);
+            m_LeaderBoardTop100Downloaded = CallResult<LeaderboardScoresDownloaded_t>.Create(OnLeaderboardTop100Downloaded);
         }   
     }
 
@@ -57,18 +57,18 @@ public class Leaderboard : MonoBehaviour
         }
     }
 
-    private void OnLeaderboardTop10Downloaded(LeaderboardScoresDownloaded_t pCallback, bool bIOFailure)
+    private void OnLeaderboardTop100Downloaded(LeaderboardScoresDownloaded_t pCallback, bool bIOFailure)
     {
         if (pCallback.m_cEntryCount == 0)
         {
-            Debug.Log("[LeaderBoard] Top10: No entries Found");
+            Debug.Log("[LeaderBoard] Top100: No entries Found");
         }
         else
         {
-            Debug.Log("[LeaderBoardTop10] Top10: " + pCallback.m_cEntryCount + " entries found");
+            Debug.Log("[LeaderBoardTop100] Top100: " + pCallback.m_cEntryCount + " entries found");
             topEntriesCount = pCallback.m_cEntryCount;
-            hSteamTop10Entries = pCallback.m_hSteamLeaderboardEntries;
-            downLoadingTop10Entries = false;
+            hSteamTop100Entries = pCallback.m_hSteamLeaderboardEntries;
+            downLoadingTop100Entries = false;
         }
     }
 
@@ -111,9 +111,9 @@ public class Leaderboard : MonoBehaviour
         {
             DownloadUserEntry();
         }
-        if (foundLeaderboard && !downloadedLeaderboard && !downLoadingTop10Entries)
+        if (foundLeaderboard && !downloadedLeaderboard && !downLoadingTop100Entries)
         {
-            DownloadTop10Entries();
+            DownloadTop100Entries();
         }
       
     }
@@ -145,15 +145,15 @@ public class Leaderboard : MonoBehaviour
         m_LeaderBoardUserScoreDownloaded.Set(handle3); // set m_LeaderBoardUserScoreDownloaded with the user downloaded leaderboard entry
     }
 
-    public void DownloadTop10Entries()
+    public void DownloadTop100Entries()
     {
         Debug.Log("[LeaderBoard] downloading top 10 leaderboard entries");
-        downLoadingTop10Entries = true;
+        downLoadingTop100Entries = true;
         SteamAPICall_t handle4 = SteamUserStats.DownloadLeaderboardEntries(hSteamLeaderboard,ELeaderboardDataRequest.k_ELeaderboardDataRequestGlobal,0,11);
-        m_LeaderBoardTop10Downloaded.Set(handle4); // set m_LeaderBoardTop10Downloaded with the top 10 downloaded leaderboard entries
+        m_LeaderBoardTop100Downloaded.Set(handle4); // set m_LeaderBoardTop10Downloaded with the top 10 downloaded leaderboard entries
     }
     
-    public LeaderEntry[] ReadDownloadedTop10Entries()
+    public LeaderEntry[] ReadDownloadedTop100Entries()
     {
       
         Debug.Log("[LeaderBoard] reading top 10 entries");
@@ -162,7 +162,7 @@ public class Leaderboard : MonoBehaviour
         for (int i = 0; i < topEntriesCount; i++)
         {
             LeaderboardEntry_t entry_T;
-            SteamUserStats.GetDownloadedLeaderboardEntry(hSteamTop10Entries, i, out entry_T, pScoreDetails, cScoreDetailsCount);
+            SteamUserStats.GetDownloadedLeaderboardEntry(hSteamTop100Entries, i, out entry_T, pScoreDetails, cScoreDetailsCount);
             vals[i] = new LeaderEntry(entry_T.m_steamIDUser, entry_T.m_nGlobalRank,entry_T.m_nScore);
             
         }
