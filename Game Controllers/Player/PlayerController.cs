@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour
     public bool newPlayer;
 
     public int enemyMMR;
-    public int FIDE_KFactor = 31;
+    public int FIDE_KFactor = 15;
 
     private void Awake()
     {
@@ -379,6 +379,7 @@ public class PlayerController : MonoBehaviour
                 go.GetComponentInChildren<NPC>().occupyingTile = tile;
                 go.GetComponentInChildren<NPC>().PrepareNPC3DHud();
                 npcController.UpdateNpcList();
+                go.GetComponentInChildren<NPC>().TryLevelUpFriendly();
                 SetPlayerGoldCount(playerGoldCount - unitCost);
           
                 return true;

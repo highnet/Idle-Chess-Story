@@ -323,7 +323,7 @@ public class UiController : MonoBehaviour
     public void RefreshHelperTips()
     {
         helperText.text = helperTipContainer.currentTip;
-        currentTipCounterText.text = "Tip: " + (helperTipContainer.currentTipIndex+1) + "/" + helperTipContainer.totalNumberOfTips;
+        currentTipCounterText.text = "Tip: " + (helperTipContainer.currentTipIndex+1) + "/" + helperTipContainer.helperTips.Length;
     }
 
     public void PreviousTip()
@@ -455,7 +455,7 @@ public class UiController : MonoBehaviour
         selectedUnitPanel_InformationText_TIER.text = "Level " + selectedNPC.TIER;
     }
 
-    public void SyncronizeToSteamLeaderBoardIfNessecary()
+    public void SyncronizeToSteamLeaderBoardIfNeeded()
     {
         // try fetch the players leaderboard score one time
         if (fetchSteamLeaderboardEntry && steamLeaderboard.foundLeaderboard && steamLeaderboard.downloadedLeaderboard && !steamLeaderboard.downLoadingUserEntry)
@@ -484,8 +484,6 @@ public class UiController : MonoBehaviour
                     leaderboardEntryPrefab.trophyIcon.gameObject.SetActive(true);
                     leaderboardEntryPrefab.trophyIcon.sprite = top100Entry.trophyIcon;
                 } 
-               
-
             }
             fetchSteamLeaderboardTop100Entries = false;
         }
@@ -548,7 +546,7 @@ public class UiController : MonoBehaviour
 
     void Update()
     {
-        SyncronizeToSteamLeaderBoardIfNessecary();
+        SyncronizeToSteamLeaderBoardIfNeeded();
         PrepareUIAccordingly();
         ListenForEscapeMenuToggle();
   

@@ -910,7 +910,7 @@ public class NPC : MonoBehaviour
                     Helper.Increment<Tribe>(playerController.deployedTribesCounter, this.PRIMARYTRIBE);
                     Helper.Increment<Tribe>(playerController.deployedTribesCounter, this.SECONDARYTRIBE);
                     uiController.RefreshDeployedTribesCounter();
-                    LevelUpFriendly();
+                    TryLevelUpFriendly();
                 }
 
                 if (this.occupyingTile.GetComponent<TileBehaviour>().i != 8 && boardController.chessBoard[i, j].GetComponent<TileBehaviour>().i == 8) // swapping from chesss board into the reserve board
@@ -920,6 +920,7 @@ public class NPC : MonoBehaviour
                     Helper.Decrement<Tribe>(playerController.deployedTribesCounter, this.PRIMARYTRIBE);
                     Helper.Decrement<Tribe>(playerController.deployedTribesCounter, this.SECONDARYTRIBE);
                     uiController.RefreshDeployedTribesCounter();
+                    TryLevelUpFriendly();
                 }
 
                 if (playerController.currentlyDeployedUnits <= playerController.maxDeployedUnitsLimit) {
@@ -930,7 +931,6 @@ public class NPC : MonoBehaviour
                     if (forceTransformMove)
                     {
                         this.gameObject.GetComponentsInParent<Transform>()[1].position = boardController.chessBoard[i, j].GetComponent<TileBehaviour>().transform.position;
-
                     }
                     return true;
                 } else
@@ -997,7 +997,7 @@ public class NPC : MonoBehaviour
     }
 
 
-    public bool LevelUpFriendly()
+    public bool TryLevelUpFriendly()
     {
         int counter = 0;
      
@@ -1005,7 +1005,7 @@ public class NPC : MonoBehaviour
             NPC secondNPC = null;
       
 
-        foreach (NPC npc in npcController.deployedAllyList)
+        foreach (NPC npc in npcController.allyList)
         {
             if (npc.gameObject.name.Equals(this.gameObject.name) && this != npc && TIER < 3)
             {
@@ -1031,7 +1031,7 @@ public class NPC : MonoBehaviour
                         firstNPC.RemoveFromBoard(true);
                         secondNPC.RemoveFromBoard(true);
                         AudioSource.PlayClipAtPoint(uiController.levelUpAudioClip, this.transform.position);
-                        this.LevelUpFriendly();
+                        this.TryLevelUpFriendly();
                         return true;
                     }
                     else if (TIER == 2)
@@ -1041,7 +1041,7 @@ public class NPC : MonoBehaviour
                         firstNPC.RemoveFromBoard(true);
                         secondNPC.RemoveFromBoard(true);
                         AudioSource.PlayClipAtPoint(uiController.levelUpAudioClip, this.transform.position);
-                        this.LevelUpFriendly();
+                        this.TryLevelUpFriendly();
                         return true;
                     }
                     else if (TIER == 3)

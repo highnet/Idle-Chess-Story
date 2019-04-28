@@ -11,7 +11,6 @@ public class CreepBehaviour : NPC
 
         var currentGameRound = boardController.currentGameRound;
  
-
         BASE_MAXHP  = 333 * Mathf.Pow((1 + 0.10f), currentGameRound);
         BASE_ARMOR = 5 * Mathf.Pow((1 + 0.025f), currentGameRound);
         if (BASE_ARMOR >= 100)
@@ -41,5 +40,7 @@ public class CreepBehaviour : NPC
         ATTACKPOWER = BASE_ATTACKPOWER;
         SPELLPOWER = BASE_SPELLPOWER;
         RETALIATION = BASE_RETALIATION;
+
+        RecalculateInventoryItemValues();
     }
 }

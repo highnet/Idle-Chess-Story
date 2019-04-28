@@ -131,8 +131,11 @@ public class Leaderboard : MonoBehaviour
         {
             SteamAPICall_t handle2 = SteamUserStats.UploadLeaderboardScore(hSteamLeaderboard, eLeaderboardUploadScoreMethod, score, pScoreDetails, cScoreDetailsCount);
             m_LeaderBoardScoreUploaded.Set(handle2);
+        } else if (score >= 5000)
+        {
+            SteamAPICall_t handle2 = SteamUserStats.UploadLeaderboardScore(hSteamLeaderboard, eLeaderboardUploadScoreMethod, 5000, pScoreDetails, cScoreDetailsCount);
+            m_LeaderBoardScoreUploaded.Set(handle2);
         }
-     
     }
 
     public void DownloadUserEntry()
