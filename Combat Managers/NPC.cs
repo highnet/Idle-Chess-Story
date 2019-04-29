@@ -34,6 +34,7 @@ public class NPC : MonoBehaviour
     public PlayerController playerController;
     public UiController uiController;
     public SpellbookController spellBookController;
+    public SessionLogger sessionLogger;
     public Animator animator;
     public float HP;
     public float MAXHP;
@@ -683,13 +684,13 @@ public class NPC : MonoBehaviour
                 playerController.sessionLogger.goldRewarded += (long) (goldBountyReward - bonusGold);
                 playerController.SetPlayerGoldCount(playerController.playerGoldCount + goldBountyReward);
                 uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopClosedAudioClip);
+                int LootDropRoll = UnityEngine.Random.Range(0, 101);
+                if (LootDropRoll >= 90)
+                {
+                    GenerateRandomLootDrop();
+                    sessionLogger.itemDropsEarned++;
+                }
 
-                GameObject LootDrop = (GameObject) Instantiate(Resources.Load("Treasure"), boardController.transform);
-                boardController.DroppedItemList.Add(LootDrop);
-                LootDrop.transform.position = this.transform.position + new Vector3(0f, 1.5f, 0f);
-
-                Vector3 lootDropForce = new Vector3(UnityEngine.Random.Range(-200, 201), UnityEngine.Random.Range(100, 201), UnityEngine.Random.Range(-200,201));
-                LootDrop.GetComponent<Rigidbody>().AddForce(lootDropForce);
 
                 Object.Destroy(transform.parent.gameObject,2);
                 Object.Destroy(this.GetComponentInChildren<HealthBarController>().gameObject);
@@ -735,6 +736,8 @@ public class NPC : MonoBehaviour
 
         }
     }
+
+
 
     public void PrepareNPC3DHud()
     {
@@ -785,6 +788,7 @@ public class NPC : MonoBehaviour
         boardController = worldControl.GetComponent<BoardController>();
         playerController = worldControl.GetComponent<PlayerController>();
         uiController = worldControl.GetComponent<UiController>();
+        sessionLogger = worldControl.GetComponent<SessionLogger>();
         spellBookController = this.GetComponent<SpellbookController>();
         PowerChangeParticleSystem = this.GetComponentInChildren<PowerChangeParticleControl>();
         DustParticleSystem = this.GetComponentInChildren<DustParticleControl>();
@@ -794,8 +798,8 @@ public class NPC : MonoBehaviour
     {
         if (boardController.selectedItemDrop != null && this.Inventory.Count < 4)
         {
-            Debug.Log("Adding item: " + boardController.selectedItemDrop.ItemDroppedInChest.ItemName.ToString());
-            this.Inventory.Add(boardController.selectedItemDrop.ItemDroppedInChest);
+            Debug.Log("Adding item: " + boardController.selectedItemDrop.Item.ItemName.ToString());
+            this.Inventory.Add(boardController.selectedItemDrop.Item);
             RecalculateInventoryItemValues();
             GameObject.Destroy(boardController.selectedItemDrop.gameObject);
             uiController.hudCanvasAudioSource.PlayOneShot(uiController.genericSucessAudioClip);
@@ -999,52 +1003,87 @@ public class NPC : MonoBehaviour
 
     public bool TryLevelUpFriendly()
     {
-        int counter = 0;
-     
+            int likewiseUnitsFound = 0;
             NPC firstNPC = null;
             NPC secondNPC = null;
-      
-
+        List<Item> combinedInventory = new List<Item>();
+        foreach (Item item in this.Inventory)
+        {
+            combinedInventory.Add(item);
+        }
         foreach (NPC npc in npcController.allyList)
         {
             if (npc.gameObject.name.Equals(this.gameObject.name) && this != npc && TIER < 3)
             {
                 if (npc.TIER == this.TIER)
                 {
-                    counter += 1;
+                    likewiseUnitsFound += 1;
 
-                    if (counter == 1 && firstNPC == null)
+                    if (likewiseUnitsFound == 1 && firstNPC == null)
                     {
                         firstNPC = npc;
-                    } else if (counter ==2 && secondNPC == null)
+                        foreach (Item item in firstNPC.Inventory)
+                        {
+                            combinedInventory.Add(item);
+                        }
+                    } else if (likewiseUnitsFound == 2 && secondNPC == null)
                     {
                         secondNPC = npc;
+                        foreach (Item item in secondNPC.Inventory)
+                        {
+                            combinedInventory.Add(item);
+                        }
                     }
                 }
 
-                if (counter == 2)
+                if (likewiseUnitsFound == 2)
                 {
-                    if (TIER == 1)
+                    if (this.TIER == 1)
                     {
-                        ApplyTier2Upgrades();
-                        TIER = 2;
+                        this.ApplyTier2Upgrades();
+                        this.TIER = 2;
                         firstNPC.RemoveFromBoard(true);
                         secondNPC.RemoveFromBoard(true);
                         AudioSource.PlayClipAtPoint(uiController.levelUpAudioClip, this.transform.position);
                         this.TryLevelUpFriendly();
+                        this.Inventory = new List<Item>();
+                        for(int i = 0; i < combinedInventory.Count; i++)
+                        {
+                            if (i < 4)
+                            {
+                                this.Inventory.Add(combinedInventory[i]);
+                            } else
+                            {
+                               GenerateSpecificLootDrop(combinedInventory[i].ItemName);
+                            }
+                        }
+                        this.RecalculateInventoryItemValues();
                         return true;
                     }
-                    else if (TIER == 2)
+                    else if (this.TIER == 2)
                     {
-                        ApplyTier3Upgrades();
-                        TIER = 3;
+                        this.ApplyTier3Upgrades();
+                        this.TIER = 3;
                         firstNPC.RemoveFromBoard(true);
                         secondNPC.RemoveFromBoard(true);
                         AudioSource.PlayClipAtPoint(uiController.levelUpAudioClip, this.transform.position);
                         this.TryLevelUpFriendly();
+                        this.Inventory = new List<Item>();
+                        for (int i = 0; i < combinedInventory.Count; i++)
+                        {
+                            if (i < 4)
+                            {
+                                this.Inventory.Add(combinedInventory[i]);
+                            }
+                            else
+                            {
+                              GenerateSpecificLootDrop(combinedInventory[i].ItemName);
+                            }
+                        }
+                        this.RecalculateInventoryItemValues();
                         return true;
                     }
-                    else if (TIER == 3)
+                    else if (this.TIER == 3)
                     {
                         return false;
                     }
@@ -1054,6 +1093,30 @@ public class NPC : MonoBehaviour
 
         }
             return false;
+    }
+
+    public void GenerateRandomLootDrop()
+    {
+        GameObject LootDrop = (GameObject)Instantiate(Resources.Load("Treasure"), boardController.transform);
+        boardController.DroppedItemList.Add(LootDrop);
+        LootDrop.transform.position = this.transform.position + new Vector3(0f, 1.5f, 0f);
+        Vector3 lootDropForce = new Vector3(UnityEngine.Random.Range(-200, 201), UnityEngine.Random.Range(100, 201), UnityEngine.Random.Range(-200, 201));
+        LootDrop.GetComponent<Rigidbody>().AddForce(lootDropForce);
+        Vector3 lootDropRotation = new Vector3(UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361));
+        LootDrop.GetComponent<Rigidbody>().AddTorque(lootDropRotation);
+    }
+
+    public void GenerateSpecificLootDrop(ItemName itemName)
+    {
+        GameObject LootDrop = (GameObject)Instantiate(Resources.Load("Treasure"), boardController.transform);
+        LootDrop.GetComponent<ItemDrop>().ItemDroppedInChest = new Item(itemName);
+        boardController.DroppedItemList.Add(LootDrop);
+        LootDrop.transform.position = this.transform.position + new Vector3(0f, 1.5f, 0f);
+        Vector3 lootDropForce = new Vector3(UnityEngine.Random.Range(-200, 201), UnityEngine.Random.Range(100, 201), UnityEngine.Random.Range(-200, 201));
+        LootDrop.GetComponent<Rigidbody>().AddForce(lootDropForce);
+        Vector3 lootDropRotation = new Vector3(UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361));
+        LootDrop.GetComponent<Rigidbody>().AddTorque(lootDropRotation);
+
     }
 
     public void TakePureDamage(DamageReport damageReport)

@@ -429,6 +429,10 @@ public class UiController : MonoBehaviour
             {
                 goldReward = (int)(goldReward * 8f); // gold bonus for selling a tier 3 unit
             }
+            foreach(Item item in boardController.selectedNPC.GetComponent<NPC>().Inventory)
+            {
+                boardController.selectedNPC.GetComponent<NPC>().GenerateSpecificLootDrop(item.ItemName);
+            }
             boardController.selectedNPC.GetComponent<NPC>().RemoveFromBoard(true); // remove the sold npc from the board 
             playerController.SetPlayerGoldCount(playerController.playerGoldCount + (long)goldReward); // apply the gold reward to the player
             hudCanvasAudioSource.PlayOneShot(buyUnitSuccessAudioClip);

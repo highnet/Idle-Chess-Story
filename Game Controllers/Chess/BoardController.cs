@@ -16,7 +16,7 @@ public class BoardController : MonoBehaviour
     public GameObject[] reserveBoard;
     public List<GameObject> unitsList;
     public GameObject selectedNPC;
-    public ItemDrop selectedItemDrop;
+    public AssignableItemDrop selectedItemDrop;
     public GameObject tilePrefab;
     public MainCamera mainCameraController;
     public bool testDummyMode = false;
@@ -67,6 +67,7 @@ public class BoardController : MonoBehaviour
             }
         }
     }
+
 
     public void SpawnEnemyUnitsRound_Balanced() // copy the human players board and deply a similar team
     {

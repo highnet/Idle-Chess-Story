@@ -12,6 +12,7 @@ public class SessionLogger : MonoBehaviour
     public int mostDeployedTribeAmount; 
     public Dictionary<Tribe, int> TribesDeployedToFightTracker;
     public float mmrChange = 0;
+    public int itemDropsEarned = 0;
 
     private void Start()
     {

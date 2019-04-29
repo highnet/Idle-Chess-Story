@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
     public Dictionary<Tribe, List<Unit>> TRIBAL_UNIT_DATA;
     public Dictionary<Tribe, int> deployedTribesCounter;
     public Dictionary<Tribe, int> enemyActiveTribesCounter;
+    public Dictionary<ItemRarity, List<ItemName>> ITEM_RARITY_DATA;
     public Unit[] shoppingOptions;
     public int constant_Crit_RngRollBaseLowerBound;
     public int constant_Crit_RngRollBaseUpperBound;
@@ -261,6 +262,28 @@ public class PlayerController : MonoBehaviour
             {Tribe.Undead, undeadList},
             {Tribe.Warrior, warriorList},
              {Tribe.Wizard,wizardList },
+        };
+
+        List<ItemName> trashList = new List<ItemName>();
+        trashList.Add(ItemName.StickSword);
+
+        List<ItemName> commonList = new List<ItemName>();
+        commonList.Add(ItemName.MetalSword);
+
+        List<ItemName> rareList = new List<ItemName>();
+        rareList.Add(ItemName.DragonKnife);
+
+        List<ItemName> artifactList = new List<ItemName>();
+        artifactList.Add(ItemName.LifeStone);
+
+
+        ITEM_RARITY_DATA = new Dictionary<ItemRarity, List<ItemName>>
+        {
+            {ItemRarity.Trash,trashList},
+            {ItemRarity.Common,commonList},
+            {ItemRarity.Rare,rareList},
+            {ItemRarity.Artifact,artifactList},
+
         };
 
         constant_HP_RegenPerSecond = constant_HP_BaseTickRegeneration / constant_HP_RegenerationIntervalSeconds;

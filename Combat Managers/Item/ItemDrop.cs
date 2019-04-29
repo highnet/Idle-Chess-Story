@@ -8,40 +8,36 @@ public class ItemDrop : MonoBehaviour
 {
     public Item ItemDroppedInChest;
     public BoardController boardController;
-    public LineRenderer SelectionLine;
+    public PlayerController playerController;
 
     private void Start()
     {
         boardController = GetComponentInParent<BoardController>();
-        SelectionLine = GetComponent<LineRenderer>();
-        ItemName itemName = (ItemName)Enum.GetValues(typeof(ItemName)).GetValue((int)UnityEngine.Random.Range(0, Enum.GetValues(typeof(ItemName)).Length));
-        Debug.Log("rng item: " + itemName.ToString());
+        playerController = GetComponentInParent<PlayerController>();
+        int RarityRoll = UnityEngine.Random.Range(0, 101);
+        ItemRarity rolledRarity = ItemRarity.Trash;
+        if (RarityRoll >= 60 && RarityRoll < 90)
+        {
+            rolledRarity = ItemRarity.Common;
+        }
+        else if (RarityRoll >= 90 && RarityRoll < 99)
+        {
+            rolledRarity = ItemRarity.Rare;
+        }
+        else if (RarityRoll >= 99)
+        {
+            rolledRarity = ItemRarity.Artifact;
+        }
+        Debug.Log("Rolled: " + RarityRoll + " and getting a random item of rarity: " + rolledRarity.ToString());
+        List<ItemName> possibleDrops;
+        playerController.ITEM_RARITY_DATA.TryGetValue(rolledRarity, out possibleDrops); // get a list of all units of our possible item drops
+        Debug.Log("Possible drops count: " + possibleDrops.Count);
+        int possibleDropIndex = UnityEngine.Random.Range(0, possibleDrops.Count);
+        ItemName itemName = possibleDrops[possibleDropIndex];
         Item rngItem = new Item(itemName);
-        ItemDroppedInChest = rngItem; // get a random tribe); 
+        ItemDroppedInChest = rngItem; 
         Debug.Log("Generated Item: " + rngItem.ItemName.ToString() + " for Treasure Drop");
        
-    }
-    private void Update()
-    {
-        if (boardController.selectedItemDrop == this)
-        {
-            SelectionLine.enabled = true;
-        Vector3[] positions = new Vector3[2];
-        positions[0] = this.transform.position;
-
-        if (boardController.mousedOverNPC != null)
-        {
-            positions[1] = boardController.mousedOverNPC.transform.position;
-        } else
-        {
-            positions[1] = this.transform.position;
-        }
-
-        SelectionLine.SetPositions(positions);
-        } else
-        {
-            SelectionLine.enabled = false;
-        }
     }
 
     private void OnMouseOver()
@@ -52,14 +48,22 @@ public class ItemDrop : MonoBehaviour
     {
         if (boardController.gameStatus == GameStatus.Shopping)
         {
-            boardController.selectedItemDrop = this;
-            boardController.selectedNPC = null;
+            GameObject Loot = (GameObject)Instantiate(Resources.Load(ItemDroppedInChest.ItemName.ToString()), boardController.transform);
+            Loot.GetComponent<AssignableItemDrop>().Item = ItemDroppedInChest;
+            Loot.transform.position = this.transform.position + (2 * Vector3.up);
+            boardController.selectedItemDrop = Loot.GetComponent<AssignableItemDrop>();
+            Vector3 lootDropForce = new Vector3(UnityEngine.Random.Range(-20, 21), UnityEngine.Random.Range(10, 21), UnityEngine.Random.Range(-20, 21));
+            Loot.GetComponent<Rigidbody>().AddForce(lootDropForce);
+            Vector3 lootDropRotation = new Vector3(UnityEngine.Random.Range(-1, 2), UnityEngine.Random.Range(-1, 2), UnityEngine.Random.Range(-1, 2));
+            Loot.GetComponent<Rigidbody>().AddTorque(lootDropRotation);
+            GameObject.Destroy(this.gameObject);
         }
-       else
+        else
         {
-
             Vector3 lootDropForce = new Vector3(UnityEngine.Random.Range(-200, 201), UnityEngine.Random.Range(100, 201), UnityEngine.Random.Range(-200, 201));
             GetComponent<Rigidbody>().AddForce(lootDropForce);
+            Vector3 lootDropRotation = new Vector3(UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361));
+            GetComponent<Rigidbody>().AddTorque(lootDropRotation);
         }
 
     }

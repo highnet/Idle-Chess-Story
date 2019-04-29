@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ItemName {ShortSword, ShortStaff,RoundShield,LifeRune,ChainMail}
-// public enum ItemRarity {Trash, Normal, Rare, Artifact}
+public enum ItemName {StickSword,MetalSword,DragonKnife,LifeStone}
+public enum ItemRarity {Trash, Common, Rare, Artifact}
 [System.Serializable]
 public class Item 
 {
     public ItemName ItemName;
+    public ItemRarity ItemRarity;
     public int MAXHP_Bonus;
     public int ARMOR_Bonus;
     public int ATTACKPOWER_Bonus;
@@ -18,24 +19,25 @@ public class Item
     {
         Debug.Log("RECIEVED ITEMNAME :" + ItemToCreate.ToString());
         this.ItemName = ItemToCreate;
-        if (ItemToCreate == ItemName.ShortSword)
+        if (ItemToCreate == ItemName.StickSword)
         {
-            this.ATTACKPOWER_Bonus += 50;
-        } else if(ItemToCreate == ItemName.ShortStaff)
-        {
-            this.SPELLPOWER_Bonus += 50;
+            this.ItemRarity = ItemRarity.Trash;
+            this.ATTACKPOWER_Bonus += 25;
         }
-        else if (ItemToCreate == ItemName.RoundShield)
+        else if (ItemToCreate == ItemName.MetalSword)
         {
-            this.ARMOR_Bonus += 5;
+            this.ItemRarity = ItemRarity.Common;
+            this.ATTACKPOWER_Bonus += 45;
         }
-        else if (ItemToCreate == ItemName.LifeRune)
+        else if (ItemToCreate == ItemName.DragonKnife)
         {
-            this.MAXHP_Bonus += 250;
+            this.ItemRarity = ItemRarity.Rare;
+            this.ATTACKPOWER_Bonus += 65;
         }
-        else if (ItemToCreate == ItemName.ChainMail)
+        else if (ItemToCreate == ItemName.LifeStone)
         {
-            this.ARMOR_Bonus += 3;
+            this.ItemRarity = ItemRarity.Artifact;
+            this.MAXHP_Bonus += 300;
         }
 
     }
