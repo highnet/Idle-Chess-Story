@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ItemName {StickSword,MetalSword,DragonKnife,LifeStone}
+public enum ItemName {StickSword,TwoHander,DragonKnife,LifeStone,SkullShield,WoodenShield,ShortSword,FlamingScimitar,PoisonedRapier,LongSword,MoonKatana,BroadSword}
 public enum ItemRarity {Trash, Common, Rare, Artifact}
 [System.Serializable]
 public class Item 
@@ -24,7 +24,7 @@ public class Item
             this.ItemRarity = ItemRarity.Trash;
             this.ATTACKPOWER_Bonus += 25;
         }
-        else if (ItemToCreate == ItemName.MetalSword)
+        else if (ItemToCreate == ItemName.TwoHander)
         {
             this.ItemRarity = ItemRarity.Common;
             this.ATTACKPOWER_Bonus += 45;
@@ -37,7 +37,52 @@ public class Item
         else if (ItemToCreate == ItemName.LifeStone)
         {
             this.ItemRarity = ItemRarity.Artifact;
-            this.MAXHP_Bonus += 300;
+            this.MAXHP_Bonus += 1000;
+        }
+        else if (ItemToCreate == ItemName.SkullShield)
+        {
+            this.ItemRarity = ItemRarity.Rare;
+            this.ARMOR_Bonus += 7;
+        }
+        else if (ItemToCreate == ItemName.WoodenShield)
+        {
+            this.ItemRarity = ItemRarity.Trash;
+            this.ARMOR_Bonus += 3;
+        }
+        else if (ItemToCreate == ItemName.ShortSword)
+        {
+            this.ItemRarity = ItemRarity.Common;
+            this.ATTACKPOWER_Bonus += 45;
+        }
+        else if (ItemToCreate == ItemName.FlamingScimitar)
+        {
+            this.ItemRarity = ItemRarity.Rare;
+            this.ATTACKPOWER_Bonus += 25;
+            this.SPELLPOWER_Bonus += 50;
+        }
+        else if (ItemToCreate == ItemName.PoisonedRapier)
+        {
+            this.ItemRarity = ItemRarity.Rare;
+            this.ATTACKPOWER_Bonus += 50;
+            this.SPELLPOWER_Bonus += 25;
+        }
+        else if (ItemToCreate == ItemName.LongSword)
+        {
+            this.ItemRarity = ItemRarity.Trash;
+            this.ATTACKPOWER_Bonus += 30;
+            this.RETALIATION_Bonus += 3;
+        }
+        else if (ItemToCreate == ItemName.MoonKatana)
+        {
+            this.ItemRarity = ItemRarity.Artifact;
+            this.ATTACKPOWER_Bonus += 50;
+
+        }
+        else if (ItemToCreate == ItemName.BroadSword)
+        {
+            this.ItemRarity = ItemRarity.Trash;
+            this.RETALIATION_Bonus += 1;
+            this.ATTACKPOWER_Bonus += 25;
         }
 
     }

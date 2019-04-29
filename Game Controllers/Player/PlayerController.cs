@@ -256,26 +256,41 @@ public class PlayerController : MonoBehaviour
         {
             {Tribe.Assassin, assassinList},
             {Tribe.Beast, beastList},
-             {Tribe.Elemental, elementalList},
+            {Tribe.Elemental, elementalList},
             {Tribe.Guardian, guardianList},
             {Tribe.Structure,structureList },
             {Tribe.Undead, undeadList},
             {Tribe.Warrior, warriorList},
-             {Tribe.Wizard,wizardList },
+            {Tribe.Wizard,wizardList },
         };
 
-        List<ItemName> trashList = new List<ItemName>();
-        trashList.Add(ItemName.StickSword);
+        List<ItemName> trashList = new List<ItemName>
+        {
+            ItemName.StickSword,
+            ItemName.WoodenShield,
+            ItemName.LongSword,
+            ItemName.BroadSword
+        };
 
-        List<ItemName> commonList = new List<ItemName>();
-        commonList.Add(ItemName.MetalSword);
+        List<ItemName> commonList = new List<ItemName>
+        {
+            ItemName.TwoHander,
+            ItemName.ShortSword
+        };
 
-        List<ItemName> rareList = new List<ItemName>();
-        rareList.Add(ItemName.DragonKnife);
+        List<ItemName> rareList = new List<ItemName>
+        {
+            ItemName.DragonKnife,
+            ItemName.SkullShield,
+            ItemName.FlamingScimitar,
+            ItemName.PoisonedRapier
+        };
 
-        List<ItemName> artifactList = new List<ItemName>();
-        artifactList.Add(ItemName.LifeStone);
-
+        List<ItemName> artifactList = new List<ItemName>
+        {
+            ItemName.LifeStone,
+            ItemName.MoonKatana
+        };
 
         ITEM_RARITY_DATA = new Dictionary<ItemRarity, List<ItemName>>
         {
@@ -283,21 +298,17 @@ public class PlayerController : MonoBehaviour
             {ItemRarity.Common,commonList},
             {ItemRarity.Rare,rareList},
             {ItemRarity.Artifact,artifactList},
-
         };
 
         constant_HP_RegenPerSecond = constant_HP_BaseTickRegeneration / constant_HP_RegenerationIntervalSeconds;
         constant_HP_CONCENTRATIONPerSecond = constant_Concentration_BaseTickRegeneration / constant_Concentration_RegenerationIntervalSeconds;
-
         InitializeDeployedTribesCounter();
         ReInitializeEnemyActiveTribesCounter();
         InitializeShoppingOptions();
         SetPlayerGoldCount(playerGoldCount);
         playerOwnedNpcs = new List<NPC>();
         SetCurrentlyDeployedUnits(0);
-   
         uiController.ChangeHPPlayerDisplayText(this.currentPlayerHealth, this.maxPlayerHealth);
-     
     }
 
     public void ReInitializeEnemyActiveTribesCounter()

@@ -148,6 +148,8 @@ public class UiController : MonoBehaviour
     public GameObject combatTimerPanel;
     public Text combatTimerPanelText;
     public Text versionText;
+    public GameObject MousedOverSelectedItemTooltipPanel;
+    public Text hoveredOrSelectedItemText;
 
     private void Awake()
     {
@@ -221,8 +223,6 @@ public class UiController : MonoBehaviour
 
     public void BindButtons()
     {
-    
-
         previousTipButton.onClick.RemoveAllListeners();
         previousTipButton.onClick.AddListener(delegate { PreviousTip(); });
 
@@ -495,6 +495,14 @@ public class UiController : MonoBehaviour
 
     public void PrepareUIAccordingly()
     {
+        if (boardController.gameStatus != GameStatus.ReportVictory && boardController.gameStatus != GameStatus.ReportDefeat && boardController.mousedOverItem != null) // update the inventory mousedover tooltip
+        {
+                MousedOverSelectedItemTooltipPanel.gameObject.SetActive(true);
+        }
+        else
+        {
+            MousedOverSelectedItemTooltipPanel.gameObject.SetActive(false);
+        }
 
         if (boardController.gameStatus != GameStatus.ReportVictory && boardController.gameStatus != GameStatus.ReportDefeat && boardController.selectedNPC != null) // update the entire selected unit panel
         {
@@ -850,8 +858,8 @@ public class UiController : MonoBehaviour
                 sessionLogger.IncrementTribesDeployedToFightCounters(npc);
             }
 
-            foreach (GameObject treasure in boardController.DroppedItemList) {
-                GameObject.Destroy(treasure);
+            foreach (GameObject lootDrop in boardController.DroppedItemList) {
+                GameObject.Destroy(lootDrop);
             }
 
             sessionLogger.unitsDeployedToFight += npcController.deployedAllyList.Count;

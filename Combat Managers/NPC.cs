@@ -685,7 +685,7 @@ public class NPC : MonoBehaviour
                 playerController.SetPlayerGoldCount(playerController.playerGoldCount + goldBountyReward);
                 uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopClosedAudioClip);
                 int LootDropRoll = UnityEngine.Random.Range(0, 101);
-                if (LootDropRoll >= 90)
+                if (LootDropRoll >= 90 || boardController.testItemDrops)
                 {
                     GenerateRandomLootDrop();
                     sessionLogger.itemDropsEarned++;

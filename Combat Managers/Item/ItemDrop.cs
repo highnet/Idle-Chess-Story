@@ -52,6 +52,7 @@ public class ItemDrop : MonoBehaviour
             Loot.GetComponent<AssignableItemDrop>().Item = ItemDroppedInChest;
             Loot.transform.position = this.transform.position + (2 * Vector3.up);
             boardController.selectedItemDrop = Loot.GetComponent<AssignableItemDrop>();
+            boardController.DroppedItemList.Add(Loot);
             Vector3 lootDropForce = new Vector3(UnityEngine.Random.Range(-20, 21), UnityEngine.Random.Range(10, 21), UnityEngine.Random.Range(-20, 21));
             Loot.GetComponent<Rigidbody>().AddForce(lootDropForce);
             Vector3 lootDropRotation = new Vector3(UnityEngine.Random.Range(-1, 2), UnityEngine.Random.Range(-1, 2), UnityEngine.Random.Range(-1, 2));

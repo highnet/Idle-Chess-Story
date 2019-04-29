@@ -9,11 +9,13 @@ public class AssignableItemDrop : MonoBehaviour
     public Item Item;
     public Outline outline;
     public BoardController boardController;
+    public UiController uiController;
     public LineRenderer SelectionLine;
 
     private void Start()
     {
         boardController = GetComponentInParent<BoardController>();
+        uiController = GetComponentInParent<UiController>();
         SelectionLine = GetComponent<LineRenderer>();
         outline = GetComponent<Outline>();
         if (this.Item.ItemRarity.Equals(ItemRarity.Trash))
@@ -59,7 +61,12 @@ public class AssignableItemDrop : MonoBehaviour
 
     private void OnMouseOver()
     {
-        Debug.Log(this.Item.ItemName.ToString());
+        boardController.mousedOverItem = this;
+        uiController.hoveredOrSelectedItemText.text = this.Item.ItemName.ToString() + " (" + this.Item.ItemRarity.ToString() + ")";
+    }
+    private void OnMouseExit()
+    {
+        boardController.mousedOverItem = null;
     }
     private void OnMouseUp()
     {

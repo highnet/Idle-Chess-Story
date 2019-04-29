@@ -20,6 +20,7 @@ public class BoardController : MonoBehaviour
     public GameObject tilePrefab;
     public MainCamera mainCameraController;
     public bool testDummyMode = false;
+    public bool testItemDrops = false;
     public GameStatus gameStatus;
     public int currentGameRound = 1;
     public GameObject friendlySideIndicatorPlane;
@@ -32,6 +33,7 @@ public class BoardController : MonoBehaviour
     public List<GameObject> DroppedItemList;
     public Camera mainCamera;
     public NPC mousedOverNPC;
+    public AssignableItemDrop mousedOverItem;
 
     private void Awake()
     {
@@ -83,7 +85,6 @@ public class BoardController : MonoBehaviour
                     int randomJ = UnityEngine.Random.Range(0, 8); // find a random j coordinate
                     TrySpawnUnit(randomI, randomJ, Unit.RobotCreep, true, 0,true); // spawn creep
                 }
-
             }
 
             else  if (currentGameRound == 18) // boss round 
@@ -188,17 +189,16 @@ public class BoardController : MonoBehaviour
                         }
                         spawningBudget -= unitCost;
                     }
-
                 }
 
-                bool skippedOne = false;
-                bool skippedOneTierThree = false;
+                bool skippedFirstLevelup = false;
+                bool skippedOneTierThreeLevelup = false;
 
-                foreach (NPC npc in npcController.enemyList)
+                foreach (NPC npc in npcController.enemyList) // give NPCs levelups
                 {
-                    if (!skippedOne)
+                    if (!skippedFirstLevelup)
                     {
-                        skippedOne = true;
+                        skippedFirstLevelup = true;
                         continue;
                     }
                     playerController.NPC_COST_DATA.TryGetValue(npc.UNIT_TYPE, out int unitCost);
@@ -207,11 +207,11 @@ public class BoardController : MonoBehaviour
                     if (spawningBudget >= t3UpgradeCost)
                     {
                         npc.ApplyTier2Upgrades();
-                        if (!skippedOneTierThree)
+                        if (!skippedOneTierThreeLevelup)
                         {
                             npc.ApplyTier2Upgrades();
                             spawningBudget -= t2UpgradeCost;
-                            skippedOneTierThree = true;
+                            skippedOneTierThreeLevelup = true;
                             continue;
                         }
                         npc.ApplyTier3Upgrades();
@@ -221,7 +221,61 @@ public class BoardController : MonoBehaviour
                         npc.ApplyTier2Upgrades();
                         spawningBudget -= t2UpgradeCost;
                     }
+                }
+                int itemsAllowedBudget = 0;
+                if (uiController.wizard_difficultyPicker.value == 0)
+                {
+                    itemsAllowedBudget = sessionLogger.itemDropsEarned + UnityEngine.Random.Range(-2, 2);
+                }
+                else if (uiController.wizard_difficultyPicker.value == 1)
+                {
+                    itemsAllowedBudget = sessionLogger.itemDropsEarned + UnityEngine.Random.Range(-1, 2);
+                }
+                else if (uiController.wizard_difficultyPicker.value == 2)
+                {
+                    itemsAllowedBudget = sessionLogger.itemDropsEarned + UnityEngine.Random.Range(0, 3);
+                }
 
+                bool skippedFirstItemAssignation = false;
+
+                foreach (NPC npc in npcController.enemyList) // give NPCs items
+                {
+                    if (!skippedFirstItemAssignation)
+                    {
+                        skippedFirstItemAssignation = true;
+                        continue;
+                    }
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if (itemsAllowedBudget > 0)
+                        {
+                            int RarityRoll = UnityEngine.Random.Range(0, 101);
+                            ItemRarity rolledRarity = ItemRarity.Trash;
+                            if (RarityRoll >= 60 && RarityRoll < 90)
+                            {
+                                rolledRarity = ItemRarity.Common;
+                            }
+                            else if (RarityRoll >= 90 && RarityRoll < 99)
+                            {
+                                rolledRarity = ItemRarity.Rare;
+                            }
+                            else if (RarityRoll >= 99)
+                            {
+                                rolledRarity = ItemRarity.Artifact;
+                            }
+                            List<ItemName> possibleDrops;
+                            playerController.ITEM_RARITY_DATA.TryGetValue(rolledRarity, out possibleDrops); // get a list of all units of our possible item drops
+                            int possibleDropIndex = UnityEngine.Random.Range(0, possibleDrops.Count);
+                            ItemName itemName = possibleDrops[possibleDropIndex];
+                            Item rngItem = new Item(itemName);
+                            npc.Inventory.Add(rngItem);
+                            itemsAllowedBudget--;
+                        } else
+                        {
+                            break;
+                        }
+                        npc.RecalculateInventoryItemValues();
+                    }
                 }
 
                 }
