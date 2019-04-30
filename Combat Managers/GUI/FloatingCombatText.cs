@@ -99,6 +99,6 @@ TextMesh textmesh = this.GetComponent<TextMesh>();
     // Update is called once per frame
     void Update()
     {
-        transform.rotation = Camera.main.transform.rotation; // "billboard"
+        transform.rotation = Camera.main.transform.rotation; // "billboard the floating combat text"
     }
 }
