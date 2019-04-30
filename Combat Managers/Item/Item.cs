@@ -76,6 +76,9 @@ public class Item
         {
             this.ItemRarity = ItemRarity.Artifact;
             this.ATTACKPOWER_Bonus += 50;
+            this.ARMOR_Bonus += 5;
+            this.RETALIATION_Bonus += 5;
+            this.SPELLPOWER_Bonus += 50;
 
         }
         else if (ItemToCreate == ItemName.BroadSword)

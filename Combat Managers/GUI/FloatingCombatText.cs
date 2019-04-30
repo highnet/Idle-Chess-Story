@@ -11,21 +11,26 @@ public class FloatingCombatText : MonoBehaviour
     public DamageReport dmgReport;
     public string ExtraDisplayString;
     public DisplayMode displayMode;
+    public Camera mainCamera;
     // Start is called before the first frame update
 
+    private void Start()
+    {
+        mainCamera = Camera.main;
+    }
 
     public void Init()
     {
-                if (dmgReport.primaryDamageDealt< 0)
+        if (dmgReport.primaryDamageDealt< 0)
         {
             dmgReport.primaryDamageDealt = 0;
         }
 
-dmgReport.primaryDamageDealt = (float) System.Math.Round(dmgReport.primaryDamageDealt,0, System.MidpointRounding.AwayFromZero);
-dmgReport.lifeStealHeal = (float) System.Math.Round(dmgReport.lifeStealHeal,0, System.MidpointRounding.AwayFromZero);
-dmgReport.retaliationDamageRecieved = (float) System.Math.Round(dmgReport.retaliationDamageRecieved,0, System.MidpointRounding.AwayFromZero);
+      dmgReport.primaryDamageDealt = (float) System.Math.Round(dmgReport.primaryDamageDealt,0, System.MidpointRounding.AwayFromZero);
+      dmgReport.lifeStealHeal = (float) System.Math.Round(dmgReport.lifeStealHeal,0, System.MidpointRounding.AwayFromZero);
+      dmgReport.retaliationDamageRecieved = (float) System.Math.Round(dmgReport.retaliationDamageRecieved,0, System.MidpointRounding.AwayFromZero);
 
-TextMesh textmesh = this.GetComponent<TextMesh>();
+      TextMesh textmesh = this.GetComponent<TextMesh>();
 
         if (displayMode == DisplayMode.Retaliation)
         {
@@ -97,8 +102,8 @@ TextMesh textmesh = this.GetComponent<TextMesh>();
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
-        transform.rotation = Camera.main.transform.rotation; // "billboard the floating combat text"
+        transform.rotation = mainCamera.transform.rotation; // "billboard the floating combat text"
     }
 }

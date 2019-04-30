@@ -49,22 +49,26 @@ public class ItemDrop : MonoBehaviour
         if (boardController.gameStatus == GameStatus.Shopping)
         {
             GameObject Loot = (GameObject)Instantiate(Resources.Load(ItemDroppedInChest.ItemName.ToString()), boardController.transform);
-            Loot.GetComponent<AssignableItemDrop>().Item = ItemDroppedInChest;
+
+            AssignableItemDrop assignableItemDrop = Loot.GetComponent<AssignableItemDrop>();
+            assignableItemDrop.Item = ItemDroppedInChest;
             Loot.transform.position = this.transform.position + (2 * Vector3.up);
-            boardController.selectedItemDrop = Loot.GetComponent<AssignableItemDrop>();
+            boardController.selectedItemDrop = assignableItemDrop;
             boardController.DroppedItemList.Add(Loot);
             Vector3 lootDropForce = new Vector3(UnityEngine.Random.Range(-20, 21), UnityEngine.Random.Range(10, 21), UnityEngine.Random.Range(-20, 21));
-            Loot.GetComponent<Rigidbody>().AddForce(lootDropForce);
+            Rigidbody rigidBody = Loot.GetComponent<Rigidbody>();
+            rigidBody.AddForce(lootDropForce);
             Vector3 lootDropRotation = new Vector3(UnityEngine.Random.Range(-1, 2), UnityEngine.Random.Range(-1, 2), UnityEngine.Random.Range(-1, 2));
-            Loot.GetComponent<Rigidbody>().AddTorque(lootDropRotation);
+            rigidBody.AddTorque(lootDropRotation);
             GameObject.Destroy(this.gameObject);
         }
         else
         {
+            Rigidbody rigidBody = this.GetComponent<Rigidbody>();
             Vector3 lootDropForce = new Vector3(UnityEngine.Random.Range(-200, 201), UnityEngine.Random.Range(100, 201), UnityEngine.Random.Range(-200, 201));
-            GetComponent<Rigidbody>().AddForce(lootDropForce);
+            rigidBody.AddForce(lootDropForce);
             Vector3 lootDropRotation = new Vector3(UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361));
-            GetComponent<Rigidbody>().AddTorque(lootDropRotation);
+            rigidBody.AddTorque(lootDropRotation);
         }
 
     }

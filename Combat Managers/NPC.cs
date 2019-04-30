@@ -88,10 +88,12 @@ public class NPC : MonoBehaviour
     public PowerChangeParticleControl PowerChangeParticleSystem;
     public DustParticleControl DustParticleSystem;
     public List<Item> Inventory = new List<Item>();
+    public Camera mainCamera;
 
     public void Awake()
     {
         FindWorldControllers();
+        mainCamera = Camera.main;
         animator = GetComponent<Animator>();
         movementJumpYOffset = new AnimationCurve();
         movementJumpYOffset.AddKey(new Keyframe(0, 0));
@@ -691,7 +693,6 @@ public class NPC : MonoBehaviour
                     sessionLogger.itemDropsEarned++;
                 }
 
-
                 Object.Destroy(transform.parent.gameObject,2);
                 Object.Destroy(this.GetComponentInChildren<HealthBarController>().gameObject);
      
@@ -705,12 +706,12 @@ public class NPC : MonoBehaviour
         } else if (!isEnemy && !isDying_SingleRunController)
         {
             isDying_SingleRunController = true;
-            npcController.allyList.Remove(gameObject.GetComponent<NPC>());
-            npcController.deployedAllyList.Remove(gameObject.GetComponent<NPC>());
-            npcController.npcList.Remove(gameObject.GetComponent<NPC>());
-          
-            gameObject.GetComponent<NPC>().occupyingTile.GetComponent<TileBehaviour>().occupyingUnit = null;
-            if (occupyingTile.GetComponent<TileBehaviour>().i != 8)
+            npcController.allyList.Remove(this);
+            npcController.deployedAllyList.Remove(this);
+            npcController.npcList.Remove(this);
+            TileBehaviour tileBehaviour = occupyingTile.GetComponent<TileBehaviour>();
+            tileBehaviour.occupyingUnit = null;
+            if (tileBehaviour.i != 8)
             {
                 Helper.Decrement<Tribe>(playerController.deployedTribesCounter, this.PRIMARYTRIBE);
                 Helper.Decrement<Tribe>(playerController.deployedTribesCounter, this.SECONDARYTRIBE);
@@ -760,19 +761,21 @@ public class NPC : MonoBehaviour
 
             go = (GameObject)Instantiate(Resources.Load("HealthBar"), this.transform.position, this.transform.rotation);
             go.transform.SetParent(this.gameObject.transform);
+            HealthBarController healthBarController = go.GetComponent<HealthBarController>();
+            SpriteRenderer spriteRenderer = healthBarController.fullBar.GetComponentInChildren<SpriteRenderer>();
             if (this.ABILITY == Ability.NOTHING)
             {
-                go.GetComponent<HealthBarController>().emptyConcentrationBar.SetActive(false);
+                healthBarController.emptyConcentrationBar.SetActive(false);
             }
             if (this.UNIT_TYPE == Unit.Eyebat || this.UNIT_TYPE == Unit.Engineer ||this.UNIT_TYPE == Unit.AlienSoldier)
             {
-                go.GetComponent<HealthBarController>().fullBar.GetComponentInChildren<SpriteRenderer>().color = Color.red;
-                go.GetComponent<HealthBarController>().transform.localScale *= 3f;
+                spriteRenderer.color = Color.red;
+                healthBarController.transform.localScale *= 3f;
             }
            else if (this.isEnemy)
             {
-                go.GetComponent<HealthBarController>().fullBar.GetComponentInChildren<SpriteRenderer>().color = Color.red;
-                go.GetComponent<HealthBarController>().transform.localScale *= 0.9f;
+                spriteRenderer.color = Color.red;
+                healthBarController.transform.localScale *= 0.9f;
             }
 
 
@@ -838,19 +841,20 @@ public class NPC : MonoBehaviour
         if (beingDragged && !isEnemy)
         {
             RaycastHit hit;
-            if (!EventSystem.current.IsPointerOverGameObject(-1) && Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("ChessTile"))) {
+            if (!EventSystem.current.IsPointerOverGameObject(-1) && Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("ChessTile"))) {
                 this.gameObject.GetComponentsInParent<Transform>()[1].position = hit.point + Vector3.up * 2;
             }
-            if (!EventSystem.current.IsPointerOverGameObject(-1) && Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("ChessBoard")))
+            if (!EventSystem.current.IsPointerOverGameObject(-1) && Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("ChessBoard")))
             {
                 this.gameObject.GetComponentsInParent<Transform>()[1].position = hit.point + Vector3.up * 2;
             }
 
-            worldControl.GetComponent<LineRenderer>().enabled = true;
+            LineRenderer lineRenderer = worldControl.GetComponent<LineRenderer>();
+            lineRenderer.enabled = true;
             Vector3[] positions = new Vector3[2];
             positions[0] = this.transform.position;
             positions[1] = this.transform.position + Vector3.down * 2;
-            worldControl.GetComponent<LineRenderer>().SetPositions(positions);
+            lineRenderer.SetPositions(positions);
         }
     }
 
@@ -865,17 +869,18 @@ public class NPC : MonoBehaviour
         if (beingDragged)
         {
             RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("ChessTile")))
+            if (Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("ChessTile")))
             {
-                if (hit.collider.GetComponent<TileBehaviour>().i >= 4)
+                TileBehaviour tileBehaviour = hit.collider.GetComponent<TileBehaviour>();
+                if (tileBehaviour.i >= 4)
                 {
                     uiController.hudCanvasAudioSource.PlayOneShot(uiController.chessUnitReleaseAudioClip);
-                    MoveToEmptyTile(hit.collider.GetComponent<TileBehaviour>().i, hit.collider.GetComponent<TileBehaviour>().j,true);
+                    MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j,true);
                 }
 
             }
 
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("ChessBoard")))
+            if (Physics.Raycast(mainCamera.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("ChessBoard")))
             {
                     this.gameObject.GetComponentsInParent<Transform>()[1].position = this.occupyingTile.transform.position;
             }
@@ -905,9 +910,11 @@ public class NPC : MonoBehaviour
     public bool MoveToEmptyTile(int i, int j, bool forceTransformMove)
     {
         if (((i < 8 && i >= 0 && j < 8 && j >= 0) && !boardController.gameStatus.Equals(GameStatus.Shopping)) || ((i < 9 && i >= 0 && j < 8 && j >= 0) && boardController.gameStatus.Equals(GameStatus.Shopping))) {
-            if (boardController.chessBoard != null && boardController.chessBoard[i, j].GetComponent<TileBehaviour>().occupyingUnit == null)
+            TileBehaviour tileBehaviour = boardController.chessBoard[i, j].GetComponent<TileBehaviour>();
+            TileBehaviour tileBehaviour2 = this.occupyingTile.GetComponent<TileBehaviour>(); 
+            if (boardController.chessBoard != null && tileBehaviour.occupyingUnit == null)
             {
-                if (this.occupyingTile.GetComponent<TileBehaviour>().i == 8 && boardController.chessBoard[i, j].GetComponent<TileBehaviour>().i != 8) // swapping from reserve board into the chess board
+                if (tileBehaviour2.i == 8 && tileBehaviour.i != 8) // swapping from reserve board into the chess board
                 {
                     playerController.SetCurrentlyDeployedUnits(playerController.currentlyDeployedUnits + 1);
                     npcController.deployedAllyList.Add(this);
@@ -917,7 +924,7 @@ public class NPC : MonoBehaviour
                     TryLevelUpFriendly();
                 }
 
-                if (this.occupyingTile.GetComponent<TileBehaviour>().i != 8 && boardController.chessBoard[i, j].GetComponent<TileBehaviour>().i == 8) // swapping from chesss board into the reserve board
+                if (tileBehaviour2.i != 8 && tileBehaviour.i == 8) // swapping from chesss board into the reserve board
                 {
                     playerController.SetCurrentlyDeployedUnits(playerController.currentlyDeployedUnits - 1);
                     npcController.deployedAllyList.Remove(this);
@@ -931,10 +938,10 @@ public class NPC : MonoBehaviour
                   
                     this.occupyingTile.gameObject.GetComponent<TileBehaviour>().occupyingUnit = null;
                     this.occupyingTile = boardController.chessBoard[i, j];
-                    boardController.chessBoard[i, j].GetComponent<TileBehaviour>().occupyingUnit = this.gameObject;
+                    tileBehaviour.occupyingUnit = this.gameObject;
                     if (forceTransformMove)
                     {
-                        this.gameObject.GetComponentsInParent<Transform>()[1].position = boardController.chessBoard[i, j].GetComponent<TileBehaviour>().transform.position;
+                        this.gameObject.GetComponentsInParent<Transform>()[1].position = tileBehaviour.transform.position;
                     }
                     return true;
                 } else
@@ -1100,10 +1107,11 @@ public class NPC : MonoBehaviour
         GameObject LootDrop = (GameObject)Instantiate(Resources.Load("Treasure"), boardController.transform);
         boardController.DroppedItemList.Add(LootDrop);
         LootDrop.transform.position = this.transform.position + new Vector3(0f, 1.5f, 0f);
+        Rigidbody rigidbody = LootDrop.GetComponent<Rigidbody>();
         Vector3 lootDropForce = new Vector3(UnityEngine.Random.Range(-200, 201), UnityEngine.Random.Range(100, 201), UnityEngine.Random.Range(-200, 201));
-        LootDrop.GetComponent<Rigidbody>().AddForce(lootDropForce);
+        rigidbody.AddForce(lootDropForce);
         Vector3 lootDropRotation = new Vector3(UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361));
-        LootDrop.GetComponent<Rigidbody>().AddTorque(lootDropRotation);
+        rigidbody.AddTorque(lootDropRotation);
     }
 
     public void GenerateSpecificLootDrop(ItemName itemName)
@@ -1112,10 +1120,11 @@ public class NPC : MonoBehaviour
         LootDrop.GetComponent<ItemDrop>().ItemDroppedInChest = new Item(itemName);
         boardController.DroppedItemList.Add(LootDrop);
         LootDrop.transform.position = this.transform.position + new Vector3(0f, 1.5f, 0f);
+        Rigidbody rigidbody = LootDrop.GetComponent<Rigidbody>();
         Vector3 lootDropForce = new Vector3(UnityEngine.Random.Range(-200, 201), UnityEngine.Random.Range(100, 201), UnityEngine.Random.Range(-200, 201));
-        LootDrop.GetComponent<Rigidbody>().AddForce(lootDropForce);
+        rigidbody.AddForce(lootDropForce);
         Vector3 lootDropRotation = new Vector3(UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361));
-        LootDrop.GetComponent<Rigidbody>().AddTorque(lootDropRotation);
+        rigidbody.AddTorque(lootDropRotation);
 
     }
 
@@ -1252,8 +1261,9 @@ public class NPC : MonoBehaviour
                             float ap = this.ATTACKPOWER + UnityEngine.Random.Range(-3, 4);
                             damageReport = target.CalculateDamageTaken(ap, this, DamageSource.MagicalDamage_AutoAttack);
                             GameObject aap = (GameObject)Instantiate(Resources.Load("Auto Attack Projectile"), this.transform.position, Quaternion.identity);
-                            aap.GetComponentInChildren<MagicalAutoAttackProjectile>().dmgReport = damageReport;
-                            aap.GetComponentInChildren<MagicalAutoAttackProjectile>().destination = damageReport.damageReceiverNPC.transform.position;
+                            MagicalAutoAttackProjectile magicalAutoAttackProjectile = aap.GetComponentInChildren<MagicalAutoAttackProjectile>();
+                            magicalAutoAttackProjectile.dmgReport = damageReport;
+                            magicalAutoAttackProjectile.destination = damageReport.damageReceiverNPC.transform.position;
                             if (autoAttacking_SoundClip != null)
                             {
                                 npcAudioSource.PlayOneShot(autoAttacking_SoundClip);
@@ -1266,33 +1276,35 @@ public class NPC : MonoBehaviour
 
                         int deltaI = 0;
                         int deltaJ = 0;
-                        int oldI = this.occupyingTile.GetComponent<TileBehaviour>().i;
-                        int oldJ = this.occupyingTile.GetComponent<TileBehaviour>().j;
+                        TileBehaviour tileBehaviour = this.occupyingTile.GetComponent<TileBehaviour>();
+                        TileBehaviour targetTileBehaviour = target.occupyingTile.GetComponent<TileBehaviour>();
+                        int oldI = tileBehaviour.i;
+                        int oldJ = tileBehaviour.j;
                         movementJumpStartPosition = this.transform.position;
 
                         if (movementJumpFailedAttempts >= 1 || (this.PRIMARYTRIBE != Tribe.Assassin && this.SECONDARYTRIBE != Tribe.Assassin)) // normal movement
                         {
                             movementJumpSpeed = 2f;
                             Debug.Log("normal movement");
-                            if (target.occupyingTile.GetComponent<TileBehaviour>().i < occupyingTile.GetComponent<TileBehaviour>().i)
+                            if (targetTileBehaviour.i < tileBehaviour.i)
                             {
                                 deltaI = -1;
                             }
-                            else if (target.occupyingTile.GetComponent<TileBehaviour>().i > occupyingTile.GetComponent<TileBehaviour>().i)
+                            else if (targetTileBehaviour.i > tileBehaviour.i)
                             {
                                 deltaI = 1;
                             }
 
-                            if (target.occupyingTile.GetComponent<TileBehaviour>().j < occupyingTile.GetComponent<TileBehaviour>().j)
+                            if (targetTileBehaviour.j < tileBehaviour.j)
                             {
                                 deltaJ = -1;
                             }
-                            else if (target.occupyingTile.GetComponent<TileBehaviour>().j > occupyingTile.GetComponent<TileBehaviour>().j)
+                            else if (targetTileBehaviour.j > tileBehaviour.j)
                             {
                                 deltaJ = 1;
                             }
 
-                            bool moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + deltaI, occupyingTile.GetComponent<TileBehaviour>().j + deltaJ, false);
+                            bool moved = MoveToEmptyTile(tileBehaviour.i + deltaI, tileBehaviour.j + deltaJ, false);
 
                             if (moved)
                             {
@@ -1322,7 +1334,7 @@ public class NPC : MonoBehaviour
                                     Debug.Log("VERTICAL BLOCKED");
                                     Debug.Log(deltaJ);
                                     Debug.Log(deltaI);
-                                    moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + deltaI, occupyingTile.GetComponent<TileBehaviour>().j + 1, false);
+                                    moved = MoveToEmptyTile(tileBehaviour.i + deltaI, tileBehaviour.j + 1, false);
                                     if (moved)
                                     {
                                         Debug.Log("SIDESTEP LEFT");
@@ -1331,7 +1343,7 @@ public class NPC : MonoBehaviour
                                     }
                                     else
                                     {
-                                        moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + deltaI, occupyingTile.GetComponent<TileBehaviour>().j - 1, false);
+                                        moved = MoveToEmptyTile(tileBehaviour.i + deltaI, tileBehaviour.j - 1, false);
 
                                         if (moved)
                                         {
@@ -1349,7 +1361,7 @@ public class NPC : MonoBehaviour
                                     if ((deltaI == 0 && deltaJ == 1) || (deltaI == 0 && deltaJ == -1))
                                     {
                                         Debug.Log("HORIZONTAL BLOCKED");
-                                        moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + 1, occupyingTile.GetComponent<TileBehaviour>().j + deltaJ, false);
+                                        moved = MoveToEmptyTile(tileBehaviour.i + 1, tileBehaviour.j + deltaJ, false);
                                         if (moved)
                                         {
                                             Debug.Log("SIDESTEP down");
@@ -1358,7 +1370,7 @@ public class NPC : MonoBehaviour
                                         }
                                         else
                                         {
-                                            moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i - 1, occupyingTile.GetComponent<TileBehaviour>().j + deltaJ, false);
+                                            moved = MoveToEmptyTile(tileBehaviour.i - 1, tileBehaviour.j + deltaJ, false);
 
                                             if (moved)
                                             {
@@ -1378,7 +1390,7 @@ public class NPC : MonoBehaviour
                                     if ((deltaI == 1 && deltaJ == 1))
                                     {
                                         Debug.Log("diagonal down left up BLOCKED");
-                                        moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i, occupyingTile.GetComponent<TileBehaviour>().j + 1, false);
+                                        moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j + 1, false);
                                         if (moved)
                                         {
                                             Debug.Log("SIDESTEP down");
@@ -1386,7 +1398,7 @@ public class NPC : MonoBehaviour
                                         }
                                         else
                                         {
-                                            moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i - 1, occupyingTile.GetComponent<TileBehaviour>().j, false);
+                                            moved = MoveToEmptyTile(tileBehaviour.i - 1, tileBehaviour.j, false);
 
                                             if (moved)
                                             {
@@ -1404,7 +1416,7 @@ public class NPC : MonoBehaviour
                                     if ((deltaI == 1 && deltaJ == -1))
                                     {
                                         Debug.Log("diagonal down right BLOCKED");
-                                        moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i, occupyingTile.GetComponent<TileBehaviour>().j - 1, false);
+                                        moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j - 1, false);
                                         if (moved)
                                         {
                                             Debug.Log("SIDESTEP down");
@@ -1412,7 +1424,7 @@ public class NPC : MonoBehaviour
                                         }
                                         else
                                         {
-                                            moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i + 1, occupyingTile.GetComponent<TileBehaviour>().j, false);
+                                            moved = MoveToEmptyTile(tileBehaviour.i + 1, tileBehaviour.j, false);
 
                                             if (moved)
                                             {
@@ -1430,7 +1442,7 @@ public class NPC : MonoBehaviour
                                     if ((deltaI == -1 && deltaJ == -1))
                                     {
                                         Debug.Log("diagonal down right BLOCKED");
-                                        moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i, occupyingTile.GetComponent<TileBehaviour>().j - 1, false);
+                                        moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j - 1, false);
                                         if (moved)
                                         {
                                             Debug.Log("SIDESTEP down");
@@ -1438,7 +1450,7 @@ public class NPC : MonoBehaviour
                                         }
                                         else
                                         {
-                                            moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i - 1, occupyingTile.GetComponent<TileBehaviour>().j, false);
+                                            moved = MoveToEmptyTile(tileBehaviour.i - 1, tileBehaviour.j, false);
 
                                             if (moved)
                                             {
@@ -1456,7 +1468,7 @@ public class NPC : MonoBehaviour
                                     if ((deltaI == -1 && deltaJ == 1))
                                     {
                                         Debug.Log("diagonal down right BLOCKED");
-                                        moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i, occupyingTile.GetComponent<TileBehaviour>().j + 1, false);
+                                        moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j + 1, false);
                                         if (moved)
                                         {
                                             Debug.Log("SIDESTEP down");
@@ -1464,7 +1476,7 @@ public class NPC : MonoBehaviour
                                         }
                                         else
                                         {
-                                            moved = MoveToEmptyTile(occupyingTile.GetComponent<TileBehaviour>().i - 1, occupyingTile.GetComponent<TileBehaviour>().j, false);
+                                            moved = MoveToEmptyTile(tileBehaviour.i - 1, tileBehaviour.j, false);
 
                                             if (moved)
                                             {
@@ -1473,15 +1485,8 @@ public class NPC : MonoBehaviour
 
                                             }
                                         }
-
                                     }
                                 }
-
-
-
-
-
-
                                 if (moved)
                                 {
                                     movementJumpendPosition = boardController.chessBoard[newI, newJ].GetComponent<TileBehaviour>().transform.position;
@@ -1504,25 +1509,24 @@ public class NPC : MonoBehaviour
                             bool moved;
                             if (!isEnemy)
                             {
-                                 moved = MoveToEmptyTile(target.occupyingTile.GetComponent<TileBehaviour>().i - 1, target.occupyingTile.GetComponent<TileBehaviour>().j ,false);
+                                 moved = MoveToEmptyTile(targetTileBehaviour.i - 1, targetTileBehaviour.j ,false);
                                 if (moved)
                                 {
-                                    newI = target.occupyingTile.GetComponent<TileBehaviour>().i - 1;
-                                    newJ = target.occupyingTile.GetComponent<TileBehaviour>().j;
+                                    newI = targetTileBehaviour.i - 1;
+                                    newJ = targetTileBehaviour.j;
                                 }
                             } else
                             {
-                                 moved = MoveToEmptyTile(target.occupyingTile.GetComponent<TileBehaviour>().i + 1, target.occupyingTile.GetComponent<TileBehaviour>().j ,false);
+                                 moved = MoveToEmptyTile(targetTileBehaviour.i + 1, targetTileBehaviour.j ,false);
                                 if (moved)
                                 {
-                                    newI = target.occupyingTile.GetComponent<TileBehaviour>().i + 1;
-                                    newJ = target.occupyingTile.GetComponent<TileBehaviour>().j;
+                                    newI = targetTileBehaviour.i + 1;
+                                    newJ = targetTileBehaviour.j;
                                 }
                             }
 
                             if (moved)
                             {
-                                  
                                 movementJumpendPosition = boardController.chessBoard[newI, newJ].GetComponent<TileBehaviour>().transform.position;
                                 movementJumpStartTime = Time.time;
                                 movementJumpJourneyLength = Vector3.Distance(movementJumpStartPosition, movementJumpendPosition);
