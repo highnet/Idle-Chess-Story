@@ -6,7 +6,7 @@ using UnityEngine;
 [System.Serializable]
 public class AssignableItemDrop : MonoBehaviour
 {
-    public Item Item;
+    public Item item;
     public Outline outline;
     public BoardController boardController;
     public UiController uiController;
@@ -18,21 +18,22 @@ public class AssignableItemDrop : MonoBehaviour
         uiController = GetComponentInParent<UiController>();
         SelectionLine = GetComponent<LineRenderer>();
         outline = GetComponent<Outline>();
-        if (this.Item.ItemRarity.Equals(ItemRarity.Trash))
+        if (this.item.ItemRarity.Equals(ItemRarity.Trash))
         {
             this.outline.OutlineColor = Color.gray;
-        }else if(this.Item.ItemRarity.Equals(ItemRarity.Common))
+        }else if(this.item.ItemRarity.Equals(ItemRarity.Common))
         {
             this.outline.OutlineColor = Color.green;
         }
-        else if (this.Item.ItemRarity.Equals(ItemRarity.Rare))
+        else if (this.item.ItemRarity.Equals(ItemRarity.Rare))
         {
             this.outline.OutlineColor = Color.blue;
         }
-        else if (this.Item.ItemRarity.Equals(ItemRarity.Artifact))
+        else if (this.item.ItemRarity.Equals(ItemRarity.Artifact))
         {
             this.outline.OutlineColor = new Color(190, 65, 0); //orange
         }
+        this.outline.OutlineWidth = this.item.outlineWidth;
     }
     private void Update()
     {
@@ -61,12 +62,12 @@ public class AssignableItemDrop : MonoBehaviour
 
     private void OnMouseOver()
     {
-        boardController.mousedOverItem = this;
-        uiController.hoveredOrSelectedItemText.text = this.Item.ItemName.ToString() + " (" + this.Item.ItemRarity.ToString() + ")";
+        boardController.FocusedItem = this.item;
+        uiController.UpdateFocusedItemTooltip(this.item);
     }
     private void OnMouseExit()
     {
-        boardController.mousedOverItem = null;
+        boardController.FocusedItem = new Item(ItemName.NO_ITEM);
     }
     private void OnMouseUp()
     {

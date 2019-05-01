@@ -33,7 +33,7 @@ public class BoardController : MonoBehaviour
     public List<GameObject> DroppedItemList;
     public Camera mainCamera;
     public NPC mousedOverNPC;
-    public AssignableItemDrop mousedOverItem;
+    public Item FocusedItem;
 
     private void Awake()
     {
@@ -49,7 +49,7 @@ public class BoardController : MonoBehaviour
         ChangeGameStatus(GameStatus.Initializing); // set initalizing status
         CreateBoardTiles(); // create the tile 9x8 array board
         ChangeGameStatus(GameStatus.AwaitingWizardConfirmation, "confirm settings"); // set to settings wizard status
-
+        FocusedItem = new Item(ItemName.NO_ITEM);
     }
 
     void CreateBoardTiles()

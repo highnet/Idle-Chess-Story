@@ -801,8 +801,8 @@ public class NPC : MonoBehaviour
     {
         if (boardController.selectedItemDrop != null && this.Inventory.Count < 4)
         {
-            Debug.Log("Adding item: " + boardController.selectedItemDrop.Item.ItemName.ToString());
-            this.Inventory.Add(boardController.selectedItemDrop.Item);
+            Debug.Log("Adding item: " + boardController.selectedItemDrop.item.ItemName.ToString());
+            this.Inventory.Add(boardController.selectedItemDrop.item);
             RecalculateInventoryItemValues();
             GameObject.Destroy(boardController.selectedItemDrop.gameObject);
             uiController.hudCanvasAudioSource.PlayOneShot(uiController.genericSucessAudioClip);
@@ -1054,6 +1054,7 @@ public class NPC : MonoBehaviour
                         AudioSource.PlayClipAtPoint(uiController.levelUpAudioClip, this.transform.position);
                         this.TryLevelUpFriendly();
                         this.Inventory = new List<Item>();
+                        int yOffset = 0;
                         for(int i = 0; i < combinedInventory.Count; i++)
                         {
                             if (i < 4)
@@ -1061,7 +1062,8 @@ public class NPC : MonoBehaviour
                                 this.Inventory.Add(combinedInventory[i]);
                             } else
                             {
-                               GenerateSpecificLootDrop(combinedInventory[i].ItemName);
+                               GenerateSpecificLootDrop(combinedInventory[i].ItemName,yOffset);
+                                yOffset += 1;
                             }
                         }
                         this.RecalculateInventoryItemValues();
@@ -1076,6 +1078,7 @@ public class NPC : MonoBehaviour
                         AudioSource.PlayClipAtPoint(uiController.levelUpAudioClip, this.transform.position);
                         this.TryLevelUpFriendly();
                         this.Inventory = new List<Item>();
+                        int yOffset = 0;
                         for (int i = 0; i < combinedInventory.Count; i++)
                         {
                             if (i < 4)
@@ -1084,7 +1087,8 @@ public class NPC : MonoBehaviour
                             }
                             else
                             {
-                              GenerateSpecificLootDrop(combinedInventory[i].ItemName);
+                              GenerateSpecificLootDrop(combinedInventory[i].ItemName,yOffset);
+                                yOffset += 1;
                             }
                         }
                         this.RecalculateInventoryItemValues();
@@ -1114,17 +1118,13 @@ public class NPC : MonoBehaviour
         rigidbody.AddTorque(lootDropRotation);
     }
 
-    public void GenerateSpecificLootDrop(ItemName itemName)
+    public void GenerateSpecificLootDrop(ItemName itemName, int yOffset)
     {
         GameObject LootDrop = (GameObject)Instantiate(Resources.Load("Treasure"), boardController.transform);
         LootDrop.GetComponent<ItemDrop>().ItemDroppedInChest = new Item(itemName);
         boardController.DroppedItemList.Add(LootDrop);
-        LootDrop.transform.position = this.transform.position + new Vector3(0f, 1.5f, 0f);
+        LootDrop.transform.position = this.transform.position + new Vector3(0f, 1.5f + yOffset, 0f);
         Rigidbody rigidbody = LootDrop.GetComponent<Rigidbody>();
-        Vector3 lootDropForce = new Vector3(UnityEngine.Random.Range(-200, 201), UnityEngine.Random.Range(100, 201), UnityEngine.Random.Range(-200, 201));
-        rigidbody.AddForce(lootDropForce);
-        Vector3 lootDropRotation = new Vector3(UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361), UnityEngine.Random.Range(-360, 361));
-        rigidbody.AddTorque(lootDropRotation);
 
     }
 

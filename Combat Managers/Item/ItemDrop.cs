@@ -51,7 +51,7 @@ public class ItemDrop : MonoBehaviour
             GameObject Loot = (GameObject)Instantiate(Resources.Load(ItemDroppedInChest.ItemName.ToString()), boardController.transform);
 
             AssignableItemDrop assignableItemDrop = Loot.GetComponent<AssignableItemDrop>();
-            assignableItemDrop.Item = ItemDroppedInChest;
+            assignableItemDrop.item = ItemDroppedInChest;
             Loot.transform.position = this.transform.position + (2 * Vector3.up);
             boardController.selectedItemDrop = assignableItemDrop;
             boardController.DroppedItemList.Add(Loot);

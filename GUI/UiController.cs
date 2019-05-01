@@ -149,7 +149,17 @@ public class UiController : MonoBehaviour
     public Text combatTimerPanelText;
     public Text versionText;
     public GameObject MousedOverSelectedItemTooltipPanel;
-    public Text hoveredOrSelectedItemText;
+    public Text FocusedItemTooltipTextName;
+    public Text FocusedItemTooltipTextStats;
+    public GameObject CurrentlySelectedUnitInventoryPanel;
+    public Image InventorySlot1Panel;
+    public Image InventorySlot2Panel;
+    public Image InventorySlot3Panel;
+    public Image InventorySlot4Panel;
+    public Item EmptyItem;
+    private Vector3 tooltipOffsetVector;
+    private int xOffsetTooltip = 700;
+    private int yOffsetTooltip = 50;
 
     private void Awake()
     {
@@ -179,6 +189,9 @@ public class UiController : MonoBehaviour
             steamLeaderBoardTop100EntriesUIPrefabsList.Add(leaderBoardEntry.GetComponent<LeaderboardEntry>());
 
         }
+
+        EmptyItem = new Item(ItemName.NO_ITEM);
+        tooltipOffsetVector = new Vector3(xOffsetTooltip, yOffsetTooltip, 0);
     }
 
     public void GetWorldControllers()
@@ -429,9 +442,11 @@ public class UiController : MonoBehaviour
             {
                 goldReward = (int)(goldReward * 8f); // gold bonus for selling a tier 3 unit
             }
+            int yOffset = 0;
             foreach(Item item in boardController.selectedNPC.GetComponent<NPC>().Inventory)
             {
-                boardController.selectedNPC.GetComponent<NPC>().GenerateSpecificLootDrop(item.ItemName);
+                boardController.selectedNPC.GetComponent<NPC>().GenerateSpecificLootDrop(item.ItemName,yOffset);
+                yOffset += 1;
             }
             boardController.selectedNPC.GetComponent<NPC>().RemoveFromBoard(true); // remove the sold npc from the board 
             playerController.SetPlayerGoldCount(playerController.playerGoldCount + (long)goldReward); // apply the gold reward to the player
@@ -447,7 +462,7 @@ public class UiController : MonoBehaviour
         boardController.selectedNPC = null; // null it
     }
 
-    public void UpdateSelectedUnitPanel(GameObject selectedObject, NPC selectedNPC)
+    public void UpdateSelectedUnitUI(GameObject selectedObject, NPC selectedNPC)
     {
         string friendOrFoe = selectedNPC.isEnemy ? "Enemy " : "";
         selectedUnitPanel_InformationText_NAME.text = friendOrFoe + selectedObject.name;
@@ -457,6 +472,57 @@ public class UiController : MonoBehaviour
         selectedUnitPanel_InformationText_HP.text = Mathf.Round(selectedNPC.HP) + "/" + Mathf.Round(selectedNPC.MAXHP);
         selectedUnitPanel_InformationText_SPELLPOWER.text = Mathf.Round(selectedNPC.SPELLPOWER).ToString();
         selectedUnitPanel_InformationText_TIER.text = "Level " + selectedNPC.TIER;
+
+        if (selectedNPC.Inventory != null)
+        {
+            InventorySlot1Panel.GetComponent<ItemThumbnail>().shownItem = EmptyItem;
+            InventorySlot2Panel.GetComponent<ItemThumbnail>().shownItem = EmptyItem;
+            InventorySlot3Panel.GetComponent<ItemThumbnail>().shownItem = EmptyItem;
+            InventorySlot4Panel.GetComponent<ItemThumbnail>().shownItem = EmptyItem;
+            if (selectedNPC.Inventory.Count >= 1)
+            {
+                InventorySlot1Panel.GetComponent<ItemThumbnail>().shownItem = selectedNPC.Inventory[0];
+            }
+            if (selectedNPC.Inventory.Count >= 2)
+            {
+                InventorySlot2Panel.GetComponent<ItemThumbnail>().shownItem = selectedNPC.Inventory[1];
+            }
+            if (selectedNPC.Inventory.Count >= 3)
+            {
+                InventorySlot3Panel.GetComponent<ItemThumbnail>().shownItem = selectedNPC.Inventory[2];
+            }
+            if (selectedNPC.Inventory.Count >= 4)
+            {
+                InventorySlot4Panel.GetComponent<ItemThumbnail>().shownItem = selectedNPC.Inventory[3];
+            }
+        }
+        InventorySlot1Panel.GetComponent<ItemThumbnail>().SetImage();
+        InventorySlot2Panel.GetComponent<ItemThumbnail>().SetImage();
+        InventorySlot3Panel.GetComponent<ItemThumbnail>().SetImage();
+        InventorySlot4Panel.GetComponent<ItemThumbnail>().SetImage();
+    }
+
+    public void UpdateFocusedItemTooltip(Item item)
+    {
+        FocusedItemTooltipTextName.text = item.ItemName.ToString() + " (" + item.ItemRarity.ToString() + ")";
+        if (item.ItemRarity.Equals(ItemRarity.Trash))
+        {
+            FocusedItemTooltipTextName.color = Color.gray;
+        }
+        else if (item.ItemRarity.Equals(ItemRarity.Common))
+        {
+            FocusedItemTooltipTextName.color = Color.green;
+        }
+        else if (item.ItemRarity.Equals(ItemRarity.Rare))
+        {
+            FocusedItemTooltipTextName.color = Color.blue;
+        }
+        else if (item.ItemRarity.Equals(ItemRarity.Artifact))
+        {
+            FocusedItemTooltipTextName.color = new Color(190, 65, 0); //orange
+        }
+    
+        FocusedItemTooltipTextStats.text = item.Tooltip;
     }
 
     public void SyncronizeToSteamLeaderBoardIfNeeded()
@@ -495,21 +561,26 @@ public class UiController : MonoBehaviour
 
     public void PrepareUIAccordingly()
     {
-        if (boardController.gameStatus != GameStatus.ReportVictory && boardController.gameStatus != GameStatus.ReportDefeat && boardController.mousedOverItem != null) // update the inventory mousedover tooltip
+   
+        if (boardController.gameStatus != GameStatus.ReportVictory && boardController.gameStatus != GameStatus.ReportDefeat && boardController.FocusedItem.ItemName != EmptyItem.ItemName) // update the inventory mousedover tooltip
         {
                 MousedOverSelectedItemTooltipPanel.gameObject.SetActive(true);
+            RectTransform rectTrans = MousedOverSelectedItemTooltipPanel.GetComponent<RectTransform>();
+            rectTrans.position = Input.mousePosition + tooltipOffsetVector;
         }
         else
         {
             MousedOverSelectedItemTooltipPanel.gameObject.SetActive(false);
         }
-
+     
         if (boardController.gameStatus != GameStatus.ReportVictory && boardController.gameStatus != GameStatus.ReportDefeat && boardController.selectedNPC != null) // update the entire selected unit panel
         {
             hudCanvasCurrentlySelectedUnitPanel.SetActive(true);
+            CurrentlySelectedUnitInventoryPanel.SetActive(true);
             GameObject selectedObject = boardController.selectedNPC;
             NPC selectedNPC = selectedObject.GetComponent<NPC>();
-            UpdateSelectedUnitPanel(selectedObject, selectedNPC);
+            UpdateSelectedUnitUI(selectedObject, selectedNPC);
+         
 
             if (selectedNPC.UNIT_TYPE != Unit.RobotCreep)
             {
@@ -529,7 +600,7 @@ public class UiController : MonoBehaviour
         else
         {
             hudCanvasCurrentlySelectedUnitPanel.SetActive(false);
-
+            CurrentlySelectedUnitInventoryPanel.SetActive(false);
         }
 
         if (!boardController.gameStatus.Equals(GameStatus.Shopping)) // take out ui elements outside that should not be outside of the shopping phase
@@ -550,7 +621,7 @@ public class UiController : MonoBehaviour
 
     public void ListenForEscapeMenuToggle()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) && boardController.gameStatus == GameStatus.Shopping)
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             toggleEscapeMenu();
         }
