@@ -158,7 +158,7 @@ public class UiController : MonoBehaviour
     public Image InventorySlot4Panel;
     public Item EmptyItem;
     private Vector3 tooltipOffsetVector;
-    private int xOffsetTooltip = 700;
+    private int xOffsetTooltip = 800;
     private int yOffsetTooltip = 50;
 
     private void Awake()
@@ -561,7 +561,6 @@ public class UiController : MonoBehaviour
 
     public void PrepareUIAccordingly()
     {
-   
         if (boardController.gameStatus != GameStatus.ReportVictory && boardController.gameStatus != GameStatus.ReportDefeat && boardController.FocusedItem.ItemName != EmptyItem.ItemName) // update the inventory mousedover tooltip
         {
                 MousedOverSelectedItemTooltipPanel.gameObject.SetActive(true);
@@ -575,10 +574,13 @@ public class UiController : MonoBehaviour
      
         if (boardController.gameStatus != GameStatus.ReportVictory && boardController.gameStatus != GameStatus.ReportDefeat && boardController.selectedNPC != null) // update the entire selected unit panel
         {
-            hudCanvasCurrentlySelectedUnitPanel.SetActive(true);
-            CurrentlySelectedUnitInventoryPanel.SetActive(true);
             GameObject selectedObject = boardController.selectedNPC;
             NPC selectedNPC = selectedObject.GetComponent<NPC>();
+            hudCanvasCurrentlySelectedUnitPanel.SetActive(true);
+            if (!boardController.selectedNPC.GetComponent<NPC>().isCreep && !selectedNPC.isCreep && !selectedNPC.isBoss)
+            {
+                CurrentlySelectedUnitInventoryPanel.SetActive(true);
+            }
             UpdateSelectedUnitUI(selectedObject, selectedNPC);
          
 

@@ -11,12 +11,15 @@ public class AssignableItemDrop : MonoBehaviour
     public BoardController boardController;
     public UiController uiController;
     public LineRenderer SelectionLine;
+    public ArrowRenderer arrowRenderer;
+    private Vector3 belowTheScreen;
 
     private void Start()
     {
         boardController = GetComponentInParent<BoardController>();
         uiController = GetComponentInParent<UiController>();
         SelectionLine = GetComponent<LineRenderer>();
+        arrowRenderer = GetComponentInChildren<ArrowRenderer>();
         outline = GetComponent<Outline>();
         if (this.item.ItemRarity.Equals(ItemRarity.Trash))
         {
@@ -34,22 +37,27 @@ public class AssignableItemDrop : MonoBehaviour
             this.outline.OutlineColor = new Color(190, 65, 0); //orange
         }
         this.outline.OutlineWidth = this.item.outlineWidth;
+
+        belowTheScreen = new Vector3(0, -10, 0);
     }
     private void Update()
     {
         if (boardController.selectedItemDrop == this)
         {
             SelectionLine.enabled = true;
+            arrowRenderer.enabled = true;
             Vector3[] positions = new Vector3[2];
             positions[0] = this.transform.position;
 
             if (boardController.mousedOverNPC != null)
             {
                 positions[1] = boardController.mousedOverNPC.transform.position;
+                arrowRenderer.SetPositions(this.transform.position, boardController.mousedOverNPC.transform.position);
             }
             else
             {
                 positions[1] = this.transform.position;
+                arrowRenderer.SetPositions(this.transform.position,this.transform.position);
             }
 
             SelectionLine.SetPositions(positions);
