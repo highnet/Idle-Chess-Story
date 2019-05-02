@@ -40,7 +40,7 @@ public class AssignableItemDrop : MonoBehaviour
 
         belowTheScreen = new Vector3(0, -10, 0);
     }
-    private void Update()
+    private void FixedUpdate()
     {
         if (boardController.selectedItemDrop == this)
         {
@@ -64,6 +64,7 @@ public class AssignableItemDrop : MonoBehaviour
         }
         else
         {
+            arrowRenderer.SetPositions(this.transform.position, this.transform.position);
             SelectionLine.enabled = false;
         }
     }

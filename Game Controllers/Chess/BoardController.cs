@@ -524,6 +524,7 @@ public class BoardController : MonoBehaviour
             {
                 foreach (NPC npc in npcController.deployedAllyList)
                 {
+
                     if (npc.cheering_SoundClip != null && UnityEngine.Random.Range(0, 2) == 1)
                     {
                         npc.npcAudioSource.PlayOneShot(npc.cheering_SoundClip);

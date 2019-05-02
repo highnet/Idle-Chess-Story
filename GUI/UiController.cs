@@ -160,6 +160,7 @@ public class UiController : MonoBehaviour
     private Vector3 tooltipOffsetVector;
     private int xOffsetTooltip = 800;
     private int yOffsetTooltip = 50;
+    public CombatLogger combatLogger;
 
     private void Awake()
     {
@@ -200,6 +201,7 @@ public class UiController : MonoBehaviour
         playerController = GetComponent<PlayerController>();
         npcController = GetComponent<NpcController>();
         sessionLogger = GetComponent<SessionLogger>();
+        combatLogger = GetComponent<CombatLogger>();
         dialogueManager = GetComponent<DialogueManager>();
         objectPoolController = GetComponent<ObjectPoolController>();
         hudCanvas = GameObject.Find("HUDCanvas");
@@ -930,7 +932,6 @@ public class UiController : MonoBehaviour
             {
                 sessionLogger.IncrementTribesDeployedToFightCounters(npc);
             }
-
             foreach (GameObject lootDrop in boardController.DroppedItemList) {
                 GameObject.Destroy(lootDrop);
             }

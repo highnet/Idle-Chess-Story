@@ -25,7 +25,6 @@ public class MagicalAutoAttackProjectile : MonoBehaviour
                 UiController uic = GameObject.Find("World Controller").GetComponent<UiController>(); // fetch the ui controller once
                 uic.SpawnFloatingCombatText(dmgReport.damageReceiverNPC,dmgReport,DisplayMode.RegularDamage); // spawn floating combat text
                 dmgReport.damageReceiverNPC.TakePureDamage(dmgReport); // deal damage
-
             }
             Object.Destroy(this.transform.parent.gameObject); // destroy this projectile
 

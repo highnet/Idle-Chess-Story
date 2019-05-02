@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 
-
-
 public static class  Helper
 {
 
@@ -24,7 +22,6 @@ public static class  Helper
         dictionary[key] = count - 1;
     }
 }
-
 
 public class NPC : MonoBehaviour
 {
@@ -89,6 +86,7 @@ public class NPC : MonoBehaviour
     public DustParticleControl DustParticleSystem;
     public List<Item> Inventory = new List<Item>();
     public Camera mainCamera;
+    public float combatReport_DamageDoneThisRound;
 
     public void Awake()
     {
@@ -1010,6 +1008,7 @@ public class NPC : MonoBehaviour
 
     public bool TryLevelUpFriendly()
     {
+        Debug.Log("Leveling up friendly tier" + TIER + " " + name);
             int likewiseUnitsFound = 0;
             NPC firstNPC = null;
             NPC secondNPC = null;
@@ -1017,6 +1016,8 @@ public class NPC : MonoBehaviour
         foreach (Item item in this.Inventory)
         {
             combinedInventory.Add(item);
+            Debug.Log("adding" + item.ItemName.ToString() + "to combined inventory");
+
         }
         foreach (NPC npc in npcController.allyList)
         {
@@ -1024,6 +1025,7 @@ public class NPC : MonoBehaviour
             {
                 if (npc.TIER == this.TIER)
                 {
+                    Debug.Log("Found likewise unit");
                     likewiseUnitsFound += 1;
 
                     if (likewiseUnitsFound == 1 && firstNPC == null)
@@ -1032,13 +1034,16 @@ public class NPC : MonoBehaviour
                         foreach (Item item in firstNPC.Inventory)
                         {
                             combinedInventory.Add(item);
+                            Debug.Log("adding" + item.ItemName.ToString() + "to combined inventory");
                         }
+
                     } else if (likewiseUnitsFound == 2 && secondNPC == null)
                     {
                         secondNPC = npc;
                         foreach (Item item in secondNPC.Inventory)
                         {
                             combinedInventory.Add(item);
+                            Debug.Log("adding" + item.ItemName.ToString() + "to combined inventory");
                         }
                     }
                 }
@@ -1047,47 +1052,58 @@ public class NPC : MonoBehaviour
                 {
                     if (this.TIER == 1)
                     {
+                        Debug.Log("granting level up to tier 2");
                         this.ApplyTier2Upgrades();
                         this.TIER = 2;
                         firstNPC.RemoveFromBoard(true);
                         secondNPC.RemoveFromBoard(true);
                         AudioSource.PlayClipAtPoint(uiController.levelUpAudioClip, this.transform.position);
-                        this.TryLevelUpFriendly();
                         this.Inventory = new List<Item>();
                         int yOffset = 0;
                         for(int i = 0; i < combinedInventory.Count; i++)
                         {
+                            Debug.Log("concerning item: " +  combinedInventory[i].ItemName.ToString());
+
                             if (i < 4)
                             {
+                                Debug.Log("-> adding it");
                                 this.Inventory.Add(combinedInventory[i]);
                             } else
                             {
                                GenerateSpecificLootDrop(combinedInventory[i].ItemName,yOffset);
+                                Debug.Log("-> dropping it");
                                 yOffset += 1;
                             }
                         }
                         this.RecalculateInventoryItemValues();
+                        this.TryLevelUpFriendly();
+
                         return true;
                     }
                     else if (this.TIER == 2)
                     {
+                        Debug.Log("granting level up to tier 3");
+
                         this.ApplyTier3Upgrades();
                         this.TIER = 3;
                         firstNPC.RemoveFromBoard(true);
                         secondNPC.RemoveFromBoard(true);
                         AudioSource.PlayClipAtPoint(uiController.levelUpAudioClip, this.transform.position);
-                        this.TryLevelUpFriendly();
                         this.Inventory = new List<Item>();
                         int yOffset = 0;
                         for (int i = 0; i < combinedInventory.Count; i++)
                         {
+                            Debug.Log("concerning item: " + combinedInventory[i].ItemName.ToString());
+
                             if (i < 4)
                             {
+                                Debug.Log("-> adding it");
                                 this.Inventory.Add(combinedInventory[i]);
                             }
                             else
                             {
-                              GenerateSpecificLootDrop(combinedInventory[i].ItemName,yOffset);
+                                Debug.Log("-> dropping it");
+                                GenerateSpecificLootDrop(combinedInventory[i].ItemName,yOffset);
                                 yOffset += 1;
                             }
                         }
@@ -1249,6 +1265,7 @@ public class NPC : MonoBehaviour
                             damageReport = target.CalculateDamageTaken(ap, this, autoAttack_DamageType);
                             uiController.SpawnFloatingCombatText(damageReport.damageReceiverNPC, damageReport, DisplayMode.RegularDamage);
                             target.TakePureDamage(damageReport);
+                      //      uiController.combatLogger.Add(this.name, damageReport.primaryDamageDealt);
                             if (autoAttacking_SoundClip != null && npcAudioSource != null)
                             {
                                 npcAudioSource.PlayOneShot(autoAttacking_SoundClip);
@@ -1264,6 +1281,7 @@ public class NPC : MonoBehaviour
                             MagicalAutoAttackProjectile magicalAutoAttackProjectile = aap.GetComponentInChildren<MagicalAutoAttackProjectile>();
                             magicalAutoAttackProjectile.dmgReport = damageReport;
                             magicalAutoAttackProjectile.destination = damageReport.damageReceiverNPC.transform.position;
+                   //         uiController.combatLogger.Add(this, damageReport.primaryDamageDealt);
                             if (autoAttacking_SoundClip != null)
                             {
                                 npcAudioSource.PlayOneShot(autoAttacking_SoundClip);

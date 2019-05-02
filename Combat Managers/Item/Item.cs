@@ -111,11 +111,11 @@ public class Item
         List<string> nonZeroStats = new List<string>();
         if (ap != 0)
         {
-            nonZeroStats.Add("AP: " + ap.ToString());
+            nonZeroStats.Add("Attack: " + ap.ToString());
         }
         if (sp != 0)
         {
-            nonZeroStats.Add("SP: " + ap.ToString());
+            nonZeroStats.Add("Spell Power: " + ap.ToString());
         }
         if (armor != 0)
         {
