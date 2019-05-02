@@ -87,6 +87,8 @@ public class NPC : MonoBehaviour
     public List<Item> Inventory = new List<Item>();
     public Camera mainCamera;
     public float combatReport_DamageDoneThisRound;
+    public Color combatReport_barUnitColor;
+    public bool combatReport_barUnitColor_isDirty = true;
 
     public void Awake()
     {
@@ -97,6 +99,41 @@ public class NPC : MonoBehaviour
         movementJumpYOffset.AddKey(new Keyframe(0, 0));
         movementJumpYOffset.AddKey(new Keyframe(0.7f, 1));
         movementJumpYOffset.AddKey(new Keyframe(1, 0));
+
+        if (combatReport_barUnitColor_isDirty)
+        {
+            int colorsRNG = UnityEngine.Random.Range(0, 5);
+            if (colorsRNG == 0)
+            {
+                combatReport_barUnitColor = Color.red;
+            }
+            else if (colorsRNG == 1)
+            {
+                combatReport_barUnitColor = Color.blue;
+
+            }
+            else if (colorsRNG == 2)
+            {
+                combatReport_barUnitColor = Color.gray;
+
+            }
+            else if (colorsRNG == 3)
+            {
+                combatReport_barUnitColor = Color.green;
+
+            }
+            else if (colorsRNG == 4)
+            {
+                combatReport_barUnitColor = Color.magenta;
+
+            }
+            else
+            {
+                combatReport_barUnitColor = Color.black;
+            }
+            
+            combatReport_barUnitColor_isDirty = false;
+        }
     }
 
     // Start is called before the first frame update
@@ -725,7 +762,7 @@ public class NPC : MonoBehaviour
                 }
                 if (this.combatReport_DamageDoneThisRound != 0)
                 {
-                    uiController.combatLogger.AddCombatReport(new CombatReport(this.name, this.TIER, this.combatReport_DamageDoneThisRound, 999f, true));
+                    uiController.combatLogger.AddCombatReport(new CombatReport(this.name, this.TIER, this.combatReport_DamageDoneThisRound, 999f, true,this.combatReport_barUnitColor));
                 }
                 this.StopCoroutine(liveRoutine);
                 this.liveRoutine = null;

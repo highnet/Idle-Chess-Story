@@ -536,7 +536,7 @@ public class BoardController : MonoBehaviour
         {
             if (!npc.isEnemy && !npc.isCreep && !npc.isBoss && npc.combatReport_DamageDoneThisRound != 0)
             {
-                uiController.combatLogger.AddCombatReport(new CombatReport(npc.UNIT_TYPE.ToString(), npc.TIER, npc.combatReport_DamageDoneThisRound, uiController.combatLogger.parseTime,false));
+                uiController.combatLogger.AddCombatReport(new CombatReport(npc.UNIT_TYPE.ToString(), npc.TIER, npc.combatReport_DamageDoneThisRound, uiController.combatLogger.parseTime,false,npc.combatReport_barUnitColor));
                 npc.combatReport_DamageDoneThisRound = 0;
             }
         }
@@ -556,6 +556,12 @@ public class BoardController : MonoBehaviour
             CombatReportBar combatReportBar = go.GetComponent<CombatReportBar>();
             combatReportBar.combatReport = combatReport;
             combatReportBar.totalDamage = totalDamageDone;
+            combatReportBar.unitColor = combatReport.unitColor;
+            if (sortedCombatReports.Count >= 0)
+            {
+                combatReportBar.topDamage = sortedCombatReports[0].damageDealt;
+
+            }
             combatReportBar.SetUIElements();
             uiController.combatLogger.combatReportBars.Add(go);
         }
