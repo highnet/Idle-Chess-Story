@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
 
 /*  This class controls the Main camera.
 */
@@ -50,16 +51,13 @@ public class MainCamera : MonoBehaviour
 
         transform.position = Vector3.Lerp(transform.position, nextPosition, cameraSpeed * Time.deltaTime);
 
-
-
-
         if (Input.GetMouseButton(1) || Input.GetMouseButton(2))
         {  // Rotate camera with mouse.
             this.transform.RotateAround(this.transform.position, Vector3.up, -Input.GetAxis("Mouse X") * lookAroundSpeed);
             this.transform.RotateAround(this.transform.position, this.transform.forward, Input.GetAxis("Mouse Y") * lookAroundSpeed);
         }
 
-        if (((cam.transform.localPosition.x > 40) && (Input.mouseScrollDelta.y > 0)) || ((cam.transform.localPosition.x < 65) && (Input.mouseScrollDelta.y < 0)))
+        if (!EventSystem.current.IsPointerOverGameObject(-1) && (((cam.transform.localPosition.x > 40) && (Input.mouseScrollDelta.y > 0)) || ((cam.transform.localPosition.x < 65) && (Input.mouseScrollDelta.y < 0))))
         {
             cam.transform.localPosition = cam.transform.localPosition + (scrollSpeed * new Vector3(-Input.mouseScrollDelta.y, 0, 0));
         }
@@ -119,9 +117,6 @@ public class MainCamera : MonoBehaviour
 
             transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, 5);
         }
-
-
-
 
         if (boardController.gameStatus.Equals(GameStatus.Fight) && cameraMode.Equals("Follow") && boardController.selectedNPC != null)
         {

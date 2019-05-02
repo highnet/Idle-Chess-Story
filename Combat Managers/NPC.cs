@@ -723,6 +723,10 @@ public class NPC : MonoBehaviour
                 {
                     animator.Play("Death");
                 }
+                if (this.combatReport_DamageDoneThisRound != 0)
+                {
+                    uiController.combatLogger.AddCombatReport(new CombatReport(this.name, this.TIER, this.combatReport_DamageDoneThisRound, 999f, true));
+                }
                 this.StopCoroutine(liveRoutine);
                 this.liveRoutine = null;
                 Object.Destroy(transform.parent.gameObject, 2);
@@ -1083,7 +1087,6 @@ public class NPC : MonoBehaviour
                     else if (this.TIER == 2)
                     {
                         Debug.Log("granting level up to tier 3");
-
                         this.ApplyTier3Upgrades();
                         this.TIER = 3;
                         firstNPC.RemoveFromBoard(true);
@@ -1094,7 +1097,6 @@ public class NPC : MonoBehaviour
                         for (int i = 0; i < combinedInventory.Count; i++)
                         {
                             Debug.Log("concerning item: " + combinedInventory[i].ItemName.ToString());
-
                             if (i < 4)
                             {
                                 Debug.Log("-> adding it");
@@ -1265,7 +1267,7 @@ public class NPC : MonoBehaviour
                             damageReport = target.CalculateDamageTaken(ap, this, autoAttack_DamageType);
                             uiController.SpawnFloatingCombatText(damageReport.damageReceiverNPC, damageReport, DisplayMode.RegularDamage);
                             target.TakePureDamage(damageReport);
-                      //      uiController.combatLogger.Add(this.name, damageReport.primaryDamageDealt);
+                            this.combatReport_DamageDoneThisRound += damageReport.primaryDamageDealt;
                             if (autoAttacking_SoundClip != null && npcAudioSource != null)
                             {
                                 npcAudioSource.PlayOneShot(autoAttacking_SoundClip);
@@ -1281,7 +1283,7 @@ public class NPC : MonoBehaviour
                             MagicalAutoAttackProjectile magicalAutoAttackProjectile = aap.GetComponentInChildren<MagicalAutoAttackProjectile>();
                             magicalAutoAttackProjectile.dmgReport = damageReport;
                             magicalAutoAttackProjectile.destination = damageReport.damageReceiverNPC.transform.position;
-                   //         uiController.combatLogger.Add(this, damageReport.primaryDamageDealt);
+                            this.combatReport_DamageDoneThisRound += damageReport.primaryDamageDealt;
                             if (autoAttacking_SoundClip != null)
                             {
                                 npcAudioSource.PlayOneShot(autoAttacking_SoundClip);

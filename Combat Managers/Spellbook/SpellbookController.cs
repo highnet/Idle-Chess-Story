@@ -32,8 +32,7 @@ public class SpellbookController : MonoBehaviour
             DamageReport dmgReport = targetNPC.CalculateDamageTaken(2 * CasterSpellPower, casterNPC, DamageSource.Magical_Ability);
             go.GetComponentInChildren<AbilityFireball>().dmgReport = dmgReport;
             go.GetComponentInChildren<AbilityFireball>().destination = dmgReport.damageReceiverNPC.transform.position;
-        //    uiController.combatLogger.combatReport.Add(dmgReport.damageSourceNPC.name, dmgReport.primaryDamageDealt);
-
+            casterNPC.combatReport_DamageDoneThisRound += dmgReport.primaryDamageDealt;
         }
 
         else if (abilityToCast == Ability.AP_UP_Self)
@@ -98,7 +97,7 @@ public class SpellbookController : MonoBehaviour
             DamageReport dmgReport = targetNPC.CalculateDamageTaken(1.9f * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
             uiController.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DisplayMode.AbilityDamage);
             targetNPC.TakePureDamage(dmgReport);
-        //    uiController.combatLogger.combatReport.Add(dmgReport.damageSourceNPC.name, dmgReport.primaryDamageDealt);
+            casterNPC.combatReport_DamageDoneThisRound += dmgReport.primaryDamageDealt;
             GameObject.Destroy(go, 4);
 
         }
@@ -110,7 +109,7 @@ public class SpellbookController : MonoBehaviour
             DamageReport dmgReport = targetNPC.CalculateDamageTaken(1.4f * CasterAttackPower, casterNPC, DamageSource.Physical_Ability);
             uiController.SpawnFloatingCombatText(dmgReport.damageReceiverNPC, dmgReport, DisplayMode.AbilityDamage);
             targetNPC.TakePureDamage(dmgReport);
-       //     uiController.combatLogger.combatReport.Add(dmgReport.damageSourceNPC.name, dmgReport.primaryDamageDealt);
+            casterNPC.combatReport_DamageDoneThisRound += dmgReport.primaryDamageDealt;
             GameObject.Destroy(go, 3);
 
         }
@@ -149,7 +148,7 @@ public class SpellbookController : MonoBehaviour
             DamageReport dmgReport = targetNPC.CalculateDamageTaken(2 * CasterSpellPower, casterNPC, DamageSource.Magical_Ability);
             go.GetComponentInChildren<AbilityFrostBall>().dmgReport = dmgReport;
             go.GetComponentInChildren<AbilityFrostBall>().destination = dmgReport.damageReceiverNPC.transform.position;
-        //    uiController.combatLogger.combatReport.Add(dmgReport.damageSourceNPC.name, dmgReport.primaryDamageDealt);
+            casterNPC.combatReport_DamageDoneThisRound += dmgReport.primaryDamageDealt;
         }
         else if (abilityToCast == Ability.Stun)
         {

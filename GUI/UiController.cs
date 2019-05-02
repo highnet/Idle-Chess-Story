@@ -161,6 +161,8 @@ public class UiController : MonoBehaviour
     private int xOffsetTooltip = 800;
     private int yOffsetTooltip = 50;
     public CombatLogger combatLogger;
+    public GameObject combatReportEntries;
+    public GameObject combatReportPanel;
 
     private void Awake()
     {
@@ -178,7 +180,6 @@ public class UiController : MonoBehaviour
             hudCanvasTopPanelUsernameText.text = name;
             versionText.text = "Steam Build: " +  SteamApps.GetAppBuildId().ToString();
         }
-    
 
         steamLeaderBoardTop100EntriesUIPrefabsList = new List<LeaderboardEntry>();
         for (int i = 0; i < 100; i++) // prepare the leaderboard top 10 entry display prefab objects
@@ -188,11 +189,12 @@ public class UiController : MonoBehaviour
             leaderBoardEntry.GetComponent<LeaderboardEntry>().rank = rank;
             leaderBoardEntry.GetComponent<LeaderboardEntry>().rankText.text = rank + ")";
             steamLeaderBoardTop100EntriesUIPrefabsList.Add(leaderBoardEntry.GetComponent<LeaderboardEntry>());
-
         }
 
         EmptyItem = new Item(ItemName.NO_ITEM);
         tooltipOffsetVector = new Vector3(xOffsetTooltip, yOffsetTooltip, 0);
+
+     
     }
 
     public void GetWorldControllers()
@@ -205,6 +207,16 @@ public class UiController : MonoBehaviour
         dialogueManager = GetComponent<DialogueManager>();
         objectPoolController = GetComponent<ObjectPoolController>();
         hudCanvas = GameObject.Find("HUDCanvas");
+
+    }
+
+    public void DisableCombatReportPanel()
+    {
+        combatReportPanel.gameObject.SetActive(false);
+    }
+    public void EnableCombatReportPanel()
+    {
+        combatReportPanel.gameObject.SetActive(true);
 
     }
 
@@ -837,7 +849,7 @@ public class UiController : MonoBehaviour
     }
 
 
-    void ToggleShopPanel()
+    public void ToggleShopPanel()
     {
         
         if (hudCanvasShopPanel.activeSelf) // check if the shop panel is active

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -515,8 +516,51 @@ public class BoardController : MonoBehaviour
     }
     IEnumerator SmoothEndCombatRoundTransition() // smoothly end combat 
     {
+        uiController.combatLogger.parseTime = combatRoundTimer;
         combatRoundTimer = 0;
         uiController.combatTimerPanel.gameObject.SetActive(false);
+        uiController.EnableCombatReportPanel();
+        List<CombatReport> combatReports = uiController.combatLogger.combatReports;
+
+        foreach (CombatReport combatReport in combatReports)
+        {
+            if (combatReport.dirtyParseTime)
+            {
+                combatReport.parseTime = uiController.combatLogger.parseTime;
+            }
+        }
+   
+
+        GameObject combatReportBarPrefab = (GameObject)Resources.Load("Combat Report Bar");
+        foreach (NPC npc in npcController.allyList)
+        {
+            if (!npc.isEnemy && !npc.isCreep && !npc.isBoss && npc.combatReport_DamageDoneThisRound != 0)
+            {
+                uiController.combatLogger.AddCombatReport(new CombatReport(npc.UNIT_TYPE.ToString(), npc.TIER, npc.combatReport_DamageDoneThisRound, uiController.combatLogger.parseTime,false));
+                npc.combatReport_DamageDoneThisRound = 0;
+            }
+        }
+        uiController.combatLogger.ResetCombatReportBars();
+        combatReports = uiController.combatLogger.combatReports;
+
+        List<CombatReport> sortedCombatReports = combatReports.OrderByDescending(o => o.damageDealt).ToList();
+
+        float totalDamageDone = 0;
+        foreach (CombatReport combatReport in sortedCombatReports)
+        {
+            totalDamageDone += combatReport.damageDealt;
+        }
+        foreach (CombatReport combatReport in sortedCombatReports) 
+        {
+            GameObject go = Instantiate(combatReportBarPrefab, uiController.combatReportEntries.transform);
+            CombatReportBar combatReportBar = go.GetComponent<CombatReportBar>();
+            combatReportBar.combatReport = combatReport;
+            combatReportBar.totalDamage = totalDamageDone;
+            combatReportBar.SetUIElements();
+            uiController.combatLogger.combatReportBars.Add(go);
+        }
+
+        uiController.combatLogger.ResetCombatLog();
 
         if (npcController.enemyList.Count == 0) // combat victory
         {
@@ -524,12 +568,13 @@ public class BoardController : MonoBehaviour
             {
                 foreach (NPC npc in npcController.deployedAllyList)
                 {
-
+                  
                     if (npc.cheering_SoundClip != null && UnityEngine.Random.Range(0, 2) == 1)
                     {
                         npc.npcAudioSource.PlayOneShot(npc.cheering_SoundClip);
                     }
                 }
+               
             }
         }
 
@@ -587,6 +632,7 @@ public class BoardController : MonoBehaviour
             }
 
         }
+
 
       
         uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopRefreshAudioClip);

@@ -111,23 +111,23 @@ public class Item
         List<string> nonZeroStats = new List<string>();
         if (ap != 0)
         {
-            nonZeroStats.Add("Attack: " + ap.ToString());
+            nonZeroStats.Add("Attack: +" + ap.ToString());
         }
         if (sp != 0)
         {
-            nonZeroStats.Add("Spell Power: " + ap.ToString());
+            nonZeroStats.Add("Spell Power: +" + ap.ToString());
         }
         if (armor != 0)
         {
-            nonZeroStats.Add("Armor: " + armor.ToString());
+            nonZeroStats.Add("Armor: +" + armor.ToString());
         }
         if (retaliation != 0)
         {
-            nonZeroStats.Add("Retaliation: " + retaliation.ToString());
+            nonZeroStats.Add("Retaliation: +" + retaliation.ToString());
         }
         if (maxhp != 0)
         {
-            nonZeroStats.Add("HP: " + maxhp.ToString());
+            nonZeroStats.Add("HP: +" + maxhp.ToString());
         }
 
         bool firstLine = true;
