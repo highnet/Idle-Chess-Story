@@ -9,15 +9,16 @@ public class EngineerBehaviour : NPC
         StartLiveRoutine();
         if (uiController.wizard_difficultyPicker.value == 1)
         {
-            BASE_MAXHP *= 1.1f;
-            BASE_ARMOR *= 1.1f;
-            BASE_ATTACKPOWER *= 1.1f;
+            BASE_MAXHP *= 1.3f;
+            BASE_ARMOR *= 1.3f;
+            BASE_ATTACKPOWER *= 1.3f;
+            BASE_SPELLPOWER *= 1.3f;
         }
         else if (uiController.wizard_difficultyPicker.value == 2)
         {
-            BASE_MAXHP *= 1.2f;
-            BASE_ARMOR *= 1.2f;
-            BASE_ATTACKPOWER *= 1.2f;
+            BASE_MAXHP *= 1.4f;
+            BASE_ARMOR *= 1.4f;
+            BASE_ATTACKPOWER *= 1.4f;
         }
 
         HP = BASE_MAXHP;

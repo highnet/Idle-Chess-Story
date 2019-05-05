@@ -1342,7 +1342,6 @@ public class NPC : MonoBehaviour
                         if (movementJumpFailedAttempts >= 1 || (this.PRIMARYTRIBE != Tribe.Assassin && this.SECONDARYTRIBE != Tribe.Assassin)) // normal movement
                         {
                             movementJumpSpeed = 2f;
-                            Debug.Log("normal movement");
                             if (targetTileBehaviour.i < tileBehaviour.i)
                             {
                                 deltaI = -1;
@@ -1388,13 +1387,11 @@ public class NPC : MonoBehaviour
 
                                 if ((deltaI == 1 && deltaJ == 0) || (deltaI == -1 && deltaJ == 0))
                                 {
-                                    Debug.Log("VERTICAL BLOCKED");
                                     Debug.Log(deltaJ);
                                     Debug.Log(deltaI);
                                     moved = MoveToEmptyTile(tileBehaviour.i + deltaI, tileBehaviour.j + 1, false);
                                     if (moved)
                                     {
-                                        Debug.Log("SIDESTEP LEFT");
                                         newJ = newJ + 1;
                                         newI = newI + deltaI;
                                     }
@@ -1404,7 +1401,6 @@ public class NPC : MonoBehaviour
 
                                         if (moved)
                                         {
-                                            Debug.Log("SIDESTEP RIGHT");
                                             newJ = newJ - 1;
                                             newI = newI + deltaI;
 
@@ -1417,11 +1413,9 @@ public class NPC : MonoBehaviour
                                 {
                                     if ((deltaI == 0 && deltaJ == 1) || (deltaI == 0 && deltaJ == -1))
                                     {
-                                        Debug.Log("HORIZONTAL BLOCKED");
                                         moved = MoveToEmptyTile(tileBehaviour.i + 1, tileBehaviour.j + deltaJ, false);
                                         if (moved)
                                         {
-                                            Debug.Log("SIDESTEP down");
                                             newI = newI + 1;
                                             newJ = newJ + deltaJ;
                                         }
@@ -1431,7 +1425,6 @@ public class NPC : MonoBehaviour
 
                                             if (moved)
                                             {
-                                                Debug.Log("SIDESTEP up");
                                                 newI = newI - 1;
                                                 newJ = newJ + deltaJ;
 
@@ -1446,11 +1439,9 @@ public class NPC : MonoBehaviour
                                 {
                                     if ((deltaI == 1 && deltaJ == 1))
                                     {
-                                        Debug.Log("diagonal down left up BLOCKED");
                                         moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j + 1, false);
                                         if (moved)
                                         {
-                                            Debug.Log("SIDESTEP down");
                                             newJ = newJ + 1;
                                         }
                                         else
@@ -1459,7 +1450,6 @@ public class NPC : MonoBehaviour
 
                                             if (moved)
                                             {
-                                                Debug.Log("SIDESTEP up");
                                                 newI = newI - 1;
 
                                             }
@@ -1472,11 +1462,9 @@ public class NPC : MonoBehaviour
                                 {
                                     if ((deltaI == 1 && deltaJ == -1))
                                     {
-                                        Debug.Log("diagonal down right BLOCKED");
                                         moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j - 1, false);
                                         if (moved)
                                         {
-                                            Debug.Log("SIDESTEP down");
                                             newJ = newJ - 1;
                                         }
                                         else
@@ -1485,7 +1473,6 @@ public class NPC : MonoBehaviour
 
                                             if (moved)
                                             {
-                                                Debug.Log("SIDESTEP up");
                                                 newI = newI + 1;
 
                                             }
@@ -1498,11 +1485,9 @@ public class NPC : MonoBehaviour
                                 {
                                     if ((deltaI == -1 && deltaJ == -1))
                                     {
-                                        Debug.Log("diagonal down right BLOCKED");
                                         moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j - 1, false);
                                         if (moved)
                                         {
-                                            Debug.Log("SIDESTEP down");
                                             newJ = newJ - 1;
                                         }
                                         else
@@ -1511,7 +1496,6 @@ public class NPC : MonoBehaviour
 
                                             if (moved)
                                             {
-                                                Debug.Log("SIDESTEP up");
                                                 newI = newI - 1;
 
                                             }
@@ -1524,11 +1508,9 @@ public class NPC : MonoBehaviour
                                 {
                                     if ((deltaI == -1 && deltaJ == 1))
                                     {
-                                        Debug.Log("diagonal down right BLOCKED");
                                         moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j + 1, false);
                                         if (moved)
                                         {
-                                            Debug.Log("SIDESTEP down");
                                             newJ = newJ + 1;
                                         }
                                         else
@@ -1537,7 +1519,6 @@ public class NPC : MonoBehaviour
 
                                             if (moved)
                                             {
-                                                Debug.Log("SIDESTEP up");
                                                 newI = newI - 1;
 
                                             }
@@ -1559,7 +1540,6 @@ public class NPC : MonoBehaviour
                         } else // assassin teleport movement
                         {
                             movementJumpSpeed = 5f;
-                            Debug.Log("assassin movement");
                             movementJumpStartPosition = this.transform.position;
                             int newI = 0;
                             int newJ = 0;
