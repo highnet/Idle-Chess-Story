@@ -341,7 +341,7 @@ public class PlayerController : MonoBehaviour
         if ((boardController.gameStatus == GameStatus.Fight || boardController.gameStatus == GameStatus.Shopping) && currentPlayerHealth <= 0) // check lose condition
         {
             boardController.TransitionToReportDefeatPhase();
-        } else if(boardController.currentGameRound == 19 && boardController.gameStatus == GameStatus.Shopping)
+        } else if(boardController.currentGameRound == 21 && boardController.gameStatus == GameStatus.Shopping)
         {
             boardController.TransitionToReportVictoryPhase();
         } 

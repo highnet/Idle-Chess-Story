@@ -77,7 +77,7 @@ public class BoardController : MonoBehaviour
         if (!testDummyMode) // test mode spawns dummies instead of real units
         {
        
-            if (currentGameRound  == 1 || currentGameRound == 2  || currentGameRound == 5 ||  currentGameRound == 7 || currentGameRound == 11 || currentGameRound == 15 || currentGameRound == 17)
+            if (currentGameRound  == 1 || currentGameRound == 2  || currentGameRound == 5 ||  currentGameRound == 7 || currentGameRound == 11 || currentGameRound == 15 || currentGameRound == 19)
             {
                 playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
                 for(int i = 0; i < 2 + (currentGameRound/2); i++)
@@ -88,7 +88,7 @@ public class BoardController : MonoBehaviour
                 }
             }
 
-            else  if (currentGameRound == 18) // boss round 
+            else  if (currentGameRound == 20) // boss round 
             {
                 playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
                 GameObject spawnedEnemy = TrySpawnUnit(2, 4, Unit.Engineer, true, 0,true); // spawn engineer
@@ -125,15 +125,15 @@ public class BoardController : MonoBehaviour
                 int currentDificulty = uiController.wizard_difficultyPicker.value;
                 if (currentDificulty == 0)
                 {
-                    spawningBudget *= 0.5f;
+                    spawningBudget *= 0.8f;
                 }
                 if (currentDificulty == 1)
                 {
-                    spawningBudget *= 0.6f;
+                    spawningBudget *= 0.9f;
                 }
                 else if (currentDificulty == 2)
                 {
-                    spawningBudget *= 0.7f;
+                    spawningBudget *= 1f;
                 }
                 if (spawningBudget < 6)
                 {
@@ -163,14 +163,18 @@ public class BoardController : MonoBehaviour
             playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
 
                 int enemySpawnCount = playerController.maxDeployedUnitsLimit;
-
+              
                 if (currentDificulty == 0)
                 {
-                    enemySpawnCount -= 1;
+                    enemySpawnCount += 0 + UnityEngine.Random.Range(0, 2); 
+                } else if (currentDificulty == 1)
+                {
+                    enemySpawnCount += UnityEngine.Random.Range(0, 3);
                 }
                 else if (currentDificulty == 2)
                 {
-                    enemySpawnCount += 1;
+                    enemySpawnCount += UnityEngine.Random.Range(0, 4);
+
                 }
 
 
@@ -226,15 +230,15 @@ public class BoardController : MonoBehaviour
                 int itemsAllowedBudget = 0;
                 if (uiController.wizard_difficultyPicker.value == 0)
                 {
-                    itemsAllowedBudget = sessionLogger.itemDropsEarned + UnityEngine.Random.Range(-2, 2);
+                    itemsAllowedBudget = sessionLogger.itemDropsEarned + UnityEngine.Random.Range(-1, 2);
                 }
                 else if (uiController.wizard_difficultyPicker.value == 1)
                 {
-                    itemsAllowedBudget = sessionLogger.itemDropsEarned + UnityEngine.Random.Range(-1, 2);
+                    itemsAllowedBudget = sessionLogger.itemDropsEarned + UnityEngine.Random.Range(0, 2);
                 }
                 else if (uiController.wizard_difficultyPicker.value == 2)
                 {
-                    itemsAllowedBudget = sessionLogger.itemDropsEarned + UnityEngine.Random.Range(0, 3);
+                    itemsAllowedBudget = sessionLogger.itemDropsEarned + UnityEngine.Random.Range(0, 2);
                 }
 
                 bool skippedFirstItemAssignation = false;
@@ -585,7 +589,7 @@ public class BoardController : MonoBehaviour
         }
 
         yield return new WaitForSeconds(4); // wait 2 seconds
-        float goldReward = playerController.playerGoldCount; // fetch the player's current gold
+        float goldCount = playerController.playerGoldCount; // fetch the player's current gold
         playerController.enemyMMR += 5;
         if (npcController.enemyList.Count == 0) // combat VICTORY
         {
@@ -593,31 +597,33 @@ public class BoardController : MonoBehaviour
      
             sessionLogger.calculateFIDEMMRChange(true, (float)playerController.playerMMR, (float)playerController.enemyMMR, playerController.FIDE_KFactor);
         
-            goldReward *= 1.10f;
+            goldCount *= 1.11f;
+            goldCount += 1;
 
-            if (goldReward < 2)
+            if (goldCount < 2)
             {
-                goldReward = 2;
+                goldCount = 2;
             }
-            goldReward = (float)Math.Round(goldReward, 0, MidpointRounding.AwayFromZero);
-            float netGoldReward = goldReward - playerController.playerGoldCount;
+            goldCount = (float)Math.Round(goldCount, 0, MidpointRounding.AwayFromZero);
+            float netGoldReward = goldCount - playerController.playerGoldCount;
             playerController.sessionLogger.goldRewarded += (long)netGoldReward;
-            playerController.SetPlayerGoldCount((long)goldReward); // reward bonus gold
+            playerController.SetPlayerGoldCount((long)goldCount); // reward bonus gold
         }
         else // combat DEFEAT
         {
      
             sessionLogger.calculateFIDEMMRChange(false, (float)playerController.playerMMR, (float)playerController.enemyMMR, playerController.FIDE_KFactor);
        
-                goldReward *= 1.05f;
+                goldCount *= 1.06f;
+                goldCount += 1;
 
-            if (goldReward < 2)
+            if (goldCount < 2)
             {
-                goldReward = 2;
+                goldCount = 2;
             }
-            float netGoldReward = goldReward - playerController.playerGoldCount;
+            float netGoldReward = goldCount - playerController.playerGoldCount;
             playerController.sessionLogger.goldRewarded += (long)netGoldReward;
-            playerController.SetPlayerGoldCount((long)goldReward); // reward DEFEAT bonus gold
+            playerController.SetPlayerGoldCount((long)goldCount); // reward DEFEAT bonus gold
 
             bool isCreepRound = false;
             bool isBossRound = false;

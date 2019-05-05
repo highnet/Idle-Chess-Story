@@ -701,7 +701,7 @@ public class NPC : MonoBehaviour
                 }
                 this.StopCoroutine(liveRoutine);
                 this.liveRoutine = null;
-                long goldBountyReward = (long)this.baseGoldBountyReward;
+                long goldBountyReward = 1 + (long)this.baseGoldBountyReward;
                 float bonusGold = 0;
 
                 int assassinsCount = 0;
@@ -722,7 +722,7 @@ public class NPC : MonoBehaviour
                 playerController.SetPlayerGoldCount(playerController.playerGoldCount + goldBountyReward);
                 uiController.hudCanvasAudioSource.PlayOneShot(uiController.shopClosedAudioClip);
                 int LootDropRoll = UnityEngine.Random.Range(0, 101);
-                if (LootDropRoll >= 90 || boardController.testItemDrops)
+                if (LootDropRoll >= 95 || boardController.testItemDrops|| this.isBoss)
                 {
                     GenerateRandomLootDrop();
                     sessionLogger.itemDropsEarned++;

@@ -905,7 +905,7 @@ public class UiController : MonoBehaviour
             {
                 dialogueTriggerSystem.bossDialogue2.TriggerDialogue();
             }
-            else if (boardController.currentGameRound == 18)
+            else if (boardController.currentGameRound == 20)
             {
                 dialogueTriggerSystem.bossDialogue3.TriggerDialogue();
             }
