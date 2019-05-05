@@ -126,15 +126,15 @@ public class BoardController : MonoBehaviour
                 Debug.Log("difficulty: " + currentDificulty);
                 if (currentDificulty == 0)
                 {
-                    spawningBudget *= 0.8f;
+                    spawningBudget *= 0.5f;
                 }
                 if (currentDificulty == 1)
                 {
-                    spawningBudget *= 0.9f;
+                    spawningBudget *= 0.6f;
                 }
                 else if (currentDificulty == 2)
                 {
-                    spawningBudget *= 1f;
+                    spawningBudget *= 0.7f;
                 }
                 if (spawningBudget < 6)
                 {
