@@ -283,7 +283,49 @@ public class BoardController : MonoBehaviour
                 {
                     itemsAllowedBudget = sessionLogger.itemDropsEarned + UnityEngine.Random.Range(0, 2);
                 }
+                int[] itemDistribution = new int[npcController.enemyList.Count];
 
+                for(int l = 0; l < itemsAllowedBudget; l++)
+                {
+                    int randomIndex = UnityEngine.Random.Range(0, itemDistribution.Length);
+                    if (itemDistribution[randomIndex] < 4)
+                    {
+                        itemDistribution[randomIndex]++;
+                    }
+                }
+                
+                for(int i = 0; i < npcController.enemyList.Count; i++)
+                {
+                    for (int j = 0; j < itemDistribution[i]; j++)
+                    {
+                        if (npcController.enemyList[i].Inventory.Count < 4)
+                        {
+
+                  
+                        int RarityRoll = UnityEngine.Random.Range(0, 101);
+                        ItemRarity rolledRarity = ItemRarity.Trash;
+                        if (RarityRoll >= 60 && RarityRoll < 90)
+                        {
+                            rolledRarity = ItemRarity.Common;
+                        }
+                        else if (RarityRoll >= 90 && RarityRoll < 99)
+                        {
+                            rolledRarity = ItemRarity.Rare;
+                        }
+                        else if (RarityRoll >= 99)
+                        {
+                            rolledRarity = ItemRarity.Artifact;
+                        }
+                        List<ItemName> possibleDrops;
+                        playerController.ITEM_RARITY_DATA.TryGetValue(rolledRarity, out possibleDrops); // get a list of all units of our possible item drops
+                        int possibleDropIndex = UnityEngine.Random.Range(0, possibleDrops.Count);
+                        ItemName itemName = possibleDrops[possibleDropIndex];
+                        Item rngItem = new Item(itemName);
+                        npcController.enemyList[i].Inventory.Add(rngItem);
+                        }
+                    }
+                }
+                /*
                 bool skippedFirstItemAssignation = false;
 
                 foreach (NPC npc in npcController.enemyList) // give NPCs items
@@ -326,7 +368,7 @@ public class BoardController : MonoBehaviour
                         npc.RecalculateInventoryItemValues();
                     }
                 }
-
+                */
             }
         }
 
