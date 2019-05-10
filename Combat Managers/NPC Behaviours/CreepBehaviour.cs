@@ -17,7 +17,7 @@ public class CreepBehaviour : NPC
         {
             BASE_ARMOR = 99f;
         }
-        BASE_ATTACKPOWER = 55 * Mathf.Pow( (1 + 0.7f), currentGameRound);
+        BASE_ATTACKPOWER = 55 * Mathf.Pow( (1 + 0.05f), currentGameRound);
         BASE_SPELLPOWER = 0;
         BASE_RETALIATION = 0;
 
