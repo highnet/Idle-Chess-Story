@@ -44,7 +44,6 @@ public class AssignableItemDrop : MonoBehaviour
     {
         if (boardController.selectedItemDrop == this)
         {
-        //    SelectionLine.enabled = true;
             arrowRenderer.enabled = true;
             Vector3[] positions = new Vector3[2];
             positions[0] = this.transform.position;
@@ -65,7 +64,6 @@ public class AssignableItemDrop : MonoBehaviour
         else
         {
             arrowRenderer.SetPositions(this.transform.position, this.transform.position);
-       //     SelectionLine.enabled = false;
         }
     }
 

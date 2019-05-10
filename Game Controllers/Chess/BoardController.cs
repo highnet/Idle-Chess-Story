@@ -677,7 +677,7 @@ public class BoardController : MonoBehaviour
         {
             steamAchievements.IncrementRoundsWon(1);
 
-            sessionLogger.calculateFIDEMMRChange(true, (float)playerController.playerMMR, (float)playerController.enemyMMR, playerController.FIDE_KFactor);
+            sessionLogger.CalculateFIDEMMRChange(true, (float)playerController.playerMMR, (float)playerController.enemyMMR, playerController.FIDE_KFactor);
 
             goldCount *= 1.11f;
             goldCount += 1;
@@ -694,7 +694,7 @@ public class BoardController : MonoBehaviour
         else // combat DEFEAT
         {
 
-            sessionLogger.calculateFIDEMMRChange(false, (float)playerController.playerMMR, (float)playerController.enemyMMR, playerController.FIDE_KFactor);
+            sessionLogger.CalculateFIDEMMRChange(false, (float)playerController.playerMMR, (float)playerController.enemyMMR, playerController.FIDE_KFactor);
 
             goldCount *= 1.06f;
             goldCount += 1;
