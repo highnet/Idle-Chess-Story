@@ -89,6 +89,8 @@ public class NPC : MonoBehaviour
     public float combatReport_DamageDoneThisRound;
     public Color combatReport_barUnitColor;
     public bool combatReport_barUnitColor_isDirty = true;
+    public ArrowRenderer arrow;
+
 
     public void Awake()
     {
@@ -134,6 +136,8 @@ public class NPC : MonoBehaviour
             
             combatReport_barUnitColor_isDirty = false;
         }
+
+        arrow = worldControl.GetComponentInChildren<ArrowRenderer>();
     }
 
     // Start is called before the first frame update
@@ -164,7 +168,6 @@ public class NPC : MonoBehaviour
         recalculateSpellPowerValue();
         foreach (Item item in Inventory)
         {
-            Debug.Log(item.ItemName.ToString());
             this.ARMOR += item.ARMOR_Bonus;
             this.ATTACKPOWER += item.ATTACKPOWER_Bonus;
             this.MAXHP += item.MAXHP_Bonus;
@@ -840,7 +843,6 @@ public class NPC : MonoBehaviour
     {
         if (boardController.selectedItemDrop != null && this.Inventory.Count < 4)
         {
-            Debug.Log("Adding item: " + boardController.selectedItemDrop.item.ItemName.ToString());
             this.Inventory.Add(boardController.selectedItemDrop.item);
             RecalculateInventoryItemValues();
             GameObject.Destroy(boardController.selectedItemDrop.gameObject);
@@ -888,12 +890,8 @@ public class NPC : MonoBehaviour
                 this.gameObject.GetComponentsInParent<Transform>()[1].position = hit.point + Vector3.up * 2;
             }
 
-            LineRenderer lineRenderer = worldControl.GetComponent<LineRenderer>();
-            lineRenderer.enabled = true;
-            Vector3[] positions = new Vector3[2];
-            positions[0] = this.transform.position;
-            positions[1] = this.transform.position + Vector3.down * 2;
-            lineRenderer.SetPositions(positions);
+            arrow.gameObject.SetActive(true);
+            arrow.SetPositions(this.transform.position, this.transform.position + Vector3.down * 2);
         }
     }
 
@@ -925,7 +923,8 @@ public class NPC : MonoBehaviour
             }
             boardController.friendlySideIndicatorPlane.SetActive(false);
             beingDragged = false;
-            worldControl.GetComponent<LineRenderer>().enabled = false;
+            arrow.SetPositions(new Vector3(1000, 1000, 1000), new Vector3(1001, 1001, 1001));
+
         }
     }
 
@@ -1049,7 +1048,6 @@ public class NPC : MonoBehaviour
 
     public bool TryLevelUpFriendly()
     {
-        Debug.Log("Leveling up friendly tier" + TIER + " " + name);
             int likewiseUnitsFound = 0;
             NPC firstNPC = null;
             NPC secondNPC = null;
@@ -1057,7 +1055,6 @@ public class NPC : MonoBehaviour
         foreach (Item item in this.Inventory)
         {
             combinedInventory.Add(item);
-            Debug.Log("adding" + item.ItemName.ToString() + "to combined inventory");
 
         }
         foreach (NPC npc in npcController.allyList)
@@ -1066,7 +1063,6 @@ public class NPC : MonoBehaviour
             {
                 if (npc.TIER == this.TIER)
                 {
-                    Debug.Log("Found likewise unit");
                     likewiseUnitsFound += 1;
 
                     if (likewiseUnitsFound == 1 && firstNPC == null)
@@ -1075,7 +1071,6 @@ public class NPC : MonoBehaviour
                         foreach (Item item in firstNPC.Inventory)
                         {
                             combinedInventory.Add(item);
-                            Debug.Log("adding" + item.ItemName.ToString() + "to combined inventory");
                         }
 
                     } else if (likewiseUnitsFound == 2 && secondNPC == null)
@@ -1084,7 +1079,6 @@ public class NPC : MonoBehaviour
                         foreach (Item item in secondNPC.Inventory)
                         {
                             combinedInventory.Add(item);
-                            Debug.Log("adding" + item.ItemName.ToString() + "to combined inventory");
                         }
                     }
                 }
@@ -1093,7 +1087,6 @@ public class NPC : MonoBehaviour
                 {
                     if (this.TIER == 1)
                     {
-                        Debug.Log("granting level up to tier 2");
                         this.ApplyTier2Upgrades();
                         this.TIER = 2;
                         firstNPC.RemoveFromBoard(true);
@@ -1103,16 +1096,12 @@ public class NPC : MonoBehaviour
                         int yOffset = 0;
                         for(int i = 0; i < combinedInventory.Count; i++)
                         {
-                            Debug.Log("concerning item: " +  combinedInventory[i].ItemName.ToString());
-
                             if (i < 4)
                             {
-                                Debug.Log("-> adding it");
                                 this.Inventory.Add(combinedInventory[i]);
                             } else
                             {
                                GenerateSpecificLootDrop(combinedInventory[i].ItemName,yOffset);
-                                Debug.Log("-> dropping it");
                                 yOffset += 1;
                             }
                         }
@@ -1123,7 +1112,6 @@ public class NPC : MonoBehaviour
                     }
                     else if (this.TIER == 2)
                     {
-                        Debug.Log("granting level up to tier 3");
                         this.ApplyTier3Upgrades();
                         this.TIER = 3;
                         firstNPC.RemoveFromBoard(true);
@@ -1133,15 +1121,12 @@ public class NPC : MonoBehaviour
                         int yOffset = 0;
                         for (int i = 0; i < combinedInventory.Count; i++)
                         {
-                            Debug.Log("concerning item: " + combinedInventory[i].ItemName.ToString());
                             if (i < 4)
                             {
-                                Debug.Log("-> adding it");
                                 this.Inventory.Add(combinedInventory[i]);
                             }
                             else
                             {
-                                Debug.Log("-> dropping it");
                                 GenerateSpecificLootDrop(combinedInventory[i].ItemName,yOffset);
                                 yOffset += 1;
                             }
@@ -1387,8 +1372,6 @@ public class NPC : MonoBehaviour
 
                                 if ((deltaI == 1 && deltaJ == 0) || (deltaI == -1 && deltaJ == 0))
                                 {
-                                    Debug.Log(deltaJ);
-                                    Debug.Log(deltaI);
                                     moved = MoveToEmptyTile(tileBehaviour.i + deltaI, tileBehaviour.j + 1, false);
                                     if (moved)
                                     {

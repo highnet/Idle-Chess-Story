@@ -24,7 +24,7 @@ public class Item
         if (ItemToCreate == ItemName.StickSword)
         {
             this.ItemRarity = ItemRarity.Trash;
-            this.ATTACKPOWER_Bonus += 25;
+            this.ATTACKPOWER_Bonus += 35;
             outlineWidth = 1;
         }
         else if (ItemToCreate == ItemName.TwoHander)
@@ -81,7 +81,7 @@ public class Item
         else if (ItemToCreate == ItemName.LongSword)
         {
             this.ItemRarity = ItemRarity.Trash;
-            this.ATTACKPOWER_Bonus += 30;
+            this.ATTACKPOWER_Bonus += 15;
             this.RETALIATION_Bonus += 3;
             outlineWidth = 1;
         }

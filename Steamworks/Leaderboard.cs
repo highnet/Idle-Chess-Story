@@ -150,16 +150,16 @@ public class Leaderboard : MonoBehaviour
 
     public void DownloadTop100Entries()
     {
-        Debug.Log("[LeaderBoard] downloading top 10 leaderboard entries");
+        Debug.Log("[LeaderBoard] downloading top 100 leaderboard entries");
         downLoadingTop100Entries = true;
-        SteamAPICall_t handle4 = SteamUserStats.DownloadLeaderboardEntries(hSteamLeaderboard,ELeaderboardDataRequest.k_ELeaderboardDataRequestGlobal,0,11);
-        m_LeaderBoardTop100Downloaded.Set(handle4); // set m_LeaderBoardTop10Downloaded with the top 10 downloaded leaderboard entries
+        SteamAPICall_t handle4 = SteamUserStats.DownloadLeaderboardEntries(hSteamLeaderboard,ELeaderboardDataRequest.k_ELeaderboardDataRequestGlobal,0,100);
+        m_LeaderBoardTop100Downloaded.Set(handle4); // set m_LeaderBoardTop100Downloaded with the top 10 downloaded leaderboard entries
     }
     
     public LeaderEntry[] ReadDownloadedTop100Entries()
     {
       
-        Debug.Log("[LeaderBoard] reading top 10 entries");
+        Debug.Log("[LeaderBoard] reading top 100 entries");
         LeaderEntry[] vals = new LeaderEntry[topEntriesCount];
         
         for (int i = 0; i < topEntriesCount; i++)

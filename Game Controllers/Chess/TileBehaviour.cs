@@ -18,12 +18,6 @@ public class TileBehaviour : MonoBehaviour
         findController();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     public void findController()
     {
         worldControl = GameObject.FindGameObjectWithTag("Controller");

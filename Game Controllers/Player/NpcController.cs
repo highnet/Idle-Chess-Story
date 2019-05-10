@@ -19,17 +19,11 @@ public class NpcController : MonoBehaviour
         deployedAllyList = new List<NPC>();
     }
 
-
-    // Update is called once per frame
-    void Update() { }
-
     public void UpdateNpcList()
     {
         npcList = new List<NPC>();
         enemyList = new List<NPC>();
         allyList = new List<NPC>();
-
-        
 
         foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Targetable"))
         {
