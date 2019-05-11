@@ -376,7 +376,7 @@ public class BoardController : MonoBehaviour
         else // if in test mode
         {
             playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
-            GameObject spawnedEnemy = TrySpawnDummy(2, 5, true); // spawn dummy
+            GameObject spawnedEnemy = TrySpawnDummy(3, 5, true); // spawn dummy
             if (spawnedEnemy != null) // this can be used to test enemy tribe bonuses
             {
                 Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE); //

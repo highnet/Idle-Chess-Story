@@ -72,7 +72,7 @@ public class PlayerController : MonoBehaviour
     public bool newPlayer;
 
     public int enemyMMR;
-    public int FIDE_KFactor = 15;
+    public int FIDE_KFactor = 10;
 
     private void Awake()
     {

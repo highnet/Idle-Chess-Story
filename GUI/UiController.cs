@@ -14,6 +14,7 @@ public class UiController : MonoBehaviour
     NpcController npcController;
     SessionLogger sessionLogger;
     DialogueManager dialogueManager;
+    public AudioSource musicSource;
     public GameObject hudCanvas;
     public GameObject hudCanvasTopBar;
     public GameObject hudCanvasBottomBar;
@@ -578,8 +579,6 @@ public class UiController : MonoBehaviour
         if (boardController.gameStatus != GameStatus.ReportVictory && boardController.gameStatus != GameStatus.ReportDefeat && boardController.FocusedItem.ItemName != EmptyItem.ItemName) // update the inventory mousedover tooltip
         {
                 MousedOverSelectedItemTooltipPanel.gameObject.SetActive(true);
-            RectTransform rectTrans = MousedOverSelectedItemTooltipPanel.GetComponent<RectTransform>();
-            rectTrans.position = Input.mousePosition + tooltipOffsetVector;
         }
         else
         {
@@ -1072,5 +1071,10 @@ public class UiController : MonoBehaviour
     public void ChangeCurrentPlayerUsernameDisplayText(string nameString, string mmrString)
     {
         hudCanvasTopPanelUsernameText.text = nameString + "(" + mmrString + ")";
+    }
+
+    public void ToggleMusic()
+    {
+        musicSource.mute = !musicSource.mute;
     }
 }

@@ -170,7 +170,7 @@ public class Achievements : MonoBehaviour
         if (m_StatsValid)
         {
             m_GoldEarned += (int)goldEarned;
-            SteamUserStats.SetStat("Games Won", m_GoldEarned);
+            SteamUserStats.SetStat("Gold Earned", m_GoldEarned);
             if (m_GoldEarned < 10000)
             {
                 SteamUserStats.IndicateAchievementProgress("Gold Earned", (uint)m_GoldEarned, 10000);

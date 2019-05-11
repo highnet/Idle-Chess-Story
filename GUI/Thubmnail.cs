@@ -33,8 +33,6 @@ public class Thubmnail : MonoBehaviour
         if (mousedOver)
         {
             SpawnedAssociatedNPC.transform.Rotate(new Vector3(0f, randomRotationOrientation * shopThumbnailRotationSpeed, 0f), Space.Self);
-            RectTransform rectTrans = uicontroller.ShopPanelTooltipSubPanel.GetComponent<RectTransform>();
-            rectTrans.position =   Input.mousePosition + offsetVector;
         }
     }
 

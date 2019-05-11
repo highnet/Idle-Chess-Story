@@ -1363,7 +1363,7 @@ public class NPC : MonoBehaviour
                                 ++movementJumpFailedAttempts;
                             }
 
-                            if (!moved && movementJumpFailedAttempts >= 3)
+                            if (!moved && movementJumpFailedAttempts >= 2)
                             {
 
                                 int newI = oldI;
@@ -1422,18 +1422,20 @@ public class NPC : MonoBehaviour
                                 {
                                     if ((deltaI == 1 && deltaJ == 1))
                                     {
-                                        moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j + 1, false);
+                                        moved = MoveToEmptyTile(tileBehaviour.i + 1, tileBehaviour.j, false);
+
                                         if (moved)
                                         {
-                                            newJ = newJ + 1;
+                                            newI = newI + 1;
+                                         
                                         }
                                         else
                                         {
-                                            moved = MoveToEmptyTile(tileBehaviour.i - 1, tileBehaviour.j, false);
+                                            moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j + 1, false);
 
                                             if (moved)
                                             {
-                                                newI = newI - 1;
+                                                newJ = newJ + 1;
 
                                             }
                                         }
@@ -1445,18 +1447,20 @@ public class NPC : MonoBehaviour
                                 {
                                     if ((deltaI == 1 && deltaJ == -1))
                                     {
-                                        moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j - 1, false);
+                                        moved = MoveToEmptyTile(tileBehaviour.i + 1, tileBehaviour.j, false);
+
                                         if (moved)
                                         {
-                                            newJ = newJ - 1;
+                                            newI = newI + 1;
                                         }
                                         else
                                         {
-                                            moved = MoveToEmptyTile(tileBehaviour.i + 1, tileBehaviour.j, false);
+                                            moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j - 1, false);
 
                                             if (moved)
                                             {
-                                                newI = newI + 1;
+                                                newJ = newJ - 1;
+
 
                                             }
                                         }
@@ -1468,18 +1472,20 @@ public class NPC : MonoBehaviour
                                 {
                                     if ((deltaI == -1 && deltaJ == -1))
                                     {
-                                        moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j - 1, false);
+                                        moved = MoveToEmptyTile(tileBehaviour.i - 1, tileBehaviour.j, false);
                                         if (moved)
                                         {
-                                            newJ = newJ - 1;
+                                            newI = newI - 1;
+                   
                                         }
                                         else
                                         {
-                                            moved = MoveToEmptyTile(tileBehaviour.i - 1, tileBehaviour.j, false);
+                                            moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j - 1, false);
+
 
                                             if (moved)
                                             {
-                                                newI = newI - 1;
+                                                newJ = newJ - 1;
 
                                             }
                                         }
@@ -1491,18 +1497,20 @@ public class NPC : MonoBehaviour
                                 {
                                     if ((deltaI == -1 && deltaJ == 1))
                                     {
-                                        moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j + 1, false);
+                                        moved = MoveToEmptyTile(tileBehaviour.i - 1, tileBehaviour.j, false);
+
                                         if (moved)
                                         {
-                                            newJ = newJ + 1;
+                                            newI = newI - 1;
+
                                         }
                                         else
                                         {
-                                            moved = MoveToEmptyTile(tileBehaviour.i - 1, tileBehaviour.j, false);
+                                            moved = MoveToEmptyTile(tileBehaviour.i, tileBehaviour.j + 1, false);
 
                                             if (moved)
                                             {
-                                                newI = newI - 1;
+                                                newJ = newJ + 1;
 
                                             }
                                         }
