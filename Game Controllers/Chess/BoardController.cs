@@ -121,7 +121,7 @@ public class BoardController : MonoBehaviour
             {
                 float spawningBudget = playerController.sessionLogger.goldRewarded;
 
-                int currentDificulty = uiController.wizard_difficultyPicker.value;
+                int currentDificulty = uiController.difficultyPicker.value;
                 Debug.Log("difficulty: " + currentDificulty);
                 if (currentDificulty == 0)
                 {
@@ -270,15 +270,15 @@ public class BoardController : MonoBehaviour
                     }
                 }
                 int itemsAllowedBudget = 0;
-                if (uiController.wizard_difficultyPicker.value == 0)
+                if (uiController.difficultyPicker.value == 0)
                 {
                     itemsAllowedBudget = sessionLogger.itemDropsEarned + UnityEngine.Random.Range(-1, 2);
                 }
-                else if (uiController.wizard_difficultyPicker.value == 1)
+                else if (uiController.difficultyPicker.value == 1)
                 {
                     itemsAllowedBudget = sessionLogger.itemDropsEarned + UnityEngine.Random.Range(0, 2);
                 }
-                else if (uiController.wizard_difficultyPicker.value == 2)
+                else if (uiController.difficultyPicker.value == 2)
                 {
                     itemsAllowedBudget = sessionLogger.itemDropsEarned + UnityEngine.Random.Range(0, 2);
                 }

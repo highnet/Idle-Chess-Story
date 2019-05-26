@@ -7,14 +7,14 @@ public class AlienSoldierBehaviour : NPC
     private void Start()
     {
         StartLiveRoutine();
-        if (uiController.wizard_difficultyPicker.value == 1)
+        if (uiController.difficultyPicker.value == 1)
         {
             BASE_MAXHP *= 1.3f;
             BASE_ARMOR *= 1.3f;
             BASE_ATTACKPOWER *= 1.3f;
             BASE_SPELLPOWER *= 1.3f;
         }
-        else if (uiController.wizard_difficultyPicker.value == 2)
+        else if (uiController.difficultyPicker.value == 2)
         {
             BASE_MAXHP *= 1.4f;
             BASE_ARMOR *= 1.4f;

@@ -21,13 +21,13 @@ public class CreepBehaviour : NPC
         BASE_SPELLPOWER = 0;
         BASE_RETALIATION = 0;
 
-        if (uiController.wizard_difficultyPicker.value == 0)
+        if (uiController.difficultyPicker.value == 0)
         {
             BASE_MAXHP *= 0.9f;
             BASE_ARMOR *= 0.9f;
             BASE_ATTACKPOWER *= 0.9f;
         }
-        else if (uiController.wizard_difficultyPicker.value == 2)
+        else if (uiController.difficultyPicker.value == 2)
         {
             BASE_MAXHP *= 1.1f;
             BASE_ARMOR *= 1.1f;

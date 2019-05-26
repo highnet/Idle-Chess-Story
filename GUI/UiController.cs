@@ -68,7 +68,7 @@ public class UiController : MonoBehaviour
     public Text intro_playerName;
     public Text intro_playerMMR;
     public Button intro_SettingsButton;
-    public Dropdown wizard_difficultyPicker;
+    public Dropdown difficultyPicker;
     public Button startGameButton;
     public Text selectedUnitPanel_InformationText_NAME;
     public Text selectedUnitPanel_InformationText_TIER;
@@ -169,6 +169,15 @@ public class UiController : MonoBehaviour
     public Text profileText;
     public Language currentLanguage;
     public Text startGameText;
+    public Text leaderboardText;
+    public Text settingsText;
+    public Text creditsText;
+    public Text newsText0;
+    public Text newsText1;
+    public Text newsText;
+    public Text difficultyText;
+    public Text difficultyDropdownText;
+    public Text idleChessStoryLogoText;
 
     private void Awake()
     {
@@ -690,10 +699,10 @@ public class UiController : MonoBehaviour
         }
        
 
-        if (wizard_difficultyPicker.value == 0)
+        if (difficultyPicker.value == 0)
         {
             playerController.enemyMMR = 1200;
-        } else if (wizard_difficultyPicker.value == 1)
+        } else if (difficultyPicker.value == 1)
         {
             playerController.enemyMMR = 1600;
         } else
