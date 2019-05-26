@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ItemName {StickSword,TwoHander,DragonKnife,LifeStone,SkullShield,WoodenShield,ShortSword,FlamingScimitar,PoisonedRapier,LongSword,MoonKatana,BroadSword,NO_ITEM}
+public enum ItemName {StickSword,TwoHander,DragonKnife,LifeStone,SkullShield,WoodenShield,ShortSword,FlamingScimitar,PoisonedRapier,LongSword,MoonKatana,BroadSword,NO_ITEM,WolfMask}
 public enum ItemRarity {Trash, Common, Rare, Artifact}
 [System.Serializable]
 public class Item 
@@ -99,6 +99,15 @@ public class Item
             this.ItemRarity = ItemRarity.Trash;
             this.RETALIATION_Bonus += 1;
             this.ATTACKPOWER_Bonus += 25;
+            outlineWidth = 1;
+        }
+        else if (ItemToCreate == ItemName.WolfMask)
+        {
+            this.ItemRarity = ItemRarity.Common;
+            this.RETALIATION_Bonus += 2;
+            this.ATTACKPOWER_Bonus += 25;
+            this.MAXHP_Bonus += 100;
+            outlineWidth = 0.7f;
         }
 
         int ap = ATTACKPOWER_Bonus;

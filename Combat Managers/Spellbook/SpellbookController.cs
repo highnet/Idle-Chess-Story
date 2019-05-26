@@ -145,7 +145,7 @@ public class SpellbookController : MonoBehaviour
         else if (abilityToCast == Ability.FrostBall)
         {
             GameObject go = (GameObject)Instantiate(Resources.Load("FrostBall"), this.transform.position, Quaternion.identity);
-            DamageReport dmgReport = targetNPC.CalculateDamageTaken(2 * CasterSpellPower, casterNPC, DamageSource.Magical_Ability);
+            DamageReport dmgReport = targetNPC.CalculateDamageTaken(1.5f * CasterSpellPower, casterNPC, DamageSource.Magical_Ability);
             go.GetComponentInChildren<AbilityFrostBall>().dmgReport = dmgReport;
             go.GetComponentInChildren<AbilityFrostBall>().destination = dmgReport.damageReceiverNPC.transform.position;
             casterNPC.combatReport_DamageDoneThisRound += dmgReport.primaryDamageDealt;

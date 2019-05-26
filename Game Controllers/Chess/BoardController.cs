@@ -90,8 +90,7 @@ public class BoardController : MonoBehaviour
 
             else if (currentGameRound == 20) // boss round 
             {
-                playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
-                GameObject spawnedEnemy = TrySpawnUnit(2, 4, Unit.Engineer, true, 0, true); // spawn engineer
+                GameObject spawnedEnemy = NewMethod();
                 if (spawnedEnemy != null) // this can be used to test enemy tribe bonuses
                 {
                     Helper.Increment<Tribe>(playerController.enemyActiveTribesCounter, spawnedEnemy.GetComponentInChildren<NPC>().PRIMARYTRIBE); //
@@ -385,6 +384,13 @@ public class BoardController : MonoBehaviour
 
         }
 
+    }
+
+    private GameObject NewMethod()
+    {
+        playerController.ReInitializeEnemyActiveTribesCounter(); // reset the enemy tribe counter
+        GameObject spawnedEnemy = TrySpawnUnit(2, 4, Unit.Engineer, true, 0, true); // spawn engineer
+        return spawnedEnemy;
     }
 
     public GameObject TrySpawnUnit(int i, int j, Unit unitToSpawn, bool isEnemySpawn, int tierOverride, bool isCreep) // try to spawn a unit and return it

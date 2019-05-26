@@ -77,6 +77,7 @@ public class UiController : MonoBehaviour
     public Text selectedUnitPanel_InformationText_ARMORANDRETALIATION;
     public Text selectedUnitPanel_InformationText_ATTACKPOWER;
     public Text selectedUnitPanel_InformationText_SPELLPOWER;
+    public Text selectedUnitPanel_AbilityText;
     public DynamicTribeIconVisualizer selectedUnitPanel_primaryTribeIconVisualizer;
     public DynamicTribeIconVisualizer selectedUnitPanel_secondaryTribeIconVisualizer;
     public DynamicAbilityIconVisualizer selectedUnitPanel_abilityiconVisualizer;
@@ -164,6 +165,10 @@ public class UiController : MonoBehaviour
     public CombatLogger combatLogger;
     public GameObject combatReportEntries;
     public GameObject combatReportPanel;
+    public Text languageSelectedText;
+    public Text profileText;
+    public Language currentLanguage;
+    public Text startGameText;
 
     private void Awake()
     {
@@ -487,6 +492,14 @@ public class UiController : MonoBehaviour
         selectedUnitPanel_InformationText_HP.text = Mathf.Round(selectedNPC.HP) + "/" + Mathf.Round(selectedNPC.MAXHP);
         selectedUnitPanel_InformationText_SPELLPOWER.text = Mathf.Round(selectedNPC.SPELLPOWER).ToString();
         selectedUnitPanel_InformationText_TIER.text = "Level " + selectedNPC.TIER;
+
+        if (selectedNPC.ABILITY == Ability.NOTHING)
+        {
+            selectedUnitPanel_AbilityText.gameObject.SetActive(false);
+        } else
+        {
+            selectedUnitPanel_AbilityText.gameObject.SetActive(true);
+        }
 
         if (selectedNPC.Inventory != null)
         {

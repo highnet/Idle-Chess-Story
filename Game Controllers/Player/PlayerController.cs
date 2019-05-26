@@ -152,37 +152,33 @@ public class PlayerController : MonoBehaviour
 
 
     {
-
     { Unit.AngelStatue, 4 },
-     { Unit.AlienSoldier, 999 },
+    { Unit.AlienSoldier, 999 },
     { Unit.AxeGuard, 2 },
-       { Unit.BabyDragon, 6 },
-          { Unit.BigLizard, 4 },
-             { Unit.Cactus, 2 },
-                { Unit.Chomper, 2 },
-                   { Unit.CursedTomb, 4 },
-                      { Unit.DoomBull, 4 },
-                         { Unit.DemonLord, 6 },
-                            { Unit.Engineer, 999 },
-                               { Unit.Eyebat, 999 },
-                                  { Unit.GoblinZerk, 2 },
-                                     { Unit.Grenadier, 2 },
-                                        { Unit.KnightTower, 4 },
-                                           { Unit.MageTower, 4 },
-                                              { Unit.Orbling, 6 },
-                                                 { Unit.RatWarrior, 4 },
-                                                    { Unit.RockGolem, 2 },
-                                                       { Unit.RogueSpy, 6 },
-                                                          { Unit.ShamanTotem, 4 },
-                                                             { Unit.Skeleton, 2 },
-                                                                { Unit.Spitter, 2 },
-                                                                   { Unit.Tiger, 4 },
-                                                                      { Unit.Tree, 4 },
-                                                                         { Unit.WarriorTent, 4 },
-                                                                            { Unit.Zombie, 2 },
-
-
-
+    { Unit.BabyDragon, 6 },
+    { Unit.BigLizard, 4 },
+    { Unit.Cactus, 2 },
+    { Unit.Chomper, 2 },
+    { Unit.CursedTomb, 4 },
+    { Unit.DoomBull, 4 },
+    { Unit.DemonLord, 6 },
+    { Unit.Engineer, 999 },
+    { Unit.Eyebat, 999 },
+    { Unit.GoblinZerk, 2 },
+    { Unit.Grenadier, 2 },
+    { Unit.KnightTower, 4 },
+    { Unit.MageTower, 4 },
+    { Unit.Orbling, 6 },
+    { Unit.RatWarrior, 4 },
+    { Unit.RockGolem, 2 },
+    { Unit.RogueSpy, 6 },
+    { Unit.ShamanTotem, 4 },
+    { Unit.Skeleton, 2 },
+    { Unit.Spitter, 2 },
+    { Unit.Tiger, 4 },
+    { Unit.Tree, 4 },
+    { Unit.WarriorTent, 4 },
+    { Unit.Zombie, 2 },
     };
 
         List<Unit> assassinList = new List<Unit>();
@@ -275,7 +271,8 @@ public class PlayerController : MonoBehaviour
         List<ItemName> commonList = new List<ItemName>
         {
             ItemName.TwoHander,
-            ItemName.ShortSword
+            ItemName.ShortSword,
+            ItemName.WolfMask
         };
 
         List<ItemName> rareList = new List<ItemName>
@@ -317,7 +314,6 @@ public class PlayerController : MonoBehaviour
         var TribesArray = Enum.GetValues(typeof(Tribe));
         for (int i = 0; i < TribesArray.Length; i++)
         {
-   
             enemyActiveTribesCounter.Add((Tribe)TribesArray.GetValue(i), 0);
         }
     }
