@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class DynamicAbilityIconVisualizer : MonoBehaviour
 {
+    public UiController uiController;
+    public Translator translator;
+    public GameObject worldController;
     public Image fireballIcon;
     public Image AP_UP_SelfIcon;
     public Image Armor_UP_SelfIcon;
@@ -20,6 +23,13 @@ public class DynamicAbilityIconVisualizer : MonoBehaviour
     public GameObject tooltipPanel;
     public Text AbilityNameTooltipText;
     public Text AbilityDescriptionTooltipText;
+
+    private void Start()
+    {
+        worldController = GameObject.Find("World Controller");
+        uiController = worldController.GetComponent<UiController>();
+        translator = worldController.GetComponent<Translator>();
+    }
 
     public void SetImage(Ability abilitytoSet)
     {
@@ -38,79 +48,54 @@ public class DynamicAbilityIconVisualizer : MonoBehaviour
         if (abilitytoSet == Ability.Fireball)
         {
             fireballIcon.enabled = true;
-            AbilityNameTooltipText.text = "Fireball";
-            AbilityDescriptionTooltipText.text = "Deal damage equal to 200% of your spell power";
         }
         else if(abilitytoSet == Ability.AP_UP_Self)
         {
             AP_UP_SelfIcon.enabled = true;
-            AbilityNameTooltipText.text = "AttackPower UP Self";
-            AbilityDescriptionTooltipText.text = "Increase your attack power for a duration of time;";
         }
         else if (abilitytoSet == Ability.Armor_UP_Self)
         {
             Armor_UP_SelfIcon.enabled = true;
-            AbilityNameTooltipText.text = "Armor UP Self";
-            AbilityDescriptionTooltipText.text = "Increase your armor for a duration of time";
         }
         else if (abilitytoSet == Ability.MaxHP_Up_Self)
         {
             MaxHP_Up_SelfIcon.enabled = true;
-            AbilityNameTooltipText.text = "HP UP Self";
-            AbilityDescriptionTooltipText.text = "Increases your HP for a duration of time";
         }
         else if (abilitytoSet == Ability.Retaliation_UP_Self)
         {
             Retaliation_UP_SelfIcon.enabled = true;
-            AbilityNameTooltipText.text = "Retalation UP Self";
-            AbilityDescriptionTooltipText.text = "Increases your retaliation for a duration of time";
         }
         else if (abilitytoSet == Ability.HeroicStrike)
         {
             heroicStrikeIcon.enabled = true;
-            AbilityNameTooltipText.text = "Heroic Strike";
-            AbilityDescriptionTooltipText.text = "Deal Damage equal to 190% of your Attack Power";
         }
         else if (abilitytoSet == Ability.AP_DOWN_OTHER)
         {
             apPowerDownIcon.enabled = true;
-            AbilityNameTooltipText.text = "AttackPower DOWN Other";
-            AbilityDescriptionTooltipText.text = "Reduce your target's Attackpower for a duration of time";
         }
         else if (abilitytoSet == Ability.ARMOR_DOWN_OTHER)
         {
             armorPowerDownIcon.enabled = true;
-            AbilityNameTooltipText.text = "Armor DOWN Other";
-            AbilityDescriptionTooltipText.text = "Deal damage equal to 200% of your spell power";
         }
         else if (abilitytoSet == Ability.FrostBall)
         {
             frostballIcon.enabled = true;
-            AbilityNameTooltipText.text = "Frostball";
-            AbilityDescriptionTooltipText.text = "Deal damage equal to 150% of your spell power";
         }
         else if (abilitytoSet == Ability.Stab)
         {
             stabIcon.enabled = true;
-            AbilityNameTooltipText.text = "Stab";
-            AbilityDescriptionTooltipText.text = "Deal damage equal to 140% of your AttackPower";
         }
         else if (abilitytoSet == Ability.Stun)
         {
             stunIcon.enabled = true;
-            AbilityNameTooltipText.text = "Stun";
-            AbilityDescriptionTooltipText.text = "Stun your target for a duration of time";
         }
         else if (abilitytoSet == Ability.HealFriend)
         {
             healIcon.enabled = true;
-            AbilityNameTooltipText.text = "Heal Friend";
-            AbilityDescriptionTooltipText.text = "Heal a friend for 100% of your spell power";
-        } else
-        {
-            AbilityNameTooltipText.text = "";
-            AbilityDescriptionTooltipText.text = "";
-        }
+        } 
+
+        AbilityDescriptionTooltipText.text = translator.TranslateAbilityTooltip(abilitytoSet, uiController.currentLanguage);
+        AbilityNameTooltipText.text = translator.TranslateAbilityName(abilitytoSet, uiController.currentLanguage);
     }
 
     public void DisableTooltipPanel()

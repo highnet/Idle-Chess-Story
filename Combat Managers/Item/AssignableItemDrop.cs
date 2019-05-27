@@ -10,7 +10,6 @@ public class AssignableItemDrop : MonoBehaviour
     public Outline outline;
     public BoardController boardController;
     public UiController uiController;
-    public LineRenderer SelectionLine;
     public ArrowRenderer arrowRenderer;
     private Vector3 belowTheScreen;
 
@@ -18,7 +17,6 @@ public class AssignableItemDrop : MonoBehaviour
     {
         boardController = GetComponentInParent<BoardController>();
         uiController = GetComponentInParent<UiController>();
-        SelectionLine = GetComponent<LineRenderer>();
         arrowRenderer = GetComponentInChildren<ArrowRenderer>();
         outline = GetComponent<Outline>();
         if (this.item.ItemRarity.Equals(ItemRarity.Trash))
@@ -59,7 +57,6 @@ public class AssignableItemDrop : MonoBehaviour
                 arrowRenderer.SetPositions(this.transform.position,this.transform.position);
             }
 
-            SelectionLine.SetPositions(positions);
         }
         else
         {

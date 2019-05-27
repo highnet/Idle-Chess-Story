@@ -8,7 +8,9 @@ public class Thubmnail : MonoBehaviour
 {
     public GameObject SourcePrefab;
     public GameObject SpawnedAssociatedNPC;
-    public UiController uicontroller;
+    public GameObject worldController;
+    UiController uicontroller;
+    Translator translator;
     public int randomRotationOrientation;
     public float shopThumbnailRotationSpeed = 5f;
     private bool mousedOver = false;
@@ -18,8 +20,9 @@ public class Thubmnail : MonoBehaviour
 
     private void Start()
     {
-        
-        uicontroller = GameObject.Find("World Controller").GetComponent<UiController>();
+        worldController = GameObject.Find("World Controller");
+        uicontroller = worldController.GetComponent<UiController>();
+        translator = worldController.GetComponent<Translator>();
         offsetVector = new Vector3(xOffset, yOffset, 0);
         randomRotationOrientation = UnityEngine.Random.Range(-1, 1);
         if (randomRotationOrientation == 0)
@@ -42,8 +45,8 @@ public class Thubmnail : MonoBehaviour
         uicontroller.shopMouseOverInfoIcon_PRIMARYTRIBE_tribeIconVisualizer.gameObject.SetActive(true);
         uicontroller.shopMouseOverInfoIcon_SECONDARYTRIBE_tribeIconVisualizer.gameObject.SetActive(true);
         uicontroller.shopMouseOverInfoText_NAME.text = SourcePrefab.GetComponentInChildren<Prefab_Thumbnail>().unit.ToString();
-        uicontroller.shopMouseOverInfoText_PRIMARYTRIBE.text = SourcePrefab.GetComponentInChildren<Prefab_Thumbnail>().primaryTribe.ToString();
-        uicontroller.shopMouseOverInfoText_SECONDARYTRIBE.text = SourcePrefab.GetComponentInChildren<Prefab_Thumbnail>().secondaryTribe.ToString();
+        uicontroller.shopMouseOverInfoText_PRIMARYTRIBE.text = translator.TranslateTribe(SourcePrefab.GetComponentInChildren<Prefab_Thumbnail>().primaryTribe, uicontroller.currentLanguage);
+        uicontroller.shopMouseOverInfoText_SECONDARYTRIBE.text = translator.TranslateTribe(SourcePrefab.GetComponentInChildren<Prefab_Thumbnail>().secondaryTribe, uicontroller.currentLanguage);
         uicontroller.shopMouseOverInfoIcon_PRIMARYTRIBE_tribeIconVisualizer.SetImage(SourcePrefab.GetComponentInChildren<Prefab_Thumbnail>().primaryTribe, true);
         uicontroller.shopMouseOverInfoIcon_SECONDARYTRIBE_tribeIconVisualizer.SetImage(SourcePrefab.GetComponentInChildren<Prefab_Thumbnail>().secondaryTribe, true);
         mousedOver = true;

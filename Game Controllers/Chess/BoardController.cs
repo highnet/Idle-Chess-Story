@@ -13,6 +13,7 @@ public class BoardController : MonoBehaviour
     UiController uiController;
     PlayerController playerController;
     SessionLogger sessionLogger;
+    Translator translator;
     public GameObject[,] chessBoard;
     public GameObject[] reserveBoard;
     public List<GameObject> unitsList;
@@ -42,6 +43,7 @@ public class BoardController : MonoBehaviour
         uiController = GetComponent<UiController>();
         playerController = GetComponent<PlayerController>();
         sessionLogger = GetComponent<SessionLogger>();
+        translator = GetComponent<Translator>();
     }
 
     // Start is called before the first frame update
@@ -49,7 +51,7 @@ public class BoardController : MonoBehaviour
     {
         ChangeGameStatus(GameStatus.Initializing); // set initalizing status
         CreateBoardTiles(); // create the tile 9x8 array board
-        ChangeGameStatus(GameStatus.AwaitingWizardConfirmation, "confirm settings"); // set to settings wizard status
+        ChangeGameStatus(GameStatus.AwaitingWizardConfirmation); // set to settings wizard status
         FocusedItem = new Item(ItemName.NO_ITEM);
     }
 
@@ -299,8 +301,6 @@ public class BoardController : MonoBehaviour
                     {
                         if (npcController.enemyList[i].Inventory.Count < 4)
                         {
-
-                  
                         int RarityRoll = UnityEngine.Random.Range(0, 101);
                         ItemRarity rolledRarity = ItemRarity.Trash;
                         if (RarityRoll >= 60 && RarityRoll < 90)
@@ -468,18 +468,11 @@ public class BoardController : MonoBehaviour
         return spawnedDummy; // return the dummy
     }
 
-
-
-    public void ChangeGameStatus(GameStatus developerStatus, string userDisplayText) // change game status and display string status (overload)
-    {
-        gameStatus = developerStatus;
-        uiController.ChangeGameStatusDisplayText(userDisplayText);
-    }
-
     public void ChangeGameStatus(GameStatus status) // change game status and display string status
     {
         gameStatus = status;
-        uiController.ChangeGameStatusDisplayText(status.ToString());
+        uiController.UpdateGameStatusText(status);
+
     }
 
     public void ChangeCurrentRound(int round) // change the current game round
@@ -817,8 +810,8 @@ public class BoardController : MonoBehaviour
         uiController.ShopPanelTooltipSubPanel.SetActive(false);
         uiController.hudCanvasShopPanel.gameObject.SetActive(false);
         sessionLogger.CalculateMaxDeployedTribe();
-        uiController.reportDefeatPanel_TotalUnitsDeployedText.text = "You deployed: " + sessionLogger.unitsDeployedToFight.ToString() + " unit(s)";
-        uiController.reportDefeatPanel_MostTribesDeployedText.text = "Most deployed tribe: " + sessionLogger.mostDeployedTribeAmount + " " + sessionLogger.mostDeployedTribe.ToString();
+        uiController.reportDefeatPanel_TotalUnitsDeployedText.text =  translator.TranslateStringSnippet("You deployed: ", uiController.currentLanguage) + sessionLogger.unitsDeployedToFight.ToString() + translator.TranslateStringSnippet(" unit(s)",uiController.currentLanguage);
+        uiController.reportDefeatPanel_MostTribesDeployedText.text = translator.TranslateStringSnippet("Most deployed tribe: ", uiController.currentLanguage) + sessionLogger.mostDeployedTribeAmount + " " + translator.TranslateTribe(sessionLogger.mostDeployedTribe,uiController.currentLanguage);
         uiController.reportDefeatPanel_MostTribeDeployedIconVisualizer.SetImage(sessionLogger.mostDeployedTribe, true);
         steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + (int)sessionLogger.mmrChange);
         steamAchievements.IncrementDeployedTribesStats(sessionLogger.TribesDeployedToFightTracker);
@@ -835,8 +828,8 @@ public class BoardController : MonoBehaviour
         uiController.ShopPanelTooltipSubPanel.SetActive(false);
         uiController.hudCanvasShopPanel.gameObject.SetActive(false);
         sessionLogger.CalculateMaxDeployedTribe();
-        uiController.reportVictoryPanel_TotalUnitsDeployedText.text = "You deployed: " + sessionLogger.unitsDeployedToFight.ToString() + " unit(s)";
-        uiController.reportVictoryPanel_MostTribesDeployedText.text = "Most deployed tribe: " + sessionLogger.mostDeployedTribeAmount + " " + sessionLogger.mostDeployedTribe.ToString();
+        uiController.reportVictoryPanel_TotalUnitsDeployedText.text = translator.TranslateStringSnippet("You deployed: ", uiController.currentLanguage) + sessionLogger.unitsDeployedToFight.ToString() + translator.TranslateStringSnippet(" unit(s)", uiController.currentLanguage);
+        uiController.reportVictoryPanel_MostTribesDeployedText.text = translator.TranslateStringSnippet("Most deployed tribe: ", uiController.currentLanguage) + " " + translator.TranslateTribe(sessionLogger.mostDeployedTribe, uiController.currentLanguage);
         uiController.reportVictoryPanel_MostTribeDeployedIconVisualizer.SetImage(sessionLogger.mostDeployedTribe, true);
         steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + (int)sessionLogger.mmrChange);
         steamAchievements.IncrementGamesWon();
@@ -854,7 +847,7 @@ public class BoardController : MonoBehaviour
 
     public void TransitionToShoppingPhase()
     {
-        ChangeGameStatus(GameStatus.Wait, "Combat Over");
+        ChangeGameStatus(GameStatus.Wait);
         StartCoroutine(SmoothEndCombatRoundTransition());
 
     }

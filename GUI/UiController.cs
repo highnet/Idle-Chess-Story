@@ -14,6 +14,7 @@ public class UiController : MonoBehaviour
     NpcController npcController;
     SessionLogger sessionLogger;
     DialogueManager dialogueManager;
+    Translator translator;
     public AudioSource musicSource;
     public GameObject hudCanvas;
     public GameObject hudCanvasTopBar;
@@ -46,7 +47,8 @@ public class UiController : MonoBehaviour
     public Text hudCanvasTopPanelGoldCountText;
     public Text hudCanvasTopPanelUsernameText;
     public Text hudCanvasTopPanelGameStatusText;
-    public Text hudCanvasTopPanelCurrentRoundText;
+    public Text CurrentRoundText;
+    public Text CurrentRoundTextNumber;
     public Text hudCanvasTopPanelDeployedUnitCountText;
     public Text hudCanvasShopCostToShuffleText;
     public Text hudCanvasShopUnitCapUpgradeText;
@@ -72,12 +74,19 @@ public class UiController : MonoBehaviour
     public Button startGameButton;
     public Text selectedUnitPanel_InformationText_NAME;
     public Text selectedUnitPanel_InformationText_TIER;
+    public Text selectedUnitPanel_InformationText_TIER_Value;
     public Text selectedUnitPanel_InformationText_HP;
     public Text selectedUnitPanel_InformationText_CONCENTRATION;
-    public Text selectedUnitPanel_InformationText_ARMORANDRETALIATION;
+    public Text selectedUnitPanel_InformationText_CONCENTRATION_Value;
+    public Text selectedUnitPanel_InformationText_ARMOR;
+    public Text selectedUnitPanel_InformationText_ARMOR_Value;
+    public Text selectedUnitPanel_InformationText_RETALIATION;
+    public Text selectedUnitPanel_InformationText_RETALIATION_Value;
     public Text selectedUnitPanel_InformationText_ATTACKPOWER;
     public Text selectedUnitPanel_InformationText_SPELLPOWER;
     public Text selectedUnitPanel_AbilityText;
+    public Text selectedUnitPanel_TribesText;
+    public Text selectedUnitPanel_SellUnitText;
     public DynamicTribeIconVisualizer selectedUnitPanel_primaryTribeIconVisualizer;
     public DynamicTribeIconVisualizer selectedUnitPanel_secondaryTribeIconVisualizer;
     public DynamicAbilityIconVisualizer selectedUnitPanel_abilityiconVisualizer;
@@ -149,7 +158,8 @@ public class UiController : MonoBehaviour
     public List<LeaderboardEntry> steamLeaderBoardTop100EntriesUIPrefabsList;
     public GameObject combatTimerPanel;
     public Text combatTimerPanelText;
-    public Text versionText;
+    public Text steamBuildVersionText;
+    public Text steamBuildVersionTextNumber;
     public GameObject MousedOverSelectedItemTooltipPanel;
     public Text FocusedItemTooltipTextName;
     public Text FocusedItemTooltipTextStats;
@@ -165,7 +175,7 @@ public class UiController : MonoBehaviour
     public CombatLogger combatLogger;
     public GameObject combatReportEntries;
     public GameObject combatReportPanel;
-    public Text languageSelectedText;
+    public Text languageText;
     public Text profileText;
     public Language currentLanguage;
     public Text startGameText;
@@ -178,6 +188,48 @@ public class UiController : MonoBehaviour
     public Text difficultyText;
     public Text difficultyDropdownText;
     public Text idleChessStoryLogoText;
+    public Text leaderboard2Text;
+    public Text rankText;
+    public Text nameText;
+    public Text ratingText;
+    public Text eloText;
+    public Text settings2Text;
+    public Text volumeText;
+    public Text muteSoundText;
+    public Text muteMusicText;
+    public Text cameraModeText;
+    public Text cameraModeDropdownText;
+    public Text restartText;
+    public Text exitGameText;
+    public Text endGameConfirmationText;
+    public Text forfeitText;
+    public Text cancelText;
+    public Text creditsTitleText;
+    public Text leadDevelopersText;
+    public Text musicText;
+    public Text localizationText;
+    public Text spanishText;
+    public Text tribesText;
+    public Text shopText;
+    public Text fightText;
+    public Text settings3Text;
+    public Text helpText;
+    public Text assassinTooltipText;
+    public Text beastTooltipText;
+    public Text elementalTooltipText;
+    public Text guardianTooltipText;
+    public Text structureTooltipText;
+    public Text undeadTooltipText;
+    public Text warriorTooltipText;
+    public Text wizardTooltipText;
+    public Text randomTipText;
+    public Text help2Text;
+    public Text combatLogText;
+    public Text DPSText;
+    public Text performanceReportText;
+    public Text performanceReport2Text;
+    public Text mainMenuText;
+    public Text mainMenu2Text;
 
     private void Awake()
     {
@@ -193,7 +245,7 @@ public class UiController : MonoBehaviour
             string name = SteamFriends.GetPersonaName();
             intro_playerName.text = name;
             hudCanvasTopPanelUsernameText.text = name;
-            versionText.text = "Steam Build: " +  SteamApps.GetAppBuildId().ToString();
+            steamBuildVersionTextNumber.text = SteamApps.GetAppBuildId().ToString();
         }
 
         steamLeaderBoardTop100EntriesUIPrefabsList = new List<LeaderboardEntry>();
@@ -221,6 +273,7 @@ public class UiController : MonoBehaviour
         combatLogger = GetComponent<CombatLogger>();
         dialogueManager = GetComponent<DialogueManager>();
         objectPoolController = GetComponent<ObjectPoolController>();
+        translator = GetComponent<Translator>();
         hudCanvas = GameObject.Find("HUDCanvas");
 
     }
@@ -365,7 +418,7 @@ public class UiController : MonoBehaviour
     public void RefreshHelperTips()
     {
         helperText.text = helperTipContainer.currentTip;
-        currentTipCounterText.text = "Tip: " + (helperTipContainer.currentTipIndex+1) + "/" + helperTipContainer.helperTips.Length;
+        currentTipCounterText.text = (helperTipContainer.currentTipIndex+1) + "/" + helperTipContainer.helperTips.Length;
     }
 
     public void PreviousTip()
@@ -493,14 +546,14 @@ public class UiController : MonoBehaviour
 
     public void UpdateSelectedUnitUI(GameObject selectedObject, NPC selectedNPC)
     {
-        string friendOrFoe = selectedNPC.isEnemy ? "Enemy " : "";
-        selectedUnitPanel_InformationText_NAME.text = friendOrFoe + selectedObject.name;
-        selectedUnitPanel_InformationText_ARMORANDRETALIATION.text = "Armor: " + Mathf.Round(selectedNPC.ARMOR) + " / Retaliation: " + Mathf.Round(selectedNPC.RETALIATION);
+        selectedUnitPanel_InformationText_NAME.text = selectedObject.name;
+        selectedUnitPanel_InformationText_ARMOR_Value.text = Mathf.Round(selectedNPC.ARMOR).ToString();
+        selectedUnitPanel_InformationText_RETALIATION_Value.text = Mathf.Round(selectedNPC.RETALIATION).ToString();
         selectedUnitPanel_InformationText_ATTACKPOWER.text = Mathf.Round(selectedNPC.ATTACKPOWER).ToString();
-        selectedUnitPanel_InformationText_CONCENTRATION.text = "Concentration: " + Mathf.Round(selectedNPC.CONCENTRATION) + "/" + Mathf.Round(selectedNPC.MAXCONCENTRATION);
+        selectedUnitPanel_InformationText_CONCENTRATION_Value.text = Mathf.Round(selectedNPC.CONCENTRATION) + "/" + Mathf.Round(selectedNPC.MAXCONCENTRATION);
         selectedUnitPanel_InformationText_HP.text = Mathf.Round(selectedNPC.HP) + "/" + Mathf.Round(selectedNPC.MAXHP);
         selectedUnitPanel_InformationText_SPELLPOWER.text = Mathf.Round(selectedNPC.SPELLPOWER).ToString();
-        selectedUnitPanel_InformationText_TIER.text = "Level " + selectedNPC.TIER;
+        selectedUnitPanel_InformationText_TIER_Value.text = selectedNPC.TIER.ToString();
 
         if (selectedNPC.ABILITY == Ability.NOTHING)
         {
@@ -541,7 +594,7 @@ public class UiController : MonoBehaviour
 
     public void UpdateFocusedItemTooltip(Item item)
     {
-        FocusedItemTooltipTextName.text = item.ItemName.ToString() + " (" + item.ItemRarity.ToString() + ")";
+        FocusedItemTooltipTextName.text = item.ItemName.ToString();
         if (item.ItemRarity.Equals(ItemRarity.Trash))
         {
             FocusedItemTooltipTextName.color = Color.gray;
@@ -684,7 +737,7 @@ public class UiController : MonoBehaviour
     {
 
             hudCanvasAudioSource.PlayOneShot(startGameAudioClip);
-            boardController.ChangeGameStatus(GameStatus.Shopping, "Shopping Phase"); // set to shopping phae
+            boardController.ChangeGameStatus(GameStatus.Shopping); // set to shopping phae
             ChangeCurrentRoundDisplayText(boardController.currentGameRound); // update ui text element
             boardController.StartCoroutine("ProgressHealthRegeneration"); // begin health regeneration process
             boardController.StartCoroutine("ProgressConcentrationRegeneration"); // begin concentration regeneration process
@@ -695,7 +748,13 @@ public class UiController : MonoBehaviour
             hudCanvasWizardPanel.SetActive(false);
         if (playerController.newPlayer)
         {
-            dialogueTriggerSystem.tutorialDialogue1.TriggerDialogue();
+            if (currentLanguage == Language.English)
+            {
+                dialogueTriggerSystem.tutorialDialogue1_English.TriggerDialogue();
+            } else if (currentLanguage == Language.Spanish)
+            {
+                dialogueTriggerSystem.tutorialDialogue1_Spanish.TriggerDialogue();
+            }
         }
        
 
@@ -912,23 +971,57 @@ public class UiController : MonoBehaviour
 
             if (playerController.newPlayer && boardController.currentGameRound == 1)
             {
-                dialogueTriggerSystem.tutorialDialogue2.TriggerDialogue();
+                if (currentLanguage == Language.English)
+                {
+                    dialogueTriggerSystem.tutorialDialogue2_English.TriggerDialogue();
+                } else if (currentLanguage == Language.Spanish)
+                {
+                    dialogueTriggerSystem.tutorialDialogue2_Spanish.TriggerDialogue();
+                }
             }
             else if (playerController.newPlayer && boardController.currentGameRound == 3)
             {
-                dialogueTriggerSystem.tutorialDialogue3.TriggerDialogue();
+                if (currentLanguage == Language.English)
+                {
+                    dialogueTriggerSystem.tutorialDialogue3_English.TriggerDialogue();
+                }
+                else if (currentLanguage == Language.Spanish)
+                {
+                    dialogueTriggerSystem.tutorialDialogue3_Spanish.TriggerDialogue();
+                }
             }
             else if (boardController.currentGameRound == 6)
             {
-                dialogueTriggerSystem.bossDialogue1.TriggerDialogue();
+                if (currentLanguage == Language.English)
+                {
+                    dialogueTriggerSystem.bossDialogue1_English.TriggerDialogue();
+                }
+                else if (currentLanguage == Language.Spanish)
+                {
+                    dialogueTriggerSystem.bossDialogue1_Spanish.TriggerDialogue();
+                }
             }
             else if (boardController.currentGameRound == 12)
             {
-                dialogueTriggerSystem.bossDialogue2.TriggerDialogue();
+                if (currentLanguage == Language.English)
+                {
+                    dialogueTriggerSystem.bossDialogue2_English.TriggerDialogue();
+                }
+                else if (currentLanguage == Language.Spanish)
+                {
+                    dialogueTriggerSystem.bossDialogue2_Spanish.TriggerDialogue();
+                }
             }
             else if (boardController.currentGameRound == 20)
             {
-                dialogueTriggerSystem.bossDialogue3.TriggerDialogue();
+                if (currentLanguage == Language.English)
+                {
+                    dialogueTriggerSystem.bossDialogue3_English.TriggerDialogue();
+                }
+                else if (currentLanguage == Language.Spanish)
+                {
+                    dialogueTriggerSystem.bossDialogue3_Spanish.TriggerDialogue();
+                }
             }
 
             if (UnityEngine.Random.Range(0,7) == 1)
@@ -1034,10 +1127,7 @@ public class UiController : MonoBehaviour
 
     public void ChangeCurrentRoundDisplayText(int _roundCounter)
     {
-        if (hudCanvasTopPanelCurrentRoundText != null)
-        {
-            hudCanvasTopPanelCurrentRoundText.text = "Round " + _roundCounter;
-        }
+        CurrentRoundTextNumber.text = _roundCounter.ToString();
     }
 
     public void ChangeHPPlayerDisplayText(int _currentHP, int _maxHP)
@@ -1066,13 +1156,14 @@ public class UiController : MonoBehaviour
 
     }
 
+    public void UpdateGameStatusText(GameStatus status)
+    {
+       ChangeGameStatusDisplayText(translator.TranslateGameStatus(status,currentLanguage));
+    }
+
     public void ChangeGameStatusDisplayText(string str)
     {
-        if (hudCanvasTopPanelGameStatusText != null)
-        {
             hudCanvasTopPanelGameStatusText.text = str;
-        }
-
     }
 
     public void ChangeCostToShuffleShopDisplayText(string str)

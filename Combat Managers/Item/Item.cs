@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum ItemName {StickSword,TwoHander,DragonKnife,LifeStone,SkullShield,WoodenShield,ShortSword,FlamingScimitar,PoisonedRapier,LongSword,MoonKatana,BroadSword,NO_ITEM,WolfMask}
 public enum ItemRarity {Trash, Common, Rare, Artifact}
+public enum Stat {AP,SP,ARMOR,RETALIATION,MAXHP}
 [System.Serializable]
 public class Item 
 {
@@ -17,9 +18,17 @@ public class Item
     public string Tooltip;
     public float outlineWidth;
     public Sprite thumbnailSprite;
+    GameObject worldController;
+    UiController uiController;
+    Translator translator;
+
 
     public Item(ItemName ItemToCreate)
     {
+        worldController = GameObject.Find("World Controller");
+        uiController = worldController.GetComponent<UiController>();
+        translator = worldController.GetComponent<Translator>();
+
         this.ItemName = ItemToCreate;
         if (ItemToCreate == ItemName.StickSword)
         {
@@ -118,25 +127,26 @@ public class Item
 
 
         List<string> nonZeroStats = new List<string>();
+
         if (ap != 0)
         {
-            nonZeroStats.Add("Attack: +" + ap.ToString());
+            nonZeroStats.Add(translator.TranslateStat(Stat.AP,uiController.currentLanguage) + "+" + ap.ToString());
         }
         if (sp != 0)
         {
-            nonZeroStats.Add("Spell Power: +" + ap.ToString());
+            nonZeroStats.Add(translator.TranslateStat(Stat.SP, uiController.currentLanguage) + "+" + sp.ToString());
         }
         if (armor != 0)
         {
-            nonZeroStats.Add("Armor: +" + armor.ToString());
+            nonZeroStats.Add(translator.TranslateStat(Stat.ARMOR, uiController.currentLanguage) + "+" + armor.ToString());
         }
         if (retaliation != 0)
         {
-            nonZeroStats.Add("Retaliation: +" + retaliation.ToString());
+            nonZeroStats.Add(translator.TranslateStat(Stat.RETALIATION, uiController.currentLanguage) + "+" + retaliation.ToString());
         }
         if (maxhp != 0)
         {
-            nonZeroStats.Add("HP: +" + maxhp.ToString());
+            nonZeroStats.Add(translator.TranslateStat(Stat.MAXHP, uiController.currentLanguage) + "+" + maxhp.ToString());
         }
 
         bool firstLine = true;
