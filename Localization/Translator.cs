@@ -9,128 +9,124 @@ public class Translator : MonoBehaviour
     public Dropdown languagePicker;
 
     private string shoppingPhase_English = "Shopping Phase"; // string id : 44
-    private string shoppingPhase_Spanish = "***"; // string id : 44
+    private string shoppingPhase_Spanish = "Fase de compra"; // string id : 44
 
     private string fightPhase_English = "Fight Phase"; // string id : 45
-    private string fightPhase_Spanish = "***"; // string id : 45
+    private string fightPhase_Spanish = "Fase de lucha"; // string id : 45
 
     private string waitPhase_English = "Wait"; // string id : 46
-    private string waitPhase_Spanish = "***"; // string id : 46
+    private string waitPhase_Spanish = "Espera"; // string id : 46
 
     private string ability_name_fireball_English = "Fireball"; // string id : 96
-    private string ability_name_fireball_Spanish = "***"; // string id : 96
+    private string ability_name_fireball_Spanish = "Bola de fuego"; // string id : 96
 
     private string ability_name_apupself_English = "AttackPower UP Self"; // string id : 97
-    private string ability_name_apupself_Spanish = "***"; // string id : 97
+    private string ability_name_apupself_Spanish = "Poder de ataque MÁS a mí"; // string id : 97
 
     private string ability_name_armorupself_English = "Armor UP Self"; // string id : 98
-    private string ability_name_armorupself_Spanish = "***"; // string id : 98
+    private string ability_name_armorupself_Spanish = "Armadura MÁS a mí"; // string id : 98
 
     private string ability_name_retaliationupself_English = "Retalation UP Self"; // string id : 99
-    private string ability_name_retaliationupself_Spanish = "***"; // string id : 99
+    private string ability_name_retaliationupself_Spanish = "Represalia MÁS a mí"; // string id : 99
 
     private string ability_name_heroicstrike_English = "Heroic Strike"; // string id : 100
-    private string ability_name_heroicstrike_Spanish = "***"; // string id : 100
+    private string ability_name_heroicstrike_Spanish = "Golpe heroico"; // string id : 100
 
     private string ability_name_apdownother_English = "AttackPower DOWN Other"; // string id : 101
-    private string ability_name_apdownother_Spanish = "***"; // string id : 101
+    private string ability_name_apdownother_Spanish = "Poder de ataque MENOS a otro"; // string id : 101
 
     private string ability_name_armordownother_English = "Armor DOWN Other"; // string id : 102
-    private string ability_name_armordownother_Spanish = "***"; // string id : 102
+    private string ability_name_armordownother_Spanish = "Armadura MENOS a otro"; // string id : 102
 
     private string ability_name_frostball_English = "Frostball"; // string id : 103
-    private string ability_name_frostball_Spanish = "***"; // string id : 103
+    private string ability_name_frostball_Spanish = "Bola de hielo"; // string id : 103
 
     private string ability_name_stab_English = "Stab"; // string id : 104
-    private string ability_name_stab_Spanish = "***"; // string id : 104
+    private string ability_name_stab_Spanish = "Puñalada"; // string id : 104
 
     private string ability_name_stun_English = "Stun"; // string id : 105
-    private string ability_name_stun_Spanish = "***"; // string id : 105
+    private string ability_name_stun_Spanish = "Aturdimiento"; // string id : 105
 
     private string ability_name_healfriend_English = "Heal Friend"; // string id : 106
-    private string ability_name_healfriend_Spanish = "***"; // string id : 106
+    private string ability_name_healfriend_Spanish = "Cura a un amigo"; // string id : 106
 
     private string ability_name_hpupself_English = "HP UP Self"; // string id : 107
-    private string ability_name_hpupself_Spanish = "***"; // string id : 107
+    private string ability_name_hpupself_Spanish = "HP MÁS a mí"; // string id : 107
 
     private string ability_tooltip_fireball_English = "Deal damage equal to 200% of your spell power"; // string id : 108
-    private string ability_tooltip_fireball_Spanish = "***"; // string id : 108
+    private string ability_tooltip_fireball_Spanish = "Inflige daño igual al 200% de tu poder de hechizos"; // string id : 108
 
     private string ability_tooltip_apupself_English = "Increase your attack power for a duration of time;"; // string id : 109
-    private string ability_tooltip_apupself_Spanish = "***"; // string id : 109
+    private string ability_tooltip_apupself_Spanish = "Aumenta tu poder de ataque por cierto tiempo"; // string id : 109
 
     private string ability_tooltip_armorupself_English = "Increase your armor for a duration of time"; // string id : 110
-    private string ability_tooltip_armorupself_Spanish = "***"; // string id : 110
+    private string ability_tooltip_armorupself_Spanish = "Aumenta tu armadura por cierto tiempo"; // string id : 110
 
     private string ability_tooltip_retaliationupself_English = "Increases your retaliation for a duration of time"; // string id : 111
-    private string ability_tooltip_retaliationupself_Spanish = "***"; // string id : 111
+    private string ability_tooltip_retaliationupself_Spanish = "Aumenta tu poder de represalia por cierto tiempo"; // string id : 111
 
     private string ability_tooltip_heroicstrike_English = "Deal Damage equal to 190% of your Attack Power"; // string id : 112
-    private string ability_tooltip_heroicstrike_Spanish = "***"; // string id : 112
+    private string ability_tooltip_heroicstrike_Spanish = "Inflige daño igual al 190% de tu poder de ataque"; // string id : 112
 
     private string ability_tooltip_apdownother_English = "Reduce your target's Attackpower for a duration of time"; // string id : 113
-    private string ability_tooltip_apdownother_Spanish = "***"; // string id : 113
+    private string ability_tooltip_apdownother_Spanish = "Reduce el poder de ataque de tu adversario por cierto tiempo"; // string id : 113
 
     private string ability_tooltip_armordownother_English = "Increases your ARMOR for a duration of time"; // string id : 114
-    private string ability_tooltip_armordownother_Spanish = "***"; // string id : 114
+    private string ability_tooltip_armordownother_Spanish = "Aumenta tu armadura por cierto tiempo"; // string id : 114
 
     private string ability_tooltip_frostball_English = "Deal damage equal to 150% of your spell power"; // string id : 115
-    private string ability_tooltip_frostball_Spanish = "***"; // string id : 115
+    private string ability_tooltip_frostball_Spanish = "Inflige daño igual al 150% de tu poder de hechizos"; // string id : 115
 
     private string ability_tooltip_stab_English = "Deal damage equal to 140% of your AttackPower"; // string id : 116
-    private string ability_tooltip_stab_Spanish = "***"; // string id : 116
+    private string ability_tooltip_stab_Spanish = "Inflige daño igual al 140% de tu poder de ataque"; // string id : 116
 
     private string ability_tooltip_stun_English = "Stun your target for a duration of time"; // string id : 117
-    private string ability_tooltip_stun_Spanish = "***"; // string id : 117
+    private string ability_tooltip_stun_Spanish = "Aturde a tu adversario por cierto tiempo"; // string id : 117
 
     private string ability_tooltip_healfriend_English = "Heal a friend for 100% of your spell power"; // string id : 118 
-    private string ability_tooltip_healfriend_Spanish = "***"; // string id : 118 
+    private string ability_tooltip_healfriend_Spanish = "Cura a un amigo al 100% de tu poder de hechizos"; // string id : 118 
 
     private string ability_tooltip_hpupself_English = "Increases your HP for a duration of time"; // string id : 119
-    private string ability_tooltip_hpupself_Spanish = "***"; // string id : 119
+    private string ability_tooltip_hpupself_Spanish = "Aumenta tu HP por cierto tiempo"; // string id : 119
 
     private string tribe_assassin_English = "Assassin"; // string id : 120
-    private string tribe_assassin_Spanish = "***"; // string id : 120
+    private string tribe_assassin_Spanish = "Asesino"; // string id : 120
 
     private string tribe_Beast_English = "Beast"; // string id : 121
-    private string tribe_Beast_Spanish = "***"; // string id : 121
+    private string tribe_Beast_Spanish = "Bestia"; // string id : 121
 
     private string tribe_Elemental_English = "Elemental"; // string id : 122
-    private string tribe_Elemental_Spanish = "***"; // string id : 122
+    private string tribe_Elemental_Spanish = "Elemental"; // string id : 122
 
     private string tribe_Guardian_English = "Guardian"; // string id : 123
-    private string tribe_Guardian_Spanish = "***"; // string id : 123
+    private string tribe_Guardian_Spanish = "Guardián"; // string id : 123
 
     private string tribe_Structure_English = "Structure"; // string id : 124
-    private string tribe_Structure_Spanish = "***"; // string id : 124
+    private string tribe_Structure_Spanish = "Estructura"; // string id : 124
 
     private string tribe_Undead_English = "Undead"; // string id : 125
-    private string tribe_Undead_Spanish = "***"; // string id : 125
+    private string tribe_Undead_Spanish = "No muerto"; // string id : 125
 
     private string tribe_Warrior_English = "Warrior"; // string id : 126
-    private string tribe_Warrior_Spanish = "***"; // string id : 126
+    private string tribe_Warrior_Spanish = "Guerrero"; // string id : 126
 
     private string tribe_Wizard_English = "Wizard"; // string id : 127
-    private string tribe_Wizard_Spanish = "***"; // string id : 127
+    private string tribe_Wizard_Spanish = "Brujo"; // string id : 127
 
     public string stat_ap_English = "Attack: "; // string id : 128
-    public string stat_ap_Spanish = "***"; // string id : 128 
+    public string stat_ap_Spanish = "Ataque"; // string id : 128 
 
     public string stat_armor_English = "Armor: "; // string id : 129
-    public string stat_armor_Spanish = "***"; // string id : 129
+    public string stat_armor_Spanish = "Armadura"; // string id : 129
 
     public string stat_maxhp_English = "HP: "; // string id : 130
-    public string stat_maxhp_Spanish = "***"; // string id : 130
+    public string stat_maxhp_Spanish = "HP"; // string id : 130
 
     public string stat_retaliation_English = "Retaliation: "; // string id : 131
-    public string stat_retaliation_Spanish = "***"; // string id : 131
+    public string stat_retaliation_Spanish = "Represalia"; // string id : 131
 
     public string stat_sp_English = "Spell Power: "; // string id : 132
-    public string stat_sp_Spanish = "***"; // string id : 132
-
-    public string string_snippet_1_English = "You deployed: "; // string id : 141
-    public string string_snippet_2_English = " unit(s)"; // string id : 142
-    public string string_snippet_3_English = "Most deployed tribe: "; // string id : 143
+    public string stat_sp_Spanish = "Poder de hechizos"; // string id : 132
 
     private void Start()
     {
@@ -138,27 +134,6 @@ public class Translator : MonoBehaviour
         languagePicker.onValueChanged.AddListener(delegate { SwapLanguage(true,Language.NONE); });
     }
 
-    public string TranslateStringSnippet(string text, Language language)
-    {
-        string str = "";
-        if (language == Language.English)
-        {
-            return text;
-        } else if (language == Language.Spanish)
-        {
-            if (text.Equals("You deployed: "))
-            {
-                return "***";
-            } else if (text.Equals(" unit(s)"))
-            {
-                return "***";
-            }else if(text.Equals("Most deployed tribe: "))
-            {
-                return "***";
-            }
-        }
-        return str;
-    }
     public string TranslateAbilityName(Ability ability, Language language)
     {
         string str = "";
@@ -502,53 +477,6 @@ public class Translator : MonoBehaviour
 
         return str;
     }
-    public string TranslateStat(Stat stat, Language language)
-    {
-        string str = "";
-        if (language == Language.English)
-        {
-            if (stat == Stat.AP)
-            {
-                return stat_ap_English;
-
-            } else if (stat == Stat.ARMOR)
-            {
-                return stat_armor_English;  
-            } else if (stat == Stat.MAXHP)
-            {
-                return stat_maxhp_English;
-            } else if ( stat == Stat.RETALIATION)
-            {
-                return stat_retaliation_English;
-            } else if (stat == Stat.SP)
-            {
-                return stat_sp_English;
-            }
-        }else if (language == Language.Spanish)
-        {
-            if (stat == Stat.AP)
-            {
-                return stat_ap_Spanish;
-            }
-            else if (stat == Stat.ARMOR)
-            {
-                return stat_armor_Spanish;
-            }
-            else if (stat == Stat.MAXHP)
-            {
-                return stat_maxhp_Spanish;
-            }
-            else if (stat == Stat.RETALIATION)
-            {
-                return stat_retaliation_Spanish;
-            }
-            else if (stat == Stat.SP)
-            {
-                return stat_sp_Spanish;
-            }
-        }
-        return str;
-    }
 
     public void SwapLanguage(bool takeLanguageFromLanguagePicker, Language languageOverride)
     {
@@ -571,6 +499,8 @@ public class Translator : MonoBehaviour
             languageToSwapTo = languageOverride;
         }
         uiController.currentLanguage = languageToSwapTo;
+        PlayerPrefs.SetInt("language", (int) uiController.currentLanguage);
+        languagePicker.value = (int)uiController.currentLanguage;
 
         if (languageToSwapTo == Language.English)
         {
@@ -581,7 +511,7 @@ public class Translator : MonoBehaviour
             uiController.leaderboardText.text = "Leaderboard"; // string id : 4
             uiController.settingsText.text = "Settings"; // string id : 5
             uiController.newsText0.text = "We want to personally thank everyone that has played the game in early access so far! \n We are working hard to add new features and make the game play experience more enjoyable."; // string id : 6
-            uiController.newsText1.text = "----------------------------- \n Patch notes for ((TBD: RELEASE DATE)) \n Added Spanish localization. \n ----------------------------- \n To read all patch notes check our news page on Steam!"; // string id : 7
+            uiController.newsText1.text = "----------------------------- \n Patch notes for 31/5/2019 \n Added spanish language localization \n Added various UI updates to support multiple languages \n Added new songs \n Bugfixes \n ---------------------------- \n To read all patch notes check our news page on Steam!"; // string id : 7
             uiController.creditsText.text = "Credits"; // string id : 8
             uiController.newsText.text = "NEWS"; // string id : 9
             uiController.difficultyText.text = "Difficulty:"; // string id : 10
@@ -635,7 +565,7 @@ public class Translator : MonoBehaviour
             uiController.helperTipContainer.helperTips[6] = "The player with the last unit surviving wins the duel and is rewarded a hefty gold bounty"; // string id : 53
             uiController.helperTipContainer.helperTips[7] = "Careful with losing all your units!Reach 0 HP and the game is over"; // string id : 54
             uiController.helperTipContainer.helperTips[8] = "Every unit belongs to two tribes. Gather enough units of the same tribe and unlock powerful bonuses for your allies"; // string id : 55
-            uiController.helperTipContainer.helperTips[9] = "Having 3 or 6 units of the same tribe is enough to unlock theiir respective tribal bonuses";  // string id : 56
+            uiController.helperTipContainer.helperTips[9] = "Having 3 or 6 units of the same tribe is enough to unlock their respective tribal bonuses";  // string id : 56
             uiController.helperTipContainer.helperTips[10] = "Use your gold wisely on units of the same type to quickly attain these bonuses to take control over your enemy"; // string id : 57
             uiController.helperTipContainer.helperTips[11] = "Work your way up the leaderboard rankings and earn all the steam achievements!"; // string id : 58
             uiController.helperTipContainer.helperTips[12] = "Your ranking reflects on your performance. Increase your knowledge of the game by mastering a tribe and crushing your opponents"; // string id : 59
@@ -666,7 +596,7 @@ public class Translator : MonoBehaviour
             uiController.beastTooltipText.text = "Beasts \n (3)Call of the Pack \n + Increased Critical Chance \n (6)Frenzied Inspiration \n + Units gain Lifesteal ability"; // string id : 83
             uiController.elementalTooltipText.text = "Elementals \n (3)Naturalist \n + Bonus Concentration Gain \n (6)Unlimited Power \n + Increased Physical and Magical dmg"; // string id : 84
             uiController.guardianTooltipText.text = "Guardians \n (3) Absorption \n + Dampen Physical Damage \n (6)Divine Brilliance \n + Bonus Concentration Regeneration"; // string id : 85
-            uiController.structureTooltipText.text = "Beasts \n (3)Call of the Pack \n + Increased Critical Chance \n (6)Frenzied Inspiration \n + Units gain Lifesteal ability"; // string id : 86
+            uiController.structureTooltipText.text = "Structures \n (3)Burning Oil \n + Increased Unit Retaliation \n (6)Heavily Fortified \n + Increased Unit Armor"; // string id : 86
             uiController.undeadTooltipText.text = "Undeads \n (3)Evil Ways \n - Reduced Enemy Armor \n (6)Dark Bargain \n + Increased Spell Damage"; // string id : 87
             uiController.warriorTooltipText.text = "Warriors \n (3)First Aid \n + Increased HP Regeneration \n (6)Barbaric Strength \n + Increased Physical Damage"; // string id : 88
             uiController.wizardTooltipText.text = "Wizards \n (3)Intellectual Advantage \n + Increased Magical Damage \n (6)Mastery of the Arts \n + Reduce Incoming Magical Dmg"; // string id : 89
@@ -677,6 +607,7 @@ public class Translator : MonoBehaviour
             uiController.selectedUnitPanel_InformationText_TIER.text = "Level:"; // string id : 93 
             uiController.selectedUnitPanel_AbilityText.text = "Ability"; // string id : 94
             uiController.selectedUnitPanel_TribesText.text = "Tribes"; // string id : 95
+            uiController.selectedUnitPanel_SellUnitText.text = "Sell Unit"; // string id : 144
             //
             uiController.randomTipText.text = "Random Tip"; // string id : 133
             uiController.help2Text.text = "Help"; // string id : 134
@@ -684,22 +615,23 @@ public class Translator : MonoBehaviour
             uiController.combatLogText.text = "Combat Log"; // string id : 135
             uiController.DPSText.text = "DPS"; // string id : 136
             //
-            uiController.performanceReportText.text = "Performance Report:"; // string id : 137
-            uiController.performanceReport2Text.text = "Performance Report:"; // string id : 138
             uiController.mainMenuText.text = "Main Menu"; // string id : 139
             uiController.mainMenu2Text.text = "Main Menu"; // string id : 140
+            //
+            uiController.continueText.text = "Continue"; // string id : 145
+            
 
         }
         else if (languageToSwapTo == Language.Spanish)
         {
-         // 
+            // 
             uiController.languageText.text = "Idioma:"; // string id : 1
             uiController.profileText.text = "Perfil:"; // string id : 2
             uiController.startGameText.text = "Iniciar juego"; // string id : 3
             uiController.leaderboardText.text = "Clasificación"; // string id : 4
             uiController.settingsText.text = "Configurar"; // string id : 5
             uiController.newsText0.text = "Muchas gracias a todas las personas que han jugado durante la etapa de acceso temprano. \n Estamos trabajando con la idea de agregar nuevas funciones para que el juego sea más divertido."; // string id : 6
-            uiController.newsText1.text = "----------------------------- \n Patch notes for ((TBD: RELEASE DATE)) \n Added Spanish localization. \n ----------------------------- \n Puedes leer todas las notas en nuestra página de noticias en Steam"; // string id : 7
+            uiController.newsText1.text = "----------------------------- \n Notas del parche 31/5/2019 \n Agregamos la localización en español \n Actualizamos varias interfaces de usuario para permitir varios idiomas \n Agregamos nuevas canciones \n Corrección de errores \n ---------------------------- \n Puedes consultar todas las notas de los parches en nuestra página de novedades en Steam"; // string id : 7            
             uiController.creditsText.text = "Créditos"; // string id : 8
             uiController.newsText.text = "NUEVO"; // string id : 9
             uiController.difficultyText.text = "Dificultad:"; // string id : 10
@@ -709,103 +641,107 @@ public class Translator : MonoBehaviour
             uiController.difficultyDropdownText.text = uiController.difficultyPicker.options[uiController.difficultyPicker.value].text; // set current difficulty label
             uiController.idleChessStoryLogoText.text = "Idle Chess Story"; ; // string id : 14
             //
-            uiController.leaderboard2Text.text = "***"; // string id : 15
-            uiController.nameText.text = "***"; // string id : 16
-            uiController.ratingText.text = "***"; // string id : 17
-            uiController.rankText.text = "***"; // string id : 18
-            uiController.eloText.text = "***"; // string id : 19
+            uiController.leaderboard2Text.text = "Clasificación"; // string id : 15
+            uiController.nameText.text = "Nombre"; // string id : 16
+            uiController.ratingText.text = "Puntuación"; // string id : 17
+            uiController.rankText.text = "Clasificación"; // string id : 18
+            uiController.eloText.text = "La puntuación *ELO se calcula de acuerdo con el sistema de puntuación de la FIDE"; // string id : 19
             //
-            uiController.settings2Text.text = "***"; // string id : 20
-            uiController.volumeText.text = "***"; // string id : 21
-            uiController.muteSoundText.text = "***"; // string id : 22 
-            uiController.muteMusicText.text = "***"; // string id : 23
-            uiController.cameraModeText.text = "***"; // string id : 24
-            uiController.cameraModePicker.options[0].text = "***";  // string id : 25
-            uiController.cameraModePicker.options[1].text = "***";  // string id : 26
+            uiController.settings2Text.text = "Configuración"; // string id : 20
+            uiController.volumeText.text = "Volumen"; // string id : 21
+            uiController.muteSoundText.text = "Silenciar el sonido"; // string id : 22 
+            uiController.muteMusicText.text = "Silenciar la música"; // string id : 23
+            uiController.cameraModeText.text = "Módo de la cámara"; // string id : 24
+            uiController.cameraModePicker.options[0].text = "Normal";  // string id : 25
+            uiController.cameraModePicker.options[1].text = "Seguimiento";  // string id : 26
             uiController.cameraModeDropdownText.text = uiController.cameraModePicker.options[uiController.cameraModePicker.value].text; // set current camera mode label
-            uiController.restartText.text = "***"; // string id : 27
-            uiController.exitGameText.text = "***"; // string id : 28
-            uiController.endGameConfirmationText.text = "***"; // string id : 29
-            uiController.forfeitText.text = "***"; // string id : 30
-            uiController.cancelText.text = "***"; // string id : 31
+            uiController.restartText.text = "Reiniciar"; // string id : 27
+            uiController.exitGameText.text = "Salir del juego"; // string id : 28
+            uiController.endGameConfirmationText.text = "¿Terminamos la partida?"; // string id : 29
+            uiController.forfeitText.text = "Rendirse"; // string id : 30
+            uiController.cancelText.text = "Cancelar"; // string id : 31
             //
-            uiController.creditsTitleText.text = "***"; // string id : 32
-            uiController.leadDevelopersText.text = "***"; // string id : 33
-            uiController.musicText.text = "***"; // string id : 34
-            uiController.localizationText.text = "***"; // string id : 35
-            uiController.spanishText.text = "***"; // string id : 36
+            uiController.creditsTitleText.text = "Créditos"; // string id : 32
+            uiController.leadDevelopersText.text = "Desarrolladores principales"; // string id : 33
+            uiController.musicText.text = "Música"; // string id : 34
+            uiController.localizationText.text = "Localización"; // string id : 35
+            uiController.spanishText.text = "Español"; // string id : 36
             //
-            uiController.tribesText.text = "***"; // string id : 37
-            uiController.shopText.text = "***"; // string id : 38
-            uiController.fightText.text = "***"; // string id : 39
-            uiController.settings3Text.text = "***"; // string id : 40
-            uiController.helpText.text = "***"; // string id : 41
+            uiController.tribesText.text = "Tribus"; // string id : 37
+            uiController.shopText.text = "Tienda"; // string id : 38
+            uiController.fightText.text = "Lucha"; // string id : 39
+            uiController.settings3Text.text = "Configuración"; // string id : 40
+            uiController.helpText.text = "Ayuda"; // string id : 41
             //
-            uiController.CurrentRoundText.text = "***"; // string id : 42
-            uiController.steamBuildVersionText.text = "***"; // string id : 43
+            uiController.CurrentRoundText.text = "Ronda"; // string id : 42
+            uiController.steamBuildVersionText.text = "Steam Build:"; // string id : 43
             //
-            uiController.helperTipContainer.helperTips[0] = "***"; // string id : 47
-            uiController.helperTipContainer.helperTips[1] = "***"; // string id : 48
-            uiController.helperTipContainer.helperTips[2] = "***"; // string id : 49
-            uiController.helperTipContainer.helperTips[3] = "***"; // string id : 50
-            uiController.helperTipContainer.helperTips[4] = "***"; // string id : 51
-            uiController.helperTipContainer.helperTips[5] = "***"; // string id : 52
-            uiController.helperTipContainer.helperTips[6] = "***"; // string id : 53
-            uiController.helperTipContainer.helperTips[7] = "***"; // string id : 54
-            uiController.helperTipContainer.helperTips[8] = "***"; // string id : 55
-            uiController.helperTipContainer.helperTips[9] = "***"; // string id : 56
-            uiController.helperTipContainer.helperTips[10] = "***";// string id : 57
-            uiController.helperTipContainer.helperTips[11] = "***"; // string id : 58
-            uiController.helperTipContainer.helperTips[12] = "***"; // string id : 59
-            uiController.helperTipContainer.helperTips[13] = "***"; // string id : 60
-            uiController.helperTipContainer.helperTips[14] = "***"; // string id : 61
-            uiController.helperTipContainer.helperTips[15] = "***"; // string id : 62
-            uiController.helperTipContainer.helperTips[16] = "***"; // string id : 63
-            uiController.helperTipContainer.helperTips[17] = "***"; // string id : 64
-            uiController.helperTipContainer.helperTips[18] = "***"; // string id : 65
-            uiController.helperTipContainer.helperTips[19] = "***"; // string id : 66
-            uiController.helperTipContainer.helperTips[20] = "***"; // string id : 67
-            uiController.helperTipContainer.helperTips[21] = "***"; // string id : 68
-            uiController.helperTipContainer.helperTips[22] = "***"; // string id : 69
-            uiController.helperTipContainer.helperTips[23] = "***"; // string id : 70
-            uiController.helperTipContainer.helperTips[24] = "***"; // string id : 71
-            uiController.helperTipContainer.helperTips[25] = "***"; // string id : 72
-            uiController.helperTipContainer.helperTips[26] = "***"; // string id : 73
-            uiController.helperTipContainer.helperTips[27] = "***"; // string id : 74 
-            uiController.helperTipContainer.helperTips[28] = "***"; // string id : 75
-            uiController.helperTipContainer.helperTips[29] = "***"; // string id : 76
-            uiController.helperTipContainer.helperTips[30] = "***"; // string id : 77
-            uiController.helperTipContainer.helperTips[31] = "***"; // string id : 78
-            uiController.helperTipContainer.helperTips[32] = "***"; // string id : 79
-            uiController.helperTipContainer.helperTips[33] = "***"; // string id : 80
-            uiController.helperTipContainer.helperTips[34] = "***"; // string id : 81
+            uiController.helperTipContainer.helperTips[0] = "Idle Chess Story es un juego de estrategia tipo rogue muy gratificante."; // string id : 47
+            uiController.helperTipContainer.helperTips[1] = "Los jugadores se enfrentan a jugadores con IA en un combate con el objetivo de alcanzar la mayor cantidad de rondas posible."; // string id : 48
+            uiController.helperTipContainer.helperTips[2] = "Criaturas de toda la galaxia se acercan para participar en el torneo anual de Idle Chess."; // string id : 49
+            uiController.helperTipContainer.helperTips[3] = "En Idle Chess controlas un equipo de unidades de ajedrez con habilidades especiales a fin de vencer a tus adversarios y aumentar tu puntuación."; // string id : 50
+            uiController.helperTipContainer.helperTips[4] = "En la fase de compra, eliges las unidades que quieres comprar y las colocas en el tablero de ajedrez."; // string id : 51
+            uiController.helperTipContainer.helperTips[5] = "En la fase de lucha, tus unidades luchan a muerte con las unidades enemigas de manera automática."; // string id : 52
+            uiController.helperTipContainer.helperTips[6] = "El jugador con la última unidad sobreviviente gana el duelo y recibe como recompensa un valioso botín de oro."; // string id : 53
+            uiController.helperTipContainer.helperTips[7] = "¡Cuidado con perder todas tus unidades! Si tu HP llega a 0 se termina el juego."; // string id : 54
+            uiController.helperTipContainer.helperTips[8] = "Cada unidad pertenece a dos tribus. Reúne la suficiente cantidad de unidades de la misma tribu para que tus aliados desbloqueen poderosos bonus."; // string id : 55
+            uiController.helperTipContainer.helperTips[9] = "Invierte tu oro con prudencia. Compra unidades del mismo tipo para poder obtener rápidamente los bonus para controlar a tu enemigo."; // string id : 56
+            uiController.helperTipContainer.helperTips[10] = "Invierte tu oro con prudencia en unidades del mismo tipo. Así podrás acceder rápidamente a los bonus y controlar a tu enemigo.";// string id : 57
+            uiController.helperTipContainer.helperTips[11] = "Avanza en la tabla de clasificación y conquista todos los logros de Steam."; // string id : 58
+            uiController.helperTipContainer.helperTips[12] = "Tu puntuación refleja tu desempeño. Aprende más acerca del juego, domina una tribu y aplasta a tus adversarios."; // string id : 59
+            uiController.helperTipContainer.helperTips[13] = "Las unidades van aumentando su concentración. Cuando alcanzan su concentración máxima, liberan su energía interna y pueden cambiar el resultado de la batalla."; // string id : 60
+            uiController.helperTipContainer.helperTips[14] = "Las habilidades llegan a su concentración máxima, se liberan y vuelven a la concentración cero."; // string id : 61
+            uiController.helperTipContainer.helperTips[15] = "Con el tiempo, las unidades van regenerando su concentración lentamente."; // string id : 62
+            uiController.helperTipContainer.helperTips[16] = "Después de un ataque automático, las unidades regeneran su concentración más rápido."; // string id : 63
+            uiController.helperTipContainer.helperTips[17] = "Las habilidades pueden cambiar rápidamente el resultado de un combate."; // string id : 64
+            uiController.helperTipContainer.helperTips[18] = "Idle Chess Story contiene una tabla de clasificaciones y logros de Steam."; // string id : 65
+            uiController.helperTipContainer.helperTips[19] = "Puedes probar tres dificultades. Con las dificultades mayores, aumenta tu MMR."; // string id : 66
+            uiController.helperTipContainer.helperTips[20] = "El MMR se usa en la puntuación de tu desempeño."; // string id : 67 
+            uiController.helperTipContainer.helperTips[21] = "Te recomendamos que pruebes los distintos modos de cámara."; // string id : 68
+            uiController.helperTipContainer.helperTips[22] = "¿El sonido está muy fuerte o te molesta? Puedes bajarlo o silenciarlo en en menú de configuración."; // string id : 69
+            uiController.helperTipContainer.helperTips[23] = "Para acceder al menú configuración, presiona la tecla de escape del teclado."; // string id : 70
+            uiController.helperTipContainer.helperTips[24] = "Ten en cuenta que ICS es un independiente creado por dos personas. Se necesita mucho tiempo para desarrollar un juego independiente."; // string id : 71
+            uiController.helperTipContainer.helperTips[25] = "Síguenos en Facebook https://www.facebook.com/Idle-Chess-Story-420264688708246/"; // string id : 72
+            uiController.helperTipContainer.helperTips[26] = "Consulta el panel de las tribus para entender los bonus de cada tribu."; // string id : 73
+            uiController.helperTipContainer.helperTips[27] = "Presiona el botón de actualizar la compra para acceder a nuevas opciones de compra."; // string id : 74 
+            uiController.helperTipContainer.helperTips[28] = "Use el botón +1 unidad de la tienda para obtener espacio para otra unidad."; // string id : 75
+            uiController.helperTipContainer.helperTips[29] = "La cantidad de unidades que puedes poner en juego aumenta cuando avanzas en las rondas."; // string id : 76
+            uiController.helperTipContainer.helperTips[30] = "No es posible guardar tu progreso hasta que no hayas terminado una ronda (tipo Rogue)."; // string id : 77
+            uiController.helperTipContainer.helperTips[31] = "Combina 3 unidades del mismo tipo para que suban de nivel."; // string id : 78
+            uiController.helperTipContainer.helperTips[32] = "Hay unidades de nivel 1, nivel 2 y nivel 3."; // string id : 79
+            uiController.helperTipContainer.helperTips[33] = "Cada unidad dispone de un inventario para almacenar los objetos que le das."; // string id : 80
+            uiController.helperTipContainer.helperTips[34] = "De vez en cuando, las unidades dejan caer objetos al tablero que puedes recoger."; // string id : 81
+            uiController.helperTipContainer.RefreshTip();
             //
-            uiController.assassinTooltipText.text = "***"; // string id : 82
-            uiController.beastTooltipText.text = "***"; // string id : 83
-            uiController.elementalTooltipText.text = "***"; // string id : 84
-            uiController.guardianTooltipText.text = "***"; // string id : 85
-            uiController.structureTooltipText.text = "***"; // string id : 86
-            uiController.undeadTooltipText.text = "***"; // string id : 87
-            uiController.warriorTooltipText.text = "***"; // string id : 88
-            uiController.wizardTooltipText.text = "***"; // string id : 89
+            uiController.assassinTooltipText.text = "Asesinos \n (3)Honor entre ladrones \n + Gana más oro por muerte \n (6)Operación encubierta \n + Aumenta el poder de evasión de tus unidades"; // string id : 82
+            uiController.beastTooltipText.text = "Bestias \n (3)Llamado de la manada \n + Aumenta la probabilidad de golpe crítico \n (6)Inspiración frenética \n + Las unidades adquieren la habilidad de robar vidas"; // string id : 83
+            uiController.elementalTooltipText.text = "Elementales \n (3)Naturalista \n + Bonus de aumento de la concentración \n (6)Poder ilimitado \n + Aumenta el daño físico y mágico"; // string id : 84
+            uiController.guardianTooltipText.text = "Guardianes \n (3) Absorción \n + Disminuye el daño físico \n (6)Brillo divino \n + Bonus de regeneración de la concentración"; // string id : 85
+            uiController.structureTooltipText.text = "Estructuras \n (3)Aceite hirviendo \n +Aumenta el poder de represalia de la unidad \n (6)Fortificación infranqueable \n + Aumenta la armadura de la unidad"; // string id : 86
+            uiController.undeadTooltipText.text = "No muertos \n (3)Maneras malvadas \n - Reduce la armadura del enemigo \n (6)Propuesta oscura \n + Aumenta el daño de los hechizos"; // string id : 87
+            uiController.warriorTooltipText.text = "Guerreros \n (3)Primeros auxilios \n + Aumenta la regeneración de HP \n (6)Fuerza bárbara \n + Aumenta del daño físico"; // string id : 88
+            uiController.wizardTooltipText.text = "Brujos \n (3)Ventaja intelectual \n + Aumenta el daño mágico \n (6)Dominio de las artes \n + Reduce el daño mágico recibido"; // string id : 89
+            uiController.selectedUnitPanel_SellUnitText.text = "Vender unidad"; // string id : 144
             //
-            uiController.selectedUnitPanel_InformationText_ARMOR.text = "***"; // string id : 90
-            uiController.selectedUnitPanel_InformationText_RETALIATION.text = "***"; // string id : 91
-            uiController.selectedUnitPanel_InformationText_CONCENTRATION.text = "***"; // string id : 92
-            uiController.selectedUnitPanel_InformationText_TIER.text = "***"; // string id : 93
-            uiController.selectedUnitPanel_AbilityText.text = "***"; // string id : 94
-            uiController.selectedUnitPanel_TribesText.text = "***"; // string id : 95
+            uiController.selectedUnitPanel_InformationText_ARMOR.text = "Armadura:"; // string id : 90
+            uiController.selectedUnitPanel_InformationText_RETALIATION.text = "Represalia:"; // string id : 91
+            uiController.selectedUnitPanel_InformationText_CONCENTRATION.text = "Concentración:"; // string id : 92
+            uiController.selectedUnitPanel_InformationText_TIER.text = "Nivel:"; // string id : 93
+            uiController.selectedUnitPanel_AbilityText.text = "Habilidad:"; // string id : 94
+            uiController.selectedUnitPanel_TribesText.text = "Tribus:"; // string id : 95
             //
-            uiController.randomTipText.text = "***"; // string id : 133
-            uiController.help2Text.text = "***"; // string id : 134
+            uiController.randomTipText.text = "Consejo al azar"; // string id : 133
+            uiController.help2Text.text = "Ayuda:"; // string id : 134
             //
-            uiController.combatLogText.text = "***"; // string id : 135
-            uiController.DPSText.text = "***"; // string id : 136
-                                               //
-            uiController.performanceReportText.text = "***"; // string id : 137
-            uiController.performanceReport2Text.text = "***"; // string id : 138
-            uiController.mainMenuText.text = "***"; // string id : 139
-            uiController.mainMenu2Text.text = "***"; // string id : 140
+            uiController.combatLogText.text = "Registro de combate"; // string id : 135
+            uiController.DPSText.text = "DPS"; // string id : 136
+            //
+            uiController.mainMenuText.text = "Menú principal"; // string id : 139
+            uiController.mainMenu2Text.text = "Menú principal"; // string id : 140
+            //                                                    //
+            uiController.continueText.text = "Continuar"; // string id : 145
+
         }
+        uiController.UpdateGameStatusText();
     }
 }

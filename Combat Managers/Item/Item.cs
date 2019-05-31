@@ -130,23 +130,23 @@ public class Item
 
         if (ap != 0)
         {
-            nonZeroStats.Add(translator.TranslateStat(Stat.AP,uiController.currentLanguage) + "+" + ap.ToString());
+            nonZeroStats.Add("AP: +" + ap.ToString());
         }
         if (sp != 0)
         {
-            nonZeroStats.Add(translator.TranslateStat(Stat.SP, uiController.currentLanguage) + "+" + sp.ToString());
+            nonZeroStats.Add("SP: +" + sp.ToString());
         }
         if (armor != 0)
         {
-            nonZeroStats.Add(translator.TranslateStat(Stat.ARMOR, uiController.currentLanguage) + "+" + armor.ToString());
+            nonZeroStats.Add("Armor: +" + armor.ToString());
         }
         if (retaliation != 0)
         {
-            nonZeroStats.Add(translator.TranslateStat(Stat.RETALIATION, uiController.currentLanguage) + "+" + retaliation.ToString());
+            nonZeroStats.Add("Retaliation: +" + retaliation.ToString());
         }
         if (maxhp != 0)
         {
-            nonZeroStats.Add(translator.TranslateStat(Stat.MAXHP, uiController.currentLanguage) + "+" + maxhp.ToString());
+            nonZeroStats.Add("HP: +" + maxhp.ToString());
         }
 
         bool firstLine = true;

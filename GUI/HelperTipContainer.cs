@@ -22,7 +22,7 @@ public class HelperTipContainer : MonoBehaviour
         helperTips[6] = "The player with the last unit surviving wins the duel and is rewarded a hefty gold bounty";
         helperTips[7] = "Careful with losing all your units!Reach 0 HP and the game is over";
         helperTips[8] = "Every unit belongs to two tribes. Gather enough units of the same tribe and unlock powerful bonuses for your allies";
-        helperTips[9] = "Having 3 or 6 units of the same tribe is enough to unlock theiir respective tribal bonuses";
+        helperTips[9] = "Having 3 or 6 units of the same tribe is enough to unlock their respective tribal bonuses";
         helperTips[10] = "Use your gold wisely on units of the same type to quickly attain these bonuses to take control over your enemy";
         helperTips[11] = "Work your way up the leaderboard rankings and earn all the steam achievements!";
         helperTips[12] = "Your ranking reflects on your performance. Increase your knowledge of the game by mastering a tribe and crushing your opponents";

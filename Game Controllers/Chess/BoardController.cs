@@ -810,8 +810,6 @@ public class BoardController : MonoBehaviour
         uiController.ShopPanelTooltipSubPanel.SetActive(false);
         uiController.hudCanvasShopPanel.gameObject.SetActive(false);
         sessionLogger.CalculateMaxDeployedTribe();
-        uiController.reportDefeatPanel_TotalUnitsDeployedText.text =  translator.TranslateStringSnippet("You deployed: ", uiController.currentLanguage) + sessionLogger.unitsDeployedToFight.ToString() + translator.TranslateStringSnippet(" unit(s)",uiController.currentLanguage);
-        uiController.reportDefeatPanel_MostTribesDeployedText.text = translator.TranslateStringSnippet("Most deployed tribe: ", uiController.currentLanguage) + sessionLogger.mostDeployedTribeAmount + " " + translator.TranslateTribe(sessionLogger.mostDeployedTribe,uiController.currentLanguage);
         uiController.reportDefeatPanel_MostTribeDeployedIconVisualizer.SetImage(sessionLogger.mostDeployedTribe, true);
         steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + (int)sessionLogger.mmrChange);
         steamAchievements.IncrementDeployedTribesStats(sessionLogger.TribesDeployedToFightTracker);
@@ -828,8 +826,6 @@ public class BoardController : MonoBehaviour
         uiController.ShopPanelTooltipSubPanel.SetActive(false);
         uiController.hudCanvasShopPanel.gameObject.SetActive(false);
         sessionLogger.CalculateMaxDeployedTribe();
-        uiController.reportVictoryPanel_TotalUnitsDeployedText.text = translator.TranslateStringSnippet("You deployed: ", uiController.currentLanguage) + sessionLogger.unitsDeployedToFight.ToString() + translator.TranslateStringSnippet(" unit(s)", uiController.currentLanguage);
-        uiController.reportVictoryPanel_MostTribesDeployedText.text = translator.TranslateStringSnippet("Most deployed tribe: ", uiController.currentLanguage) + " " + translator.TranslateTribe(sessionLogger.mostDeployedTribe, uiController.currentLanguage);
         uiController.reportVictoryPanel_MostTribeDeployedIconVisualizer.SetImage(sessionLogger.mostDeployedTribe, true);
         steamLeaderboard.SetLeaderBoardScore(playerController.playerMMR + (int)sessionLogger.mmrChange);
         steamAchievements.IncrementGamesWon();

@@ -136,11 +136,7 @@ public class UiController : MonoBehaviour
     public Camera shopCam4;
     public Camera shopCam5;
     public Camera shopCam6;
-    public Text reportDefeatPanel_TotalUnitsDeployedText;
-    public Text reportDefeatPanel_MostTribesDeployedText;
     public DynamicTribeIconVisualizer reportDefeatPanel_MostTribeDeployedIconVisualizer;
-    public Text reportVictoryPanel_TotalUnitsDeployedText;
-    public Text reportVictoryPanel_MostTribesDeployedText;
     public DynamicTribeIconVisualizer reportVictoryPanel_MostTribeDeployedIconVisualizer;
     public GameObject ShopPanelTooltipSubPanel;
     public Camera mainCamera;
@@ -226,10 +222,9 @@ public class UiController : MonoBehaviour
     public Text help2Text;
     public Text combatLogText;
     public Text DPSText;
-    public Text performanceReportText;
-    public Text performanceReport2Text;
     public Text mainMenuText;
     public Text mainMenu2Text;
+    public Text continueText;
 
     private void Awake()
     {
@@ -260,8 +255,13 @@ public class UiController : MonoBehaviour
 
         EmptyItem = new Item(ItemName.NO_ITEM);
         tooltipOffsetVector = new Vector3(xOffsetTooltip, yOffsetTooltip, 0);
-
-     
+    }
+    private void Start()
+    {
+        int preferredLanguageIndex = PlayerPrefs.GetInt("language");
+        Language preferredLanguage = (Language)preferredLanguageIndex;
+        currentLanguage = preferredLanguage;
+        translator.SwapLanguage(false, preferredLanguage);
     }
 
     public void GetWorldControllers()
@@ -1159,6 +1159,11 @@ public class UiController : MonoBehaviour
     public void UpdateGameStatusText(GameStatus status)
     {
        ChangeGameStatusDisplayText(translator.TranslateGameStatus(status,currentLanguage));
+    }
+
+    public void UpdateGameStatusText()
+    {
+        ChangeGameStatusDisplayText(translator.TranslateGameStatus(boardController.gameStatus, currentLanguage));
     }
 
     public void ChangeGameStatusDisplayText(string str)
